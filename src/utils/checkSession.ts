@@ -14,8 +14,8 @@ export async function checkSession(supabase: ReturnType<typeof createClient>) {
   if (!user) return { userId: null, rolle: null, userEmail: null };
 
   const { data: profile, error } = await supabase
-    .from("profile")
-    .select("rollen", { head: false }) // ✅ wichtige Ergänzung
+    .from("profiles")
+    .select("rolle")
     .eq("id", user.id)
     .single();
 
@@ -25,7 +25,7 @@ export async function checkSession(supabase: ReturnType<typeof createClient>) {
 
   return {
     userId: user.id,
-    rolle: profile?.rollen || null,
+    rolle: profile?.rolle || null,
     userEmail: user.email ?? null,
   };
 }

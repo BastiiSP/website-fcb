@@ -46,32 +46,45 @@ export default function KalenderSeite() {
     string | null
   >(null);
 
-  // 🔐 Session prüfen und Rolle laden
+  // Redirect-State
+  const [redirectMessage, setRedirectMessage] = useState<string | null>(null);
+
+  // Session prüfen und Rolle laden
   useEffect(() => {
-    const checkSession = async () => {
+    const pruefeZugang = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
 
-      if (session?.user) {
-        setUserId(session.user.id);
-        setIsLoggedIn(true);
-
-        const { data: profile } = await supabase
-          .from("profile")
-          .select("rolle", { head: false }) // 🔧 Fehlervermeidung
-          .eq("id", session.user.id)
-          .single();
-
-        if (profile?.rolle) setRolle(profile.rolle);
-
-        fetchEvents(supabase, setEvents);
-      } else {
-        setIsLoggedIn(false);
+      if (!session?.user) {
+        window.location.href = "/login";
+        return;
       }
+
+      setUserId(session.user.id);
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("rolle")
+        .eq("id", session.user.id)
+        .single();
+
+      const nutzerRolle = profile?.rolle ?? null;
+
+      if (nutzerRolle === "ausstehend" || !nutzerRolle) {
+        setRedirectMessage(
+          "Dein Konto wartet noch auf Freigabe durch den Vorstand."
+        );
+        return;
+      }
+
+      setRolle(nutzerRolle);
+      setIsLoggedIn(true);
+      fetchEvents(supabase, setEvents);
     };
 
-    checkSession();
+    pruefeZugang();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 🗑️ Termin löschen
@@ -139,8 +152,18 @@ export default function KalenderSeite() {
       <main className="p-4 w-full overflow-x-auto bg-[var(--background)] text-[var(--foreground)]">
         <h1 className="text-2xl font-bold mb-4">📅 Platzbelegung</h1>
 
-        {/* 🔒 Wenn nicht eingeloggt, Login-Hinweis */}
-        {!isLoggedIn ? (
+        {/* Konto ausstehend */}
+        {redirectMessage ? (
+          <div className="text-center font-medium space-y-4">
+            <p className="text-yellow-700">{redirectMessage}</p>
+            <a
+              href="/"
+              className="inline-block bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded transition"
+            >
+              Zur Startseite
+            </a>
+          </div>
+        ) : !isLoggedIn ? (
           <div className="text-center text-red-600 font-medium space-y-4">
             <p>
               Du bist nicht eingeloggt. Bitte logge dich ein, um die

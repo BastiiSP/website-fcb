@@ -13,8 +13,8 @@ export async function getUserRolle(
   userId: string
 ): Promise<string | null> {
   const { data, error } = await supabase
-    .from("profile")
-    .select("rolle", { head: false }) // ⬅️ wichtig: kein HEAD-Request
+    .from("profiles")
+    .select("rolle")
     .eq("id", userId)
     .single();
 

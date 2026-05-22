@@ -1,37 +1,28 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import BenutzerListe from "@/components/BenutzerListe";
 
 export default function VorstandPage() {
   const supabase = createClient();
-  const router = useRouter();
 
   const [loading, setLoading] = useState(true);
   const [zugelassen, setZugelassen] = useState(false);
+  const [eigeneRolle, setEigeneRolle] = useState("");
   const [activeTab, setActiveTab] = useState<"benutzer" | "buchungen">(
     "benutzer"
   );
 
-  const isLocalhost =
-    typeof window !== "undefined" && window.location.hostname === "localhost";
-
   useEffect(() => {
     const checkAccess = async () => {
-      if (isLocalhost) {
-        setZugelassen(true);
-        setLoading(false);
-        return;
-      }
-
       const session = await checkSession(supabase);
-      const rolle = session?.rolle;
+      const rolle = session?.rolle ?? "";
 
       if (rolle === "vorstand" || rolle === "admin") {
         setZugelassen(true);
+        setEigeneRolle(rolle);
       } else {
         setZugelassen(false);
       }
@@ -40,12 +31,13 @@ export default function VorstandPage() {
     };
 
     checkAccess();
-  }, [supabase, isLocalhost]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (loading) {
     return (
       <main className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">🔄 Lade Inhalte …</p>
+        <p className="text-lg">Lade Inhalte …</p>
       </main>
     );
   }
@@ -54,7 +46,7 @@ export default function VorstandPage() {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4">
-          <p className="text-xl font-semibold">🚫 Kein Zugriff</p>
+          <p className="text-xl font-semibold">Kein Zugriff</p>
           <p className="text-sm opacity-75">
             Diese Seite ist nur für Vorstandsmitglieder und Admins zugänglich.
           </p>
@@ -66,10 +58,9 @@ export default function VorstandPage() {
   return (
     <main className="min-h-screen p-4 sm:p-8">
       <h1 className="text-2xl font-bold mb-6">
-        Vorstandsbereich - Vereinsverwaltung
+        Vorstandsbereich – Vereinsverwaltung
       </h1>
 
-      {/* Tabs – mobil untereinander, ab sm nebeneinander */}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-6">
         <button
           className={`px-4 py-2 rounded border transition w-full sm:w-auto ${
@@ -79,7 +70,7 @@ export default function VorstandPage() {
           }`}
           onClick={() => setActiveTab("benutzer")}
         >
-          👥 Benutzer
+          Benutzer
         </button>
         <button
           className={`px-4 py-2 rounded border transition w-full sm:w-auto ${
@@ -89,14 +80,13 @@ export default function VorstandPage() {
           }`}
           onClick={() => setActiveTab("buchungen")}
         >
-          📅 Buchungen
+          Buchungen
         </button>
       </div>
 
-      {/* Inhalte */}
       {activeTab === "benutzer" && (
         <section>
-          <BenutzerListe />
+          <BenutzerListe eigeneRolle={eigeneRolle} />
         </section>
       )}
 
