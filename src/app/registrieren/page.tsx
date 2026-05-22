@@ -1,14 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+import { useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 
 export default function Registrierungsseite() {
   const supabase = createClient();
-  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [passwort, setPasswort] = useState("");
@@ -20,8 +17,6 @@ export default function Registrierungsseite() {
   const [vorname, setVorname] = useState("");
   const [nachname, setNachname] = useState("");
   const [telefonnummer, setTelefonnummer] = useState("");
-  const [mannschaften, setMannschaften] = useState<string[]>([]);
-  const [sonstigeMannschaft, setSonstigeMannschaft] = useState("");
 
   const [passwortStarke, setPasswortStarke] = useState(0);
   const [passwortFeedback, setPasswortFeedback] = useState({
@@ -31,29 +26,6 @@ export default function Registrierungsseite() {
     hasSymbol: false,
     hasMinLength: false,
   });
-
-  const alleMannschaften = [
-    "Herren 1",
-    "Herren 2",
-    "A1-Jugend",
-    "B1-Jugend",
-    "B2-Jugend",
-    "C1-Jugend",
-    "C2-Jugend",
-    "D1-Jugend",
-    "E-Jugend",
-    "F-Jugend",
-    "G-Jugend",
-    "Sonstige",
-  ];
-
-  const toggleMannschaft = (wert: string) => {
-    if (mannschaften.includes(wert)) {
-      setMannschaften(mannschaften.filter((m) => m !== wert));
-    } else {
-      setMannschaften([...mannschaften, wert]);
-    }
-  };
 
   const handlePasswortChange = (value: string) => {
     setPasswort(value);
@@ -81,8 +53,8 @@ export default function Registrierungsseite() {
     setFehler("");
     setErfolg("");
 
-    if (!vorname || !nachname || !telefonnummer) {
-      setFehler("❌ Bitte alle Pflichtfelder ausfüllen.");
+    if (!vorname || !nachname) {
+      setFehler("❌ Bitte Vor- und Nachname ausfüllen.");
       return;
     }
 
@@ -99,9 +71,7 @@ export default function Registrierungsseite() {
         data: {
           vorname,
           nachname,
-          telefonnummer,
-          mannschaften,
-          sonstige_mannschaft: sonstigeMannschaft || null,
+          telefonnummer: telefonnummer || null,
         },
       },
     });
@@ -146,7 +116,7 @@ export default function Registrierungsseite() {
           <div>
             <input
               type="tel"
-              placeholder="Telefonnummer"
+              placeholder="Telefonnummer (optional)"
               value={telefonnummer}
               onChange={(e) => setTelefonnummer(e.target.value)}
               className="w-full p-2 border rounded text-[var(--foreground)]"
@@ -155,38 +125,6 @@ export default function Registrierungsseite() {
               ℹ️ Wird benötigt, um dich bei kurzfristigen Änderungen zu
               erreichen.
             </p>
-          </div>
-
-          {/* Mannschaftsauswahl */}
-          <div>
-            <label className="block font-medium mb-1">
-              Mannschaftsauswahl (Mehrfachauswahl möglich)
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {alleMannschaften.map((m) => (
-                <label key={m} className="text-sm">
-                  <input
-                    type="checkbox"
-                    checked={mannschaften.includes(m)}
-                    onChange={() => toggleMannschaft(m)}
-                    className="mr-2"
-                  />
-                  {m}
-                </label>
-              ))}
-            </div>
-            <p className="text-xs text-gray-500 mt-1">
-              ℹ️ Wir brauchen diese Info, um dich korrekt zuordnen zu können.
-            </p>
-            {mannschaften.includes("Sonstige") && (
-              <input
-                type="text"
-                placeholder="z. B. Redaktion, Fan, Sponsor, Platzwart"
-                value={sonstigeMannschaft}
-                onChange={(e) => setSonstigeMannschaft(e.target.value)}
-                className="mt-2 w-full p-2 border rounded text-[var(--foreground)]"
-              />
-            )}
           </div>
 
           {/* E-Mail */}

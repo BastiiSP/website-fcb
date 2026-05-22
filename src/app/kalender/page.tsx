@@ -6,7 +6,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { EventDropArg, DateSelectArg, EventClickArg } from "@fullcalendar/core";
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "@/lib/supabaseClient";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light-border.css";
@@ -19,10 +19,7 @@ import BearbeitenModal, { type Buchung } from "@/components/BearbeitenModal";
 import TooltipContent from "@/components/TooltipContent";
 import { fetchEvents } from "@/utils/fetchEvents";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+const supabase = createClient();
 
 export default function KalenderSeite() {
   // 🔁 States für User, Rollen und Events
@@ -63,11 +60,19 @@ export default function KalenderSeite() {
 
       setUserId(session.user.id);
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("rolle")
         .eq("id", session.user.id)
         .single();
+
+      if (profileError) {
+        console.error("Fehler beim Laden des Profils:", profileError.message);
+        setRedirectMessage(
+          "Dein Profil konnte nicht geladen werden. Bitte versuch es erneut."
+        );
+        return;
+      }
 
       const nutzerRolle = profile?.rolle ?? null;
 
