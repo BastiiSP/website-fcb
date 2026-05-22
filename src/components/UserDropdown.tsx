@@ -27,7 +27,7 @@ export default function UserDropdown() {
 
       if (session?.user) {
         const { data: profile } = await supabase
-          .from("profile")
+          .from("profiles")
           .select("*")
           .eq("id", session.user.id)
           .single();
