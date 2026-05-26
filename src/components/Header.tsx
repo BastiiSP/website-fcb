@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import UserDropdown from "@/components/UserDropdown";
+import Navigation from "@/components/Navigation";
 
 export default function Header() {
   return (
@@ -16,10 +17,13 @@ export default function Header() {
           </span>
         </Link>
 
+        {/* Nav-Links in der Mitte – rollenbasiert, nur für trainer/vorstand/admin */}
+        <Navigation />
+
         {/* Rechte Seite (User Dropdown) */}
-        <nav className="flex items-center">
+        <div className="flex items-center">
           <UserDropdown />
-        </nav>
+        </div>
       </div>
     </header>
   );

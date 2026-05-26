@@ -67,8 +67,21 @@ Niemals ohne Rücksprache ändern. Das Rollensystem ist das Herzstück der Zugan
 ### Tabelle: `mitglieder` (Phase 2 – noch nicht implementiert)
 
 Vereinsmitglieder ohne Login-Konto. Wird von Vorstand/Admin gepflegt.
-Felder: id, vorname, nachname, email, telefonnummer, geburtsdatum, eintrittsdatum,
-mitgliedsnummer, status (aktiv/passiv/ehrenamt/gekündigt), mannschaft[], notizen, erstellt_von
+
+| Spalte | Typ | Besonderheit |
+|---|---|---|
+| `id` | UUID | gen_random_uuid(), Primary Key |
+| `mitgliedsnummer` | INTEGER | GENERATED ALWAYS AS IDENTITY – automatisch, kein Input-Feld |
+| `vorname`, `nachname` | TEXT | NOT NULL |
+| `email`, `telefonnummer` | TEXT | optional |
+| `geburtsdatum`, `eintrittsdatum` | DATE | optional |
+| `status` | TEXT | CHECK (aktiv/passiv/ehrenamt/gekündigt), DEFAULT 'aktiv' |
+| `mannschaft` | TEXT[] | optional |
+| `notizen` | TEXT | optional |
+| `erstellt_von` | UUID | FK → auth.users, SET NULL bei Löschung |
+| `created_at`, `updated_at` | TIMESTAMPTZ | auto, updated_at via Trigger |
+
+RLS: SELECT/INSERT/UPDATE/DELETE nur für vorstand und admin. Trainer: kein Zugriff.
 
 ## Code-Regeln
 
@@ -132,6 +145,13 @@ git add -A
 git commit -m "feat: [beschreibung]"
 git push
 ```
+
+## Arbeitsweise: Plan-Modus
+
+Handover-Prompts von Claudian sind für den Plan-Modus formuliert: Sie beschreiben Ziele
+und Anforderungen, keine Implementierungsschritte. Lies den Prompt vollständig, erstelle
+einen strukturierten Plan (Was, in welcher Reihenfolge, warum so) und warte auf Bastis
+Freigabe – erst dann wird Code geschrieben.
 
 ## Session-Ende: Claudian-Update ausgeben
 
