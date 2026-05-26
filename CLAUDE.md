@@ -89,6 +89,7 @@ RLS: SELECT/INSERT/UPDATE/DELETE nur für vorstand und admin. Trainer: kein Zugr
 - **Spaltenname**: `rolle` (Singular, String) – niemals `rollen` (Plural/Array, das war der alte kaputte Name)
 - **TypeScript strict**: Keine `any` Types. Immer explizite Interfaces definieren.
 - **RLS immer aktiv**: Zugangskontrolle läuft in der Datenbank, nicht nur im Frontend
+- **GRANTs nicht vergessen**: Bei jeder neuen Tabelle explizit `GRANT SELECT, INSERT, UPDATE, DELETE ON public.<tabelle> TO authenticated;` ausführen – ohne das greift RLS nie, da Postgres vorher mit „permission denied" abbricht. Bereits zweimal vergessen: `buchungen` (2026-05-22) und `mitglieder` (2026-05-26).
 - **Supabase MCP nutzen**: Für alle Datenbankoperationen den MCP-Server verwenden
 - **Keine direkten DB-Calls ohne RLS-Check** in Server Components
 - **Fehlerbehandlung**: Alle Supabase-Calls mit try/catch und aussagekräftigen Fehlermeldungen

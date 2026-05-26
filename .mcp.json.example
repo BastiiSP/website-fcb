@@ -1,5 +1,16 @@
 {
   "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sbp_xxxxxxxxxxxxxxxxxxxx",
+        "--project-ref",
+        "jktvmckqfklfziszfsxf"
+      ]
+    },
     "resend": {
       "command": "npx",
       "args": ["-y", "resend-mcp"],
