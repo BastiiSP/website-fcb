@@ -43,6 +43,11 @@ export default function Buchungsformular({
       return;
     }
 
+    if (endzeit <= startzeit) {
+      setErrorMessage("❌ Die Endzeit muss nach der Startzeit liegen.");
+      return;
+    }
+
     const startISO = startzeit.toISOString();
     const endISO = endzeit.toISOString();
 
@@ -158,7 +163,9 @@ export default function Buchungsformular({
         {/* ⏱️ Zeitangaben */}
         <div className="flex gap-4 flex-wrap">
           <div>
-            <label className="block text-sm font-medium mb-1">Startzeit</label>
+            <label className="block text-sm font-medium mb-1">
+              Startzeit <span className="text-red-500">*</span>
+            </label>
             <DatePicker
               selected={startzeit}
               onChange={(date) => {
@@ -169,8 +176,8 @@ export default function Buchungsformular({
                   const hatUhrzeit = hours !== 0 || minutes !== 0;
 
                   if (!endzeit && hatUhrzeit) {
-                    const sameTime = new Date(date.getTime());
-                    setEndzeit(sameTime);
+                    const endzeitVorschlag = new Date(date.getTime() + 90 * 60 * 1000);
+                    setEndzeit(endzeitVorschlag);
                   }
                 }
               }}
@@ -186,7 +193,9 @@ export default function Buchungsformular({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Endzeit</label>
+            <label className="block text-sm font-medium mb-1">
+              Endzeit <span className="text-red-500">*</span>
+            </label>
             <DatePicker
               selected={endzeit}
               onChange={(date) => setEndzeit(date)}
@@ -203,22 +212,32 @@ export default function Buchungsformular({
 
         {/* 👥 Person & Mannschaft */}
         <div className="flex gap-4 flex-wrap">
-          <input
-            type="text"
-            value={buchendePerson}
-            onChange={(e) => setBuchendePerson(e.target.value)}
-            placeholder="Name der buchenden Person"
-            required
-            className="form-field bg-[var(--background)] w-full md:w-auto"
-          />
-          <input
-            type="text"
-            value={mannschaft}
-            onChange={(e) => setMannschaft(e.target.value)}
-            placeholder="Mannschaftsname"
-            required
-            className="form-field bg-[var(--background)] w-full md:w-auto"
-          />
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Buchende Person <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={buchendePerson}
+              onChange={(e) => setBuchendePerson(e.target.value)}
+              placeholder="Name der buchenden Person"
+              required
+              className="form-field bg-[var(--background)] w-full md:w-auto"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Mannschaft <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={mannschaft}
+              onChange={(e) => setMannschaft(e.target.value)}
+              placeholder="Mannschaftsname"
+              required
+              className="form-field bg-[var(--background)] w-full md:w-auto"
+            />
+          </div>
         </div>
 
         {/* 📝 Bemerkung */}
@@ -231,12 +250,17 @@ export default function Buchungsformular({
         />
 
         {/* ✅ Absenden */}
-        <button
-          type="submit"
-          className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
-        >
-          Buchung speichern
-        </button>
+        <div className="flex items-center gap-4 flex-wrap">
+          <button
+            type="submit"
+            className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
+          >
+            Buchung speichern
+          </button>
+          <p className="text-xs text-gray-400">
+            <span className="text-red-500">*</span> Pflichtfeld
+          </p>
+        </div>
       </form>
     </>
   );

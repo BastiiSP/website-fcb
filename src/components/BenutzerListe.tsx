@@ -224,10 +224,13 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
               </div>
 
               {expandedUserIds.includes(n.id) && (
-                <div className="mt-3 text-sm space-y-1">
+                <div className="mt-3 text-sm space-y-1 text-gray-600">
                   {n.telefonnummer && <p>Telefon: {n.telefonnummer}</p>}
                   {n.mannschaft && n.mannschaft.length > 0 && (
                     <p>Mannschaft(en): {n.mannschaft.join(", ")}</p>
+                  )}
+                  {!n.telefonnummer && (!n.mannschaft || n.mannschaft.length === 0) && (
+                    <p className="italic text-gray-400">Keine weiteren Informationen vorhanden.</p>
                   )}
                 </div>
               )}

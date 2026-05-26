@@ -46,6 +46,16 @@ export default function KalenderSeite() {
   // Redirect-State
   const [redirectMessage, setRedirectMessage] = useState<string | null>(null);
 
+  // Mobile-Erkennung für responsiven Kalender-Header
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const pruefeBreite = () => setIsMobile(window.innerWidth < 768);
+    pruefeBreite();
+    window.addEventListener("resize", pruefeBreite);
+    return () => window.removeEventListener("resize", pruefeBreite);
+  }, []);
+
   // Session prüfen und Rolle laden
   useEffect(() => {
     const pruefeZugang = async () => {
@@ -189,11 +199,11 @@ export default function KalenderSeite() {
               initialView="timeGridWeek"
               locale="de"
               firstDay={1}
-              headerToolbar={{
-                left: "prev,next today",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay",
-              }}
+              headerToolbar={
+                isMobile
+                  ? { left: "prev,next", center: "title", right: "today" }
+                  : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" }
+              }
               slotMinTime="08:00:00"
               slotMaxTime="22:30:00"
               allDaySlot={false}
