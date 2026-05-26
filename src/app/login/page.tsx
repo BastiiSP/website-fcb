@@ -1,14 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { createClient } from "@/lib/supabaseClient";
-import ThemeToggle from "@/components/ThemeToggle";
 
 export default function LoginPage() {
   const supabase = createClient();
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [passwort, setPasswort] = useState("");
   const [fehler, setFehler] = useState("");

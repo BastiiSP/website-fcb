@@ -20,8 +20,13 @@ export default function ConfirmEmailPage() {
         </p>
 
         <p className="text-sm">
-          Du bist nun automatisch eingeloggt. Oben rechts auf der Startseite
-          siehst du deinen Login-Status.
+          <strong>Dein Konto wird nun vom Vorstand geprüft.</strong> Sobald es
+          freigeschaltet ist, kannst du Plätze buchen und auf die internen
+          Bereiche zugreifen.
+        </p>
+
+        <p className="text-sm text-gray-500">
+          Wir melden uns bei dir, sobald es so weit ist.
         </p>
 
         <Link

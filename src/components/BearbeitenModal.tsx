@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export type Buchung = {
   id: string;
@@ -18,7 +19,7 @@ export type Buchung = {
 type Props = {
   show: boolean;
   onClose: () => void;
-  supabase: any;
+  supabase: SupabaseClient;
   initialData: Buchung | null;
   onSave: () => void;
 };

@@ -1,7 +1,9 @@
 import { getEventColor } from "./getEventColor";
-import { formatKalenderTitel } from "./formatKalenderTitel"; // Optional: falls noch verwendet
+import { SupabaseClient } from "@supabase/supabase-js";
+import type { EventInput } from "@fullcalendar/core";
+import type { Buchung } from "@/components/BearbeitenModal";
 
-export async function fetchEvents(supabase: any, setEvents: (events: any[]) => void) {
+export async function fetchEvents(supabase: SupabaseClient, setEvents: (events: EventInput[]) => void) {
   const { data, error } = await supabase.from("buchungen").select("*");
 
   if (error) {
@@ -9,7 +11,7 @@ export async function fetchEvents(supabase: any, setEvents: (events: any[]) => v
     return;
   }
 
-  const formatted = data.map((buchung: any) => ({
+  const formatted = data.map((buchung: Buchung) => ({
     title: `⚽ ${buchung.anlass === "freundschaftsspiel" ? "Freundschaftsspiel" : capitalize(buchung.anlass)}\n👥 ${buchung.mannschaft}`,
     start: buchung.startzeit,
     end: buchung.endzeit,

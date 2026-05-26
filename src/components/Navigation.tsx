@@ -6,21 +6,32 @@ import { usePathname } from "next/navigation";
 import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 
-// Nav-Links je nach Rolle – ausstehend und nicht eingeloggte Nutzer sehen keine Links
+// Nav-Links je nach Rolle. ausstehend sieht nur "Profil".
 const NAV_LINKS: Record<string, { href: string; label: string }[]> = {
+  ausstehend: [{ href: "/profil", label: "Profil" }],
+  mitglied: [
+    { href: "/mein-verein", label: "Mein Verein" },
+    { href: "/profil", label: "Profil" },
+  ],
   trainer: [
     { href: "/kalender", label: "Kalender" },
     { href: "/mitglieder", label: "Mitglieder" },
+    { href: "/mein-verein", label: "Mein Verein" },
+    { href: "/profil", label: "Profil" },
   ],
   vorstand: [
     { href: "/kalender", label: "Kalender" },
     { href: "/mitglieder", label: "Mitglieder" },
     { href: "/vorstand", label: "Vorstand" },
+    { href: "/mein-verein", label: "Mein Verein" },
+    { href: "/profil", label: "Profil" },
   ],
   admin: [
     { href: "/kalender", label: "Kalender" },
     { href: "/mitglieder", label: "Mitglieder" },
     { href: "/vorstand", label: "Vorstand" },
+    { href: "/mein-verein", label: "Mein Verein" },
+    { href: "/profil", label: "Profil" },
   ],
 };
 

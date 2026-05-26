@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Menu } from "@headlessui/react";
 import { FiUser } from "react-icons/fi";
 
@@ -32,12 +33,12 @@ export default function UserDropdown() {
           .eq("id", session.user.id)
           .single();
 
-        // Profilinformationen setzen
+        // Profilinformationen setzen – avatar_url aus profiles, nicht mehr null
         setUser({
           email: profile?.email ?? session.user.email ?? "",
           vorname: profile?.vorname ?? "",
           nachname: profile?.nachname ?? "",
-          avatar_url: null,
+          avatar_url: profile?.avatar_url ?? null,
         });
         setIsLoggedIn(true);
       }
@@ -88,9 +89,23 @@ export default function UserDropdown() {
             </div>
             <Menu.Item>
               {({ active }) => (
+                <Link
+                  href="/profil"
+                  className={`mt-2 px-4 py-2 w-full text-sm text-center rounded border block ${
+                    active
+                      ? "bg-gray-200 border-gray-300 dark:bg-gray-700"
+                      : "bg-transparent border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  } transition`}
+                >
+                  Profil bearbeiten
+                </Link>
+              )}
+            </Menu.Item>
+            <Menu.Item>
+              {({ active }) => (
                 <button
                   onClick={handleLogout}
-                  className={`mt-3 px-4 py-2 w-full font-bold text-sm text-center rounded border ${
+                  className={`mt-2 px-4 py-2 w-full font-bold text-sm text-center rounded border ${
                     active
                       ? "bg-red-700 border-red-800"
                       : "bg-red-600 hover:bg-red-700 border-red-700"

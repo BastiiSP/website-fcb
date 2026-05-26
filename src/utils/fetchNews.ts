@@ -65,7 +65,14 @@ async function fetchInstagramNews(): Promise<NewsItem[]> {
     const parsed = parser.parse(xml);
     const items = parsed.rss?.channel?.item || [];
 
-    return items.slice(0, 3).map((item: any, index: number) => {
+    interface RssItem {
+      title?: string;
+      description?: string;
+      pubDate?: string;
+      link?: string;
+    }
+
+    return items.slice(0, 3).map((item: RssItem, index: number) => {
       const imageUrl = extractImageFromDescription(item.description || "")?.trim() || "";
 
       return {

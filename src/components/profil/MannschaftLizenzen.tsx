@@ -1,0 +1,205 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabaseClient";
+import { LIZENZEN } from "@/lib/lizenzen";
+import { MANNSCHAFTEN } from "@/lib/mannschaften";
+import MannschaftsAnfrageModal from "./MannschaftsAnfrageModal";
+
+interface Anfrage {
+  id: string;
+  typ: "hinzufuegen" | "entfernen";
+  mannschaft: string;
+  status: string;
+}
+
+interface MannschaftLizenzenProps {
+  userId: string;
+  initialMannschaft: string[];
+  initialLizenzen: string[];
+}
+
+export default function MannschaftLizenzen({
+  userId,
+  initialMannschaft,
+  initialLizenzen,
+}: MannschaftLizenzenProps) {
+  const supabase = createClient();
+
+  // Mannschaft wird nur initial aus Props gelesen; Änderungen laufen über Anfragen (kein lokales Update)
+  const [mannschaft] = useState<string[]>(initialMannschaft);
+  const [lizenzen, setLizenzen] = useState<string[]>(initialLizenzen);
+  const [offeneAnfragen, setOffeneAnfragen] = useState<Anfrage[]>([]);
+  const [modal, setModal] = useState<{
+    typ: "hinzufuegen" | "entfernen";
+    mannschaft?: string;
+  } | null>(null);
+  const [lizenzSpeichern, setLizenzSpeichern] = useState(false);
+  const [lizenzErfolg, setLizenzErfolg] = useState("");
+  const [lizenzFehler, setLizenzFehler] = useState("");
+
+  useEffect(() => {
+    ladeOffeneAnfragen();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const ladeOffeneAnfragen = async () => {
+    const { data } = await supabase
+      .from("mannschaftsanfragen")
+      .select("id, typ, mannschaft, status")
+      .eq("user_id", userId)
+      .eq("status", "offen");
+    setOffeneAnfragen((data as Anfrage[]) ?? []);
+  };
+
+  const toggleLizenz = (lizenz: string) => {
+    setLizenzen((prev) =>
+      prev.includes(lizenz) ? prev.filter((l) => l !== lizenz) : [...prev, lizenz]
+    );
+  };
+
+  const handleLizenzSpeichern = async () => {
+    setLizenzFehler("");
+    setLizenzErfolg("");
+    setLizenzSpeichern(true);
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({ trainer_lizenzen: lizenzen })
+      .eq("id", userId);
+
+    if (error) {
+      setLizenzFehler("Fehler beim Speichern: " + error.message);
+    } else {
+      setLizenzErfolg("Lizenzen gespeichert.");
+    }
+    setLizenzSpeichern(false);
+  };
+
+  const handleAnfrageErfolg = () => {
+    setModal(null);
+    ladeOffeneAnfragen();
+  };
+
+  // Mannschaften, für die noch keine offene Anfrage läuft
+  const hatOffeneAnfrageFuer = (m: string, t: "hinzufuegen" | "entfernen") =>
+    offeneAnfragen.some((a) => a.mannschaft === m && a.typ === t);
+
+  // Verfügbare Mannschaften zum Hinzufügen: nicht zugewiesen UND keine offene Anfrage
+  const hinzufuegenMoeglich = MANNSCHAFTEN.filter(
+    (m) => !mannschaft.includes(m) && !hatOffeneAnfrageFuer(m, "hinzufuegen")
+  );
+
+  return (
+    <div className="space-y-8">
+      {/* Mannschafts-Sektion (read-only, Änderungen per Anfrage) */}
+      <section>
+        <h2 className="text-base font-semibold mb-3">Meine Mannschaft(en)</h2>
+        <p className="text-sm opacity-60 mb-3">
+          Mannschaftszuweisungen werden vom Vorstand verwaltet. Du kannst Anfragen stellen.
+        </p>
+
+        {/* Offene Anfragen als gelbe Info-Cards */}
+        {offeneAnfragen.length > 0 && (
+          <div className="space-y-2 mb-4">
+            {offeneAnfragen.map((a) => (
+              <div
+                key={a.id}
+                className="text-sm p-3 border border-yellow-400 rounded bg-yellow-50 dark:bg-yellow-900/20"
+              >
+                Anfrage ausstehend: <strong>{a.mannschaft}</strong>{" "}
+                {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – wird vom Vorstand geprüft
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Zugewiesene Mannschaften */}
+        {mannschaft.length > 0 ? (
+          <ul className="space-y-2 mb-3">
+            {mannschaft.map((m) => (
+              <li
+                key={m}
+                className="flex items-center justify-between border rounded p-3"
+              >
+                <span className="text-sm">{m}</span>
+                {!hatOffeneAnfrageFuer(m, "entfernen") && (
+                  <button
+                    type="button"
+                    onClick={() => setModal({ typ: "entfernen", mannschaft: m })}
+                    className="text-xs text-red-600 underline hover:text-red-800 transition"
+                  >
+                    Entfernen anfragen
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm italic opacity-60 mb-3">Noch keine Mannschaft zugewiesen.</p>
+        )}
+
+        {hinzufuegenMoeglich.length > 0 && (
+          <button
+            type="button"
+            onClick={() => setModal({ typ: "hinzufuegen" })}
+            className="text-sm underline opacity-70 hover:opacity-100 transition"
+          >
+            + Mannschaft hinzufügen anfragen
+          </button>
+        )}
+      </section>
+
+      {/* Trainer-Lizenzen */}
+      <section>
+        <h2 className="text-base font-semibold mb-3">Trainer-Lizenzen</h2>
+
+        {lizenzFehler && (
+          <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50 mb-3">
+            {lizenzFehler}
+          </p>
+        )}
+        {lizenzErfolg && (
+          <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50 mb-3">
+            {lizenzErfolg}
+          </p>
+        )}
+
+        <div className="space-y-2 mb-4">
+          {LIZENZEN.map((lizenz) => (
+            <label key={lizenz} className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={lizenzen.includes(lizenz)}
+                onChange={() => toggleLizenz(lizenz)}
+                className="w-4 h-4"
+              />
+              <span className="text-sm">{lizenz}</span>
+            </label>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={handleLizenzSpeichern}
+          disabled={lizenzSpeichern}
+          className="px-5 py-2 bg-[var(--foreground)] text-[var(--background)] rounded hover:opacity-80 transition disabled:opacity-50"
+        >
+          {lizenzSpeichern ? "Wird gespeichert …" : "Lizenzen speichern"}
+        </button>
+      </section>
+
+      {/* Anfrage-Modal */}
+      {modal && (
+        <MannschaftsAnfrageModal
+          userId={userId}
+          typ={modal.typ}
+          mannschaftVorausgefuellt={modal.mannschaft}
+          bereitsZugewiesen={mannschaft}
+          onClose={() => setModal(null)}
+          onErfolg={handleAnfrageErfolg}
+        />
+      )}
+    </div>
+  );
+}

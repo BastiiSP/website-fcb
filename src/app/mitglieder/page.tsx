@@ -42,8 +42,8 @@ export default function MitgliederPage() {
     );
   }
 
-  // Ausstehende Nutzer haben keinen Zugriff auf diese Seite
-  if (rolle === "ausstehend") {
+  // ausstehend und mitglied haben keinen Zugriff – nur trainer/vorstand/admin
+  if (rolle === "ausstehend" || rolle === "mitglied") {
     return (
       <main className="min-h-screen flex items-center justify-center">
         <div className="text-center space-y-4 max-w-md">

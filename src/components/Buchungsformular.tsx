@@ -2,16 +2,17 @@ import { useState } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { de } from "date-fns/locale";
-import { getEventColor } from "@/utils/getEventColor";
 import { fetchEvents } from "@/utils/fetchEvents";
+import { SupabaseClient } from "@supabase/supabase-js";
+import type { EventInput } from "@fullcalendar/core";
 
 // 🗓️ Registrierung der deutschen Sprache für das DatePicker-Modul
 registerLocale("de", de);
 
 type Props = {
   userId: string;
-  supabase: any;
-  setEvents: (events: any[]) => void;
+  supabase: SupabaseClient;
+  setEvents: (events: EventInput[]) => void;
   setSuccessMessage: (msg: string) => void;
   setErrorMessage: (msg: string) => void;
 };

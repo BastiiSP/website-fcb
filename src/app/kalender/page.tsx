@@ -5,13 +5,13 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { EventDropArg, DateSelectArg, EventClickArg } from "@fullcalendar/core";
+import { EventInput } from "@fullcalendar/core";
 import { createClient } from "@/lib/supabaseClient";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
 import "tippy.js/themes/light-border.css";
 
-import ThemeToggle from "@/components/ThemeToggle";
+import Link from "next/link";
 import ToastMessage from "@/components/ToastMessage";
 import Buchungsformular from "@/components/Buchungsformular";
 import LoeschenModal from "@/components/LoeschenModal";
@@ -23,7 +23,7 @@ const supabase = createClient();
 
 export default function KalenderSeite() {
   // 🔁 States für User, Rollen und Events
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventInput[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [rolle, setRolle] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -86,7 +86,8 @@ export default function KalenderSeite() {
 
       const nutzerRolle = profile?.rolle ?? null;
 
-      if (nutzerRolle === "ausstehend" || !nutzerRolle) {
+      // mitglied hat keinen Zugriff auf den Kalender (nur trainer/vorstand/admin)
+      if (nutzerRolle === "ausstehend" || nutzerRolle === "mitglied" || !nutzerRolle) {
         setRedirectMessage(
           "Dein Konto wartet noch auf Freigabe durch den Vorstand."
         );
@@ -99,7 +100,6 @@ export default function KalenderSeite() {
     };
 
     pruefeZugang();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 🗑️ Termin löschen
@@ -121,27 +121,6 @@ export default function KalenderSeite() {
     setLoeschenModalOffen(false);
     setZuLoeschendeId(null);
     setZuLoeschendeMannschaft(null);
-  };
-
-  // 🟦 Drag & Drop Handler
-  const handleEventDrop = async (info: EventDropArg) => {
-    const event = info.event;
-    const buchungId = event.id;
-
-    const { error } = await supabase
-      .from("buchungen")
-      .update({
-        startzeit: event.start?.toISOString(),
-        endzeit: event.end?.toISOString(),
-      })
-      .eq("id", buchungId);
-
-    if (error) {
-      setErrorMessage("❌ Fehler beim Verschieben.");
-    } else {
-      setSuccessMessage("✅ Buchung erfolgreich verschoben.");
-      fetchEvents(supabase, setEvents);
-    }
   };
 
   return (
@@ -171,12 +150,12 @@ export default function KalenderSeite() {
         {redirectMessage ? (
           <div className="text-center font-medium space-y-4">
             <p className="text-yellow-700">{redirectMessage}</p>
-            <a
+            <Link
               href="/"
               className="inline-block bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded transition"
             >
               Zur Startseite
-            </a>
+            </Link>
           </div>
         ) : !isLoggedIn ? (
           <div className="text-center text-red-600 font-medium space-y-4">
@@ -184,12 +163,12 @@ export default function KalenderSeite() {
               Du bist nicht eingeloggt. Bitte logge dich ein, um die
               Platzbelegung zu sehen.
             </p>
-            <a
+            <Link
               href="/login"
               className="inline-block bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded transition"
             >
               🔐 zum Login/zur Registrierung
-            </a>
+            </Link>
           </div>
         ) : (
           <>

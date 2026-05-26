@@ -1,7 +1,8 @@
 import { EventApi } from "@fullcalendar/core";
+import type { Buchung } from "@/components/BearbeitenModal";
 
 type Props = {
-  props: any; // Buchungsdetails (z. B. Platz, Person, Bemerkung etc.)
+  props: Buchung; // Buchungsdetails (z. B. Platz, Person, Bemerkung etc.)
   event: EventApi; // Kalender-Event (z. B. Start/Ende)
   userId: string | null;
   rolle: string | null;

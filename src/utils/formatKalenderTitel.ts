@@ -1,4 +1,6 @@
-export function formatKalenderTitel(buchung: any): string {
+import type { Buchung } from "@/components/BearbeitenModal";
+
+export function formatKalenderTitel(buchung: Buchung): string {
     const anlass = buchung.anlass?.toLowerCase();
     const platz = buchung.platz?.toLowerCase();
   

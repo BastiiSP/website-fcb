@@ -2,28 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { checkSession } from "@/utils/checkSession";
-import { createClient } from "@/lib/supabaseClient";
-
-const supabase = createClient();
+import { useEffect } from "react";
 
 export default function HomePage() {
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
-  const [rolle, setRolle] = useState<string | null>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const fetchSession = async () => {
-      const { userId, rolle, userEmail } = await checkSession(supabase);
-      setUserId(userId);
-      setRolle(rolle);
-      setIsLoggedIn(!!userId);
-      setUserEmail(userEmail);
-    };
-    fetchSession();
-  }, []);
 
   // 📌 Script für LightWidget einbinden
   useEffect(() => {
