@@ -207,7 +207,14 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                     )}
                   </button>
 
-                  {erlaubteRollen.length > 0 && (
+                  {/*
+                    Dropdown nur anzeigen, wenn die aktuelle Rolle des Nutzers
+                    auch tatsächlich von der eingeloggten Person geändert werden
+                    darf. Sonst Badge: ein vorstand-User darf z. B. einen admin
+                    nicht herabstufen – ohne diesen Guard würde das <select>
+                    fälschlich auf die erste Option ("ausstehend") zurückfallen.
+                  */}
+                  {erlaubteRollen.includes(n.rolle) ? (
                     <select
                       value={n.rolle}
                       onChange={(e) => rolleAendern(n.id, e.target.value)}
@@ -219,6 +226,19 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                         </option>
                       ))}
                     </select>
+                  ) : (
+                    <span
+                      className={`px-2 py-0.5 rounded text-xs font-medium ${
+                        n.rolle === "admin"
+                          ? "bg-purple-100 text-purple-800"
+                          : n.rolle === "vorstand"
+                          ? "bg-blue-100 text-blue-800"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                      title="Diese Rolle kannst du nicht ändern"
+                    >
+                      {n.rolle}
+                    </span>
                   )}
                 </div>
               </div>
