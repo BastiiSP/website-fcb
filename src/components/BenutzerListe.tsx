@@ -149,7 +149,7 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                     <select
                       value={n.rolle}
                       onChange={(e) => rolleAendern(n.id, e.target.value)}
-                      className="text-sm border rounded pl-2 pr-6 py-1 bg-[var(--background)]"
+                      className="text-sm border rounded pl-2 pr-8 py-1 bg-[var(--background)]"
                     >
                       {erlaubteRollen.map((r) => (
                         <option key={r} value={r}>
@@ -222,7 +222,7 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                     <select
                       value={n.rolle}
                       onChange={(e) => rolleAendern(n.id, e.target.value)}
-                      className="text-sm border rounded pl-2 pr-6 py-1 bg-[var(--background)]"
+                      className="text-sm border rounded pl-2 pr-8 py-1 bg-[var(--background)]"
                     >
                       {erlaubteRollen.map((r) => (
                         <option key={r} value={r}>
