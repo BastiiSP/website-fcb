@@ -80,6 +80,7 @@ mitgliedsnummer, status (aktiv/passiv/ehrenamt/gekündigt), mannschaft[], notize
 - **Keine direkten DB-Calls ohne RLS-Check** in Server Components
 - **Fehlerbehandlung**: Alle Supabase-Calls mit try/catch und aussagekräftigen Fehlermeldungen
 - **Deutsch**: Alle UI-Texte, Fehlermeldungen und Kommentare auf Deutsch
+- **Codekommentare**: Neuen und geänderten Code sinnvoll kommentieren – nicht jede Zeile, aber überall dort, wo der Zusammenhang nicht sofort klar ist. Kommentare erklären das *Warum* oder den *Kontext*, nicht das *Was* (das liest man am Code selbst). Beispiele wo kommentiert wird: komplexe Logik, nicht-offensichtliche Bedingungen, RLS-relevante Stellen, Supabase-spezifisches Verhalten, Workarounds oder bewusste Entscheidungen.
 
 ## Wichtige Dateipfade
 
@@ -137,14 +138,23 @@ git push
 Nach jeder erledigten Aufgabe dieses Format ausgeben.
 Basti kopiert es zu Claudian (dem Obsidian-Assistenten), der die Projektdokumentation aktualisiert.
 
+Die Sektion „Manuell zu testen" ist Pflicht – sie darf nie leer bleiben. Basti testet händisch, bevor die nächste Aufgabe beginnt.
+
 ```
 ## Claudian-Update – [Datum]
 
 ### Implementiert
 - [Was gebaut / geändert wurde]
 
-### Getestet
-- [Was getestet wurde und Ergebnis]
+### Manuell zu testen
+Schritt-für-Schritt-Anleitung für Basti – was er im Browser prüfen soll, um sicherzugehen, dass die Änderungen wie erwartet funktionieren. Konkret und vollständig: welche Seite aufrufen, welche Aktion ausführen, was dabei zu sehen sein sollte (Erwartung) und was auf einen Fehler hindeutet.
+
+Beispielformat:
+1. [Seite/Funktion] → [Aktion] → [Erwartetes Ergebnis]
+2. ...
+
+### Getestet (automatisch / durch Claude)
+- [Was Claude selbst geprüft hat, z. B. Build, Lint, Supabase-Queries]
 
 ### Offen / Nächster Block
 - [Was als nächstes kommt]
