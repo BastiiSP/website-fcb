@@ -69,10 +69,6 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
     }
   };
 
-  const freischalten = async (userId: string) => {
-    await rolleAendern(userId, "trainer");
-  };
-
   const ablehnen = async (userId: string, name: string) => {
     if (!confirm(`Nutzer ${name} wirklich ablehnen und Konto löschen?`)) return;
 
@@ -146,13 +142,21 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                       </p>
                     )}
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => freischalten(n.id)}
-                      className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition"
+                  {/* Dropdown statt fester Buttons – freischalten geschieht implizit
+                      durch Auswahl einer Nicht-ausstehend-Rolle. ROLLEN_OPTIONEN
+                      enthält "ausstehend" für beide Rollen, daher immer sichtbar. */}
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={n.rolle}
+                      onChange={(e) => rolleAendern(n.id, e.target.value)}
+                      className="text-sm border rounded px-2 py-1 bg-[var(--background)]"
                     >
-                      Als Trainer freischalten
-                    </button>
+                      {erlaubteRollen.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
                     <button
                       onClick={() => ablehnen(n.id, `${n.vorname} ${n.nachname}`)}
                       className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
