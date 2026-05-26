@@ -149,10 +149,13 @@ git push
 
 ## Arbeitsweise: Plan-Modus
 
-Handover-Prompts von Claudian sind für den Plan-Modus formuliert: Sie beschreiben Ziele
-und Anforderungen, keine Implementierungsschritte. Lies den Prompt vollständig, erstelle
-einen strukturierten Plan (Was, in welcher Reihenfolge, warum so) und warte auf Bastis
-Freigabe – erst dann wird Code geschrieben.
+Handover-Prompts von Claudian sind grundsätzlich für den Plan-Modus formuliert: Sie
+beschreiben Ziele und Anforderungen, keine Implementierungsschritte. Lies den Prompt
+vollständig, erstelle einen strukturierten Plan (Was, in welcher Reihenfolge, warum so)
+und warte auf Bastis Freigabe – erst dann wird Code geschrieben.
+
+Ausnahme: Bei klar umrissenen Micro-Fixes (einzelne CSS-Anpassung, einzeiliger Bug-Fix,
+Text-Änderung) ist Plan Mode unnötiger Overhead – dort direkt umsetzen.
 
 ## Session-Ende: Claudian-Update ausgeben
 

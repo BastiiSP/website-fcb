@@ -146,10 +146,11 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                       durch Auswahl einer Nicht-ausstehend-Rolle. ROLLEN_OPTIONEN
                       enthält "ausstehend" für beide Rollen, daher immer sichtbar. */}
                   <div className="flex items-center gap-2">
+                    {/* w-32 entspricht der festen Breite im "Aktive Nutzer"-Block */}
                     <select
                       value={n.rolle}
                       onChange={(e) => rolleAendern(n.id, e.target.value)}
-                      className="text-sm border rounded pl-2 pr-8 py-1 bg-[var(--background)]"
+                      className="w-32 text-sm border rounded pl-2 pr-8 py-1 bg-[var(--background)]"
                     >
                       {erlaubteRollen.map((r) => (
                         <option key={r} value={r}>
@@ -217,33 +218,38 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                     darf. Sonst Badge: ein vorstand-User darf z. B. einen admin
                     nicht herabstufen – ohne diesen Guard würde das <select>
                     fälschlich auf die erste Option ("ausstehend") zurückfallen.
+                    Der w-32-Container stellt sicher, dass "Weitere Infos" in
+                    jeder Zeile exakt auf derselben horizontalen Position bleibt,
+                    egal ob Dropdown (breiter) oder Badge (schmaler) gezeigt wird.
                   */}
-                  {erlaubteRollen.includes(n.rolle) ? (
-                    <select
-                      value={n.rolle}
-                      onChange={(e) => rolleAendern(n.id, e.target.value)}
-                      className="text-sm border rounded pl-2 pr-8 py-1 bg-[var(--background)]"
-                    >
-                      {erlaubteRollen.map((r) => (
-                        <option key={r} value={r}>
-                          {r}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <span
-                      className={`px-2 py-0.5 rounded text-xs font-medium ${
-                        n.rolle === "admin"
-                          ? "bg-purple-100 text-purple-800"
-                          : n.rolle === "vorstand"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-100 text-gray-700"
-                      }`}
-                      title="Diese Rolle kannst du nicht ändern"
-                    >
-                      {n.rolle}
-                    </span>
-                  )}
+                  <div className="w-32 flex items-center">
+                    {erlaubteRollen.includes(n.rolle) ? (
+                      <select
+                        value={n.rolle}
+                        onChange={(e) => rolleAendern(n.id, e.target.value)}
+                        className="w-full text-sm border rounded pl-2 pr-8 py-1 bg-[var(--background)]"
+                      >
+                        {erlaubteRollen.map((r) => (
+                          <option key={r} value={r}>
+                            {r}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span
+                        className={`px-2 py-0.5 rounded text-xs font-medium ${
+                          n.rolle === "admin"
+                            ? "bg-purple-100 text-purple-800"
+                            : n.rolle === "vorstand"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                        title="Diese Rolle kannst du nicht ändern"
+                      >
+                        {n.rolle}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
