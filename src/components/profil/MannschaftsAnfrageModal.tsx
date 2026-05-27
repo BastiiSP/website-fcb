@@ -83,7 +83,7 @@ export default function MannschaftsAnfrageModal({
                 value={mannschaft}
                 onChange={(e) => setMannschaft(e.target.value)}
                 required
-                className="form-field"
+                className="select-field w-full"
               >
                 {verfuegbareMannschaften.map((m) => (
                   <option key={m} value={m}>

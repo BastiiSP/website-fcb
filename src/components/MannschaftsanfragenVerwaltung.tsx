@@ -26,7 +26,8 @@ export default function MannschaftsanfragenVerwaltung() {
   const [anfragen, setAnfragen] = useState<Mannschaftsanfrage[]>([]);
   const [laden, setLaden] = useState(true);
   const [fehler, setFehler] = useState("");
-  const [erfolg, setErfolg] = useState("");
+  // Meldung mit Ton: Genehmigen = grün, Ablehnen = rot (Grün ist dem Genehmigen vorbehalten)
+  const [meldung, setMeldung] = useState<{ text: string; ton: "gruen" | "rot" } | null>(null);
 
   useEffect(() => {
     ladeAnfragen();
@@ -70,7 +71,7 @@ export default function MannschaftsanfragenVerwaltung() {
 
   const genehmigen = async (anfrage: Mannschaftsanfrage) => {
     setFehler("");
-    setErfolg("");
+    setMeldung(null);
 
     // Atomar via RPC: genehmigt Profile-Update (mannschaft-Array) + Status auf 'genehmigt'
     const { error } = await supabase.rpc("approve_mannschaftsanfrage", {
@@ -80,14 +81,17 @@ export default function MannschaftsanfragenVerwaltung() {
     if (error) {
       setFehler("Fehler beim Genehmigen: " + error.message);
     } else {
-      setErfolg(`Anfrage von ${anfrage.vorname} ${anfrage.nachname} genehmigt.`);
+      setMeldung({
+        text: `Anfrage von ${anfrage.vorname} ${anfrage.nachname} genehmigt.`,
+        ton: "gruen",
+      });
       ladeAnfragen();
     }
   };
 
   const ablehnen = async (anfrage: Mannschaftsanfrage) => {
     setFehler("");
-    setErfolg("");
+    setMeldung(null);
 
     const { error } = await supabase
       .from("mannschaftsanfragen")
@@ -97,7 +101,11 @@ export default function MannschaftsanfragenVerwaltung() {
     if (error) {
       setFehler("Fehler beim Ablehnen: " + error.message);
     } else {
-      setErfolg(`Anfrage von ${anfrage.vorname} ${anfrage.nachname} abgelehnt.`);
+      // Ablehnen ist kein Erfolg im positiven Sinn → rote Meldung statt grün
+      setMeldung({
+        text: `Anfrage von ${anfrage.vorname} ${anfrage.nachname} abgelehnt.`,
+        ton: "rot",
+      });
       ladeAnfragen();
     }
   };
@@ -109,9 +117,15 @@ export default function MannschaftsanfragenVerwaltung() {
           {fehler}
         </p>
       )}
-      {erfolg && (
-        <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50">
-          {erfolg}
+      {meldung && (
+        <p
+          className={`text-sm p-3 border rounded ${
+            meldung.ton === "gruen"
+              ? "text-green-700 border-green-300 bg-green-50"
+              : "text-red-600 border-red-300 bg-red-50"
+          }`}
+        >
+          {meldung.text}
         </p>
       )}
 

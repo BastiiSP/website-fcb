@@ -185,14 +185,11 @@ export default function MitgliederVerwaltung({ eigeneUserId }: Props) {
           className="form-field sm:flex-1"
         />
 
-        {/* Wrapper mit relativem Positioning, damit der manuelle Pfeil korrekt sitzt.
-            appearance-none entfernt den Browser-eigenen Pfeil (inkl. @tailwindcss/forms).
-            Das SVG ist pointer-events-none, damit Klicks auf den Select durchgehen. */}
-        <div className="relative sm:w-auto">
+        <div className="sm:w-auto">
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="form-field w-full appearance-none pr-8"
+            className="select-field w-full"
           >
             <option value="">Alle Status</option>
             {STATUS_OPTIONEN.map((s) => (
@@ -201,19 +198,14 @@ export default function MitgliederVerwaltung({ eigeneUserId }: Props) {
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-            <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 20 20" aria-hidden="true">
-              <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
         </div>
 
         {alleMannschaften.length > 0 && (
-          <div className="relative sm:w-auto">
+          <div className="sm:w-auto">
             <select
               value={filterMannschaft}
               onChange={(e) => setFilterMannschaft(e.target.value)}
-              className="form-field w-full appearance-none pr-8"
+              className="select-field w-full"
             >
               <option value="">Alle Mannschaften</option>
               {alleMannschaften.map((ms) => (
@@ -222,11 +214,6 @@ export default function MitgliederVerwaltung({ eigeneUserId }: Props) {
                 </option>
               ))}
             </select>
-            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
-              <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
           </div>
         )}
 

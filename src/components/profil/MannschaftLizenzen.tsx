@@ -32,6 +32,8 @@ export default function MannschaftLizenzen({
   const [offeneAnfragen, setOffeneAnfragen] = useState<Anfrage[]>([]);
   // Abgelehnte Anfragen werden separat gespeichert, um ein rotes Banner anzuzeigen
   const [abgelehnteAnfragen, setAbgelehnteAnfragen] = useState<Anfrage[]>([]);
+  // Reiner UI-State: vom User weggeklickte abgelehnte Banner (kein DB-Delete)
+  const [geschlosseneAnfragen, setGeschlosseneAnfragen] = useState<string[]>([]);
   const [modal, setModal] = useState<{
     typ: "hinzufuegen" | "entfernen";
     mannschaft?: string;
@@ -87,6 +89,20 @@ export default function MannschaftLizenzen({
     ladeAnfragen();
   };
 
+  // Offene Anfrage zurückziehen = löschen (RLS erlaubt DELETE nur für eigene, offene Zeilen)
+  const zurueckziehen = async (id: string) => {
+    const { error } = await supabase
+      .from("mannschaftsanfragen")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Fehler beim Zurückziehen der Anfrage:", error.message);
+    } else {
+      ladeAnfragen(); // Banner verschwindet sofort
+    }
+  };
+
   // Mannschaften, für die noch keine offene Anfrage läuft
   const hatOffeneAnfrageFuer = (m: string, t: "hinzufuegen" | "entfernen") =>
     offeneAnfragen.some((a) => a.mannschaft === m && a.typ === t);
@@ -105,31 +121,55 @@ export default function MannschaftLizenzen({
           Mannschaftszuweisungen werden vom Vorstand verwaltet. Du kannst Anfragen stellen.
         </p>
 
-        {/* Abgelehnte Anfragen als rote Fehlermeldungs-Cards */}
-        {abgelehnteAnfragen.length > 0 && (
+        {/* Abgelehnte Anfragen als rote Fehlermeldungs-Cards (vom User wegklickbar) */}
+        {abgelehnteAnfragen.filter((a) => !geschlosseneAnfragen.includes(a.id)).length > 0 && (
           <div className="space-y-2 mb-4">
-            {abgelehnteAnfragen.map((a) => (
-              <div
-                key={a.id}
-                className="text-sm p-3 border border-red-400 rounded bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
-              >
-                Anfrage abgelehnt: <strong>{a.mannschaft}</strong>{" "}
-                {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – vom Vorstand abgelehnt
-              </div>
-            ))}
+            {abgelehnteAnfragen
+              .filter((a) => !geschlosseneAnfragen.includes(a.id))
+              .map((a) => (
+                <div
+                  key={a.id}
+                  className="flex items-start justify-between gap-3 text-sm p-3 border border-red-400 rounded bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                >
+                  <span>
+                    Anfrage abgelehnt: <strong>{a.mannschaft}</strong>{" "}
+                    {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – vom Vorstand abgelehnt
+                  </span>
+                  {/* Schließen blendet das Banner nur aus (reiner UI-State, kein DB-Delete) */}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setGeschlosseneAnfragen((prev) => [...prev, a.id])
+                    }
+                    className="shrink-0 text-lg leading-none font-bold opacity-60 hover:opacity-100 transition"
+                    aria-label="Meldung ausblenden"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
           </div>
         )}
 
-        {/* Offene Anfragen als gelbe Info-Cards */}
+        {/* Offene Anfragen als gelbe Info-Cards (mit Zurückziehen-Option) */}
         {offeneAnfragen.length > 0 && (
           <div className="space-y-2 mb-4">
             {offeneAnfragen.map((a) => (
               <div
                 key={a.id}
-                className="text-sm p-3 border border-yellow-400 rounded bg-yellow-50 dark:bg-yellow-900/20"
+                className="flex items-start justify-between gap-3 text-sm p-3 border border-yellow-400 rounded bg-yellow-50 dark:bg-yellow-900/20"
               >
-                Anfrage ausstehend: <strong>{a.mannschaft}</strong>{" "}
-                {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – wird vom Vorstand geprüft
+                <span>
+                  Anfrage ausstehend: <strong>{a.mannschaft}</strong>{" "}
+                  {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – wird vom Vorstand geprüft
+                </span>
+                <button
+                  type="button"
+                  onClick={() => zurueckziehen(a.id)}
+                  className="shrink-0 text-xs underline opacity-70 hover:opacity-100 transition"
+                >
+                  Zurückziehen
+                </button>
               </div>
             ))}
           </div>

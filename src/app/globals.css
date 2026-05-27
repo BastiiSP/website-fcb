@@ -35,6 +35,25 @@ body {
   @apply border p-2 rounded text-[var(--foreground)] w-full;
 }
 
+/* 🔽 Einheitliches Dropdown-Styling.
+   Diese Regel liegt bewusst UNLAYERED (außerhalb @layer) und schlägt damit im
+   Cascade die select-Styles von @tailwindcss/forms (@layer base). So erscheint
+   in jedem Browser genau EIN Pfeil – das eigene Chevron als background-image
+   überschreibt den Plugin-Pfeil, appearance:none entfernt den nativen Pfeil.
+   padding-right sorgt dafür, dass langer Optionstext den Pfeil nie überlappt.
+   Breite (w-full o. ä.) wird bewusst pro Select per Utility gesetzt. */
+.select-field {
+  @apply border p-2 rounded text-[var(--foreground)] bg-[var(--background)];
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7l5 5 5-5' stroke='%23888888' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 1.1rem 1.1rem;
+  padding-right: 2rem;
+}
+
 /* ✅ Toast-Animation */
 @keyframes toast-fade-slide {
   0% {

@@ -255,7 +255,7 @@ export default function MitgliedBearbeitenModal({
                   e.target.value as MitgliedFormData["status"]
                 )
               }
-              className="form-field"
+              className="select-field w-full"
             >
               <option value="aktiv">Aktiv</option>
               <option value="passiv">Passiv</option>
