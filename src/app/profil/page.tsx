@@ -73,6 +73,12 @@ export default function ProfilPage() {
   const handleAvatarErfolg = (neueUrl: string) => {
     setAvatarModalOffen(false);
     if (profil) setProfil({ ...profil, avatar_url: neueUrl });
+
+    // UserDropdown im Header informieren – kein globaler Auth-Context vorhanden,
+    // daher Custom-Event als minimaler Kommunikationskanal.
+    window.dispatchEvent(
+      new CustomEvent("avatar-aktualisiert", { detail: neueUrl })
+    );
   };
 
   if (loading) {

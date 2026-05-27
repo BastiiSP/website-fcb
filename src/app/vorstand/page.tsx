@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import BenutzerListe from "@/components/BenutzerListe";
+import MannschaftsanfragenVerwaltung from "@/components/MannschaftsanfragenVerwaltung";
 
 export default function VorstandPage() {
   const supabase = createClient();
@@ -11,7 +12,7 @@ export default function VorstandPage() {
   const [loading, setLoading] = useState(true);
   const [zugelassen, setZugelassen] = useState(false);
   const [eigeneRolle, setEigeneRolle] = useState("");
-  const [activeTab, setActiveTab] = useState<"benutzer" | "buchungen">(
+  const [activeTab, setActiveTab] = useState<"benutzer" | "anfragen" | "buchungen">(
     "benutzer"
   );
 
@@ -74,6 +75,16 @@ export default function VorstandPage() {
         </button>
         <button
           className={`px-4 py-2 rounded border transition w-full sm:w-auto ${
+            activeTab === "anfragen"
+              ? "bg-[var(--foreground)] text-[var(--background)]"
+              : "bg-transparent border-[var(--foreground)] text-[var(--foreground)]"
+          }`}
+          onClick={() => setActiveTab("anfragen")}
+        >
+          Mannschaftsanfragen
+        </button>
+        <button
+          className={`px-4 py-2 rounded border transition w-full sm:w-auto ${
             activeTab === "buchungen"
               ? "bg-[var(--foreground)] text-[var(--background)]"
               : "bg-transparent border-[var(--foreground)] text-[var(--foreground)]"
@@ -87,6 +98,12 @@ export default function VorstandPage() {
       {activeTab === "benutzer" && (
         <section>
           <BenutzerListe eigeneRolle={eigeneRolle} />
+        </section>
+      )}
+
+      {activeTab === "anfragen" && (
+        <section>
+          <MannschaftsanfragenVerwaltung />
         </section>
       )}
 

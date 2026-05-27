@@ -25,12 +25,13 @@ Niemals ohne Rücksprache ändern. Das Rollensystem ist das Herzstück der Zugan
 
 | Rolle | Wer | Rechte |
 |---|---|---|
-| `ausstehend` | Jeder nach Selbstregistrierung | Kein Zugriff auf Buchungen – wartet auf Freigabe |
+| `ausstehend` | Jeder nach Selbstregistrierung | Nur Profil-Seite – wartet auf Freigabe durch Vorstand |
+| `mitglied` | Vereinsmitglieder mit Login | Mein-Verein-Seite + Profil; kein Kalender-Zugriff |
 | `trainer` | Trainer, Platzwarte, Betreuer | Platzbuchungen anlegen & eigene verwalten |
 | `vorstand` | Vorstandsmitglieder | Alles + alle Buchungen verwalten + Nutzer freischalten |
 | `admin` | IT-Verantwortlicher | Alles + Vorstandsrollen und Admin-Rollen vergeben |
 
-**Wichtig:** Vorstand darf nur zwischen `ausstehend` ↔ `trainer` wechseln. Nur `admin` darf `vorstand` und `admin` vergeben.
+**Wichtig:** Vorstand darf zwischen `ausstehend` / `mitglied` / `trainer` wechseln. Nur `admin` darf `vorstand` und `admin` vergeben.
 
 ## Datenbankschema (Phase 1 – aktiv)
 
@@ -64,7 +65,7 @@ Niemals ohne Rücksprache ändern. Das Rollensystem ist das Herzstück der Zugan
 | `created_at` | TIMESTAMPTZ | auto |
 | `updated_at` | TIMESTAMPTZ | auto via Trigger |
 
-### Tabelle: `mitglieder` (Phase 2 – noch nicht implementiert)
+### Tabelle: `mitglieder` (Phase 2 – aktiv)
 
 Vereinsmitglieder ohne Login-Konto. Wird von Vorstand/Admin gepflegt.
 
@@ -82,6 +83,22 @@ Vereinsmitglieder ohne Login-Konto. Wird von Vorstand/Admin gepflegt.
 | `created_at`, `updated_at` | TIMESTAMPTZ | auto, updated_at via Trigger |
 
 RLS: SELECT/INSERT/UPDATE/DELETE nur für vorstand und admin. Trainer: kein Zugriff.
+
+### Tabelle: `mannschaftsanfragen`
+
+Anfragen von `mitglied`-Nutzern zum Beitritt/Austritt aus einer Mannschaft. Wird von Vorstand/Admin im Vorstandsbereich verwaltet.
+
+| Spalte | Typ | Besonderheit |
+|---|---|---|
+| `id` | UUID | gen_random_uuid(), Primary Key |
+| `user_id` | UUID | FK → auth.users |
+| `typ` | TEXT | Art der Anfrage (z. B. beitritt / austritt) |
+| `mannschaft` | TEXT | Betroffene Mannschaft |
+| `begruendung` | TEXT | optional |
+| `status` | TEXT | DEFAULT 'offen'; weitere Werte: genehmigt / abgelehnt |
+| `created_at` | TIMESTAMPTZ | auto |
+
+RLS: Nutzer sehen/erstellen nur eigene Anfragen; vorstand und admin verwalten alle.
 
 ## Code-Regeln
 
@@ -101,22 +118,45 @@ RLS: SELECT/INSERT/UPDATE/DELETE nur für vorstand und admin. Trainer: kein Zugr
 ```
 src/
 ├── app/
-│   ├── kalender/page.tsx       ← Buchungskalender (nur trainer/vorstand/admin)
-│   ├── vorstand/page.tsx       ← Admin-Bereich (nur vorstand/admin)
+│   ├── kalender/page.tsx          ← Buchungskalender (nur trainer/vorstand/admin)
+│   ├── vorstand/page.tsx          ← Admin-Bereich (nur vorstand/admin)
+│   ├── mitglieder/page.tsx        ← Mitgliederverwaltung (nur vorstand/admin)
+│   ├── mein-verein/page.tsx       ← Vereinslinks & Info (mitglied + höher)
+│   ├── profil/page.tsx            ← Profilverwaltung (alle eingeloggten Rollen)
 │   ├── login/page.tsx
 │   ├── registrieren/page.tsx
 │   └── confirm-email/page.tsx
 ├── components/
+│   ├── Navigation.tsx             ← Rollenbasierte Navigation
+│   ├── Header.tsx / Footer.tsx
+│   ├── UserDropdown.tsx           ← Nutzer-Menü in der Nav
 │   ├── Buchungsformular.tsx
-│   ├── BenutzerListe.tsx       ← Nutzerverwaltung im Vorstand-Bereich
-│   ├── BearbeitenModal.tsx
-│   └── LoeschenModal.tsx
+│   ├── BenutzerListe.tsx          ← Nutzerverwaltung + Mannschaftsanfragen im Vorstand-Bereich
+│   ├── BearbeitenModal.tsx / LoeschenModal.tsx
+│   ├── MitgliederVerwaltung.tsx   ← Mitgliederverwaltung (Phase 2)
+│   ├── MitgliedBearbeitenModal.tsx
+│   ├── TrainerVerzeichnis.tsx
+│   ├── ToastMessage.tsx           ← Globale Erfolgs-/Fehlermeldungen
+│   └── profil/                    ← Profil-Unterkomponenten
+│       ├── PersoenlicheDaten.tsx
+│       ├── AccountSicherheit.tsx
+│       ├── AvatarUploadModal.tsx
+│       ├── MannschaftLizenzen.tsx
+│       └── MannschaftsAnfrageModal.tsx
 ├── lib/
-│   └── supabaseClient.ts       ← Supabase-Client (anon key)
+│   ├── supabaseClient.ts          ← Supabase-Client (anon key), importiert als @/lib/supabaseClient
+│   ├── mannschaften.ts            ← Mannschaftsliste (Konstanten)
+│   ├── lizenzen.ts                ← Lizenz-Daten
+│   └── vereinslinks.ts            ← Externe Vereinslinks (WhatsApp, Social Media etc.)
 └── utils/
-    ├── checkSession.ts         ← Session + Rolle prüfen
-    ├── getUserRolle.ts         ← Rolle eines Users abrufen
-    └── fetchEvents.ts          ← Buchungen laden
+    ├── checkSession.ts            ← Session + Rolle prüfen
+    ├── getUserRolle.ts            ← Rolle eines Users abrufen
+    ├── fetchEvents.ts             ← Buchungen laden
+    ├── fetchNews.ts               ← Neuigkeiten laden
+    ├── getEventColor.ts           ← Kalender-Farben nach Mannschaft
+    ├── formatKalenderTitel.ts     ← Buchungstitel formatieren
+    ├── formatCapitalized.ts       ← Hilfsfunktion Großschreibung
+    └── passwortStaerke.ts         ← Passwort-Stärke-Berechnung
 ```
 
 ## Supabase MCP

@@ -23,19 +23,20 @@ export default function UserDropdown() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const session = sessionData?.session;
+      // getUser() statt getSession(): validiert Token serverseitig → liefert
+      // immer aktuelle E-Mail, auch nach einer bestätigten E-Mail-Änderung.
+      const { data: { user } } = await supabase.auth.getUser();
 
-      if (session?.user) {
+      if (user) {
         const { data: profile } = await supabase
           .from("profiles")
           .select("*")
-          .eq("id", session.user.id)
+          .eq("id", user.id)
           .single();
 
-        // Profilinformationen setzen – avatar_url aus profiles, nicht mehr null
+        // Profilinformationen setzen – avatar_url aus profiles, E-Mail aus Auth-User
         setUser({
-          email: profile?.email ?? session.user.email ?? "",
+          email: user.email ?? "",
           vorname: profile?.vorname ?? "",
           nachname: profile?.nachname ?? "",
           avatar_url: profile?.avatar_url ?? null,
@@ -45,6 +46,21 @@ export default function UserDropdown() {
     };
 
     fetchUser();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // Reagiert auf Profilbild-Uploads von der Profilseite, ohne Seiten-Reload.
+    // Die Profilseite dispatcht "avatar-aktualisiert" nach erfolgreichem Upload.
+    const handleAvatarAktualisiert = (e: Event) => {
+      const neueUrl = (e as CustomEvent<string>).detail;
+      setUser((prev) => (prev ? { ...prev, avatar_url: neueUrl } : prev));
+    };
+
+    window.addEventListener("avatar-aktualisiert", handleAvatarAktualisiert);
+    return () => {
+      window.removeEventListener("avatar-aktualisiert", handleAvatarAktualisiert);
+    };
   }, []);
 
   const handleLogout = async () => {

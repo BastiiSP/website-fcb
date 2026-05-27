@@ -1,15 +1,17 @@
 import { createClient } from "@/lib/supabaseClient";
 
 /**
- * Holt die Session und Rolle des aktuellen Nutzers.
+ * Holt den aktuellen Nutzer (serverseitig validiert) und seine Rolle.
  * Gibt userId, Rolle und E-Mail zurück – oder null-Werte bei fehlender Session.
+ *
+ * Warum getUser() statt getSession(): getSession() liest den lokal gecachten JWT,
+ * der nach einer E-Mail-Änderung noch die alte Adresse enthalten kann. getUser()
+ * validiert das Token gegen den Auth-Server und liefert immer aktuelle Daten.
  */
 export async function checkSession(supabase: ReturnType<typeof createClient>) {
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-
-  const user = session?.user;
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) return { userId: null, rolle: null, userEmail: null };
 

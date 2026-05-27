@@ -123,6 +123,96 @@ export default function KalenderSeite() {
     setZuLoeschendeMannschaft(null);
   };
 
+  /**
+   * Gemeinsame Logik für eventDrop und eventResize:
+   * Rechte-Check → Kollisionsprüfung → Persistierung in Supabase → Reload.
+   * Beide FullCalendar-Callbacks haben .event, .event.start/end und .revert().
+   */
+  const aktualisiereBuchungszeiten = async (info: {
+    event: { start: Date | null; end: Date | null; extendedProps: Record<string, unknown> };
+    revert: () => void;
+  }) => {
+    const buchung = info.event.extendedProps as Buchung;
+    const neuesStart = info.event.start;
+    const neuesEnde = info.event.end;
+
+    // Schutz gegen undefinierte Daten
+    if (!neuesStart || !neuesEnde) return;
+
+    const startISO = neuesStart.toISOString();
+    const endISO = neuesEnde.toISOString();
+
+    // Buchung nur aktualisieren, wenn sich Zeiten wirklich geändert haben
+    if (startISO === buchung.startzeit && endISO === buchung.endzeit) {
+      return;
+    }
+
+    // 👮 Zugriffsrechte prüfen
+    const darfAnpassen = rolle === "vorstand" || buchung.user_id === userId;
+    if (!darfAnpassen) {
+      info.revert();
+      setErrorMessage("❌ Du darfst diese Buchung nicht bearbeiten.");
+      return;
+    }
+
+    // 🔎 Bestehende Buchungen für denselben Platz abrufen (Kollisionscheck)
+    const { data: existing, error } = await supabase
+      .from("buchungen")
+      .select("startzeit, endzeit, platzanteil")
+      .eq("platz", buchung.platz)
+      .neq("id", buchung.id) // Aktuelle Buchung ausschließen
+      .gte("endzeit", startISO)
+      .lte("startzeit", endISO);
+
+    if (error) {
+      console.error("Fehler beim Abrufen:", error);
+      setErrorMessage("❌ Fehler bei der Überprüfung der Platzbelegung.");
+      info.revert();
+      return;
+    }
+
+    const anteilsWerte: Record<string, number> = {
+      ganz: 1,
+      halb: 0.5,
+      viertel: 0.25,
+    };
+
+    let belegung = 0;
+    for (const eintrag of existing || []) {
+      const existingStart = new Date(eintrag.startzeit).getTime();
+      const existingEnd = new Date(eintrag.endzeit).getTime();
+      const newStart = neuesStart.getTime();
+      const newEnd = neuesEnde.getTime();
+
+      if (newStart < existingEnd && newEnd > existingStart) {
+        belegung += anteilsWerte[eintrag.platzanteil] || 0;
+      }
+    }
+
+    const aktuellerWert = anteilsWerte[buchung.platzanteil] || 0;
+
+    if (belegung + aktuellerWert > 1) {
+      setErrorMessage("❌ Der Platz ist zu diesem Zeitpunkt vollständig belegt.");
+      info.revert();
+      return;
+    }
+
+    // ✅ Buchung mit neuen Zeiten speichern
+    const { error: updateError } = await supabase
+      .from("buchungen")
+      .update({ startzeit: startISO, endzeit: endISO })
+      .eq("id", buchung.id);
+
+    if (updateError) {
+      setErrorMessage("❌ Fehler beim Speichern der neuen Zeiten.");
+      info.revert();
+      return;
+    }
+
+    setSuccessMessage("✅ Buchung erfolgreich angepasst.");
+    await fetchEvents(supabase, setEvents);
+  };
+
   return (
     <>
       {/* <ThemeToggle /> */}
@@ -188,100 +278,9 @@ export default function KalenderSeite() {
               allDaySlot={false}
               height="auto"
               editable={true}
-              eventDrop={async (info) => {
-                const buchung = info.event.extendedProps as Buchung;
-                const neuesStart = info.event.start;
-                const neuesEnde = info.event.end;
-
-                // Schutz gegen undefinierte Daten
-                if (!neuesStart || !neuesEnde) return;
-
-                const startISO = neuesStart.toISOString();
-                const endISO = neuesEnde.toISOString();
-
-                // Buchung nur aktualisieren, wenn sich Zeiten wirklich geändert haben
-                if (
-                  startISO === buchung.startzeit &&
-                  endISO === buchung.endzeit
-                ) {
-                  return;
-                }
-
-                // 👮 Zugriffsrechte prüfen
-                const darfAnpassen =
-                  rolle === "vorstand" || buchung.user_id === userId;
-                if (!darfAnpassen) {
-                  info.revert(); // Zurückspringen
-                  setErrorMessage(
-                    "❌ Du darfst diese Buchung nicht verschieben."
-                  );
-                  return;
-                }
-
-                // 🔎 Bestehende Buchungen für denselben Platz abrufen
-                const { data: existing, error } = await supabase
-                  .from("buchungen")
-                  .select("startzeit, endzeit, platzanteil")
-                  .eq("platz", buchung.platz)
-                  .neq("id", buchung.id) // Aktuelle Buchung ausschließen
-                  .gte("endzeit", startISO)
-                  .lte("startzeit", endISO);
-
-                if (error) {
-                  console.error("Fehler beim Abrufen:", error);
-                  setErrorMessage(
-                    "❌ Fehler bei der Überprüfung der Platzbelegung."
-                  );
-                  info.revert();
-                  return;
-                }
-
-                const anteilsWerte: Record<string, number> = {
-                  ganz: 1,
-                  halb: 0.5,
-                  viertel: 0.25,
-                };
-
-                let belegung = 0;
-                for (const buchung of existing || []) {
-                  const existingStart = new Date(buchung.startzeit).getTime();
-                  const existingEnd = new Date(buchung.endzeit).getTime();
-                  const newStart = neuesStart.getTime();
-                  const newEnd = neuesEnde.getTime();
-
-                  if (newStart < existingEnd && newEnd > existingStart) {
-                    belegung += anteilsWerte[buchung.platzanteil] || 0;
-                  }
-                }
-
-                const aktuellerWert = anteilsWerte[buchung.platzanteil] || 0;
-
-                if (belegung + aktuellerWert > 1) {
-                  setErrorMessage(
-                    "❌ Der Platz ist zu diesem Zeitpunkt vollständig belegt."
-                  );
-                  info.revert();
-                  return;
-                }
-
-                // ✅ Buchung mit neuen Zeiten speichern
-                const { error: updateError } = await supabase
-                  .from("buchungen")
-                  .update({
-                    startzeit: startISO,
-                    endzeit: endISO,
-                  })
-                  .eq("id", buchung.id);
-
-                if (updateError) {
-                  setErrorMessage("❌ Fehler beim Speichern der neuen Zeiten.");
-                  info.revert();
-                  return;
-                }
-
-                setSuccessMessage("✅ Buchung erfolgreich verschoben.");
-                await fetchEvents(supabase, setEvents); // neu laden
-              }}
+              eventResizableFromStart={true}
+              eventDrop={async (info) => aktualisiereBuchungszeiten(info)}
+              eventResize={async (info) => aktualisiereBuchungszeiten(info)}
               events={events}
               eventContent={(arg) => {
                 const props = arg.event.extendedProps as Buchung;

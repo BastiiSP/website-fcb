@@ -13,16 +13,6 @@ type Nutzer = {
   mannschaft: string[] | null;
 };
 
-type Mannschaftsanfrage = {
-  id: string;
-  user_id: string;
-  typ: "hinzufuegen" | "entfernen";
-  mannschaft: string;
-  begruendung: string | null;
-  status: string;
-  vorname?: string;
-  nachname?: string;
-};
 
 interface BenutzerListeProps {
   eigeneRolle: string;
@@ -36,8 +26,8 @@ const ROLLEN_OPTIONEN: Record<string, string[]> = {
 
 export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
   const supabase = createClient();
+  // Mannschaftsanfragen wurden in MannschaftsanfragenVerwaltung.tsx ausgelagert
   const [nutzer, setNutzer] = useState<Nutzer[]>([]);
-  const [mannschaftsanfragen, setMannschaftsanfragen] = useState<Mannschaftsanfrage[]>([]);
   const [suche, setSuche] = useState("");
   const [expandedUserIds, setExpandedUserIds] = useState<string[]>([]);
   const [fehler, setFehler] = useState("");
@@ -45,7 +35,6 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
 
   useEffect(() => {
     ladeNutzer();
-    ladeMannschaftsanfragen();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,76 +50,6 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
     }
 
     setNutzer(data ?? []);
-  };
-
-  const ladeMannschaftsanfragen = async () => {
-    // Alle offenen Anfragen laden + zugehörige Profilnamen per Join
-    const { data, error } = await supabase
-      .from("mannschaftsanfragen")
-      .select("id, user_id, typ, mannschaft, begruendung, status, profiles(vorname, nachname)")
-      .eq("status", "offen")
-      .order("created_at");
-
-    if (error) {
-      console.error("Fehler beim Laden der Mannschaftsanfragen:", error.message);
-      return;
-    }
-
-    // Profildaten aus dem Join in die flache Struktur überführen
-    const anfragen = (data ?? []).map((a) => {
-      const profile = Array.isArray(a.profiles) ? a.profiles[0] : a.profiles;
-      return {
-        id: a.id,
-        user_id: a.user_id,
-        typ: a.typ as "hinzufuegen" | "entfernen",
-        mannschaft: a.mannschaft,
-        begruendung: a.begruendung,
-        status: a.status,
-        vorname: profile?.vorname ?? "",
-        nachname: profile?.nachname ?? "",
-      };
-    });
-
-    setMannschaftsanfragen(anfragen);
-  };
-
-  const mannschaftsanfrageGenehmigen = async (anfrage: Mannschaftsanfrage) => {
-    setFehler("");
-    setErfolg("");
-
-    // Atomar via RPC (genehmigt Profil-Update + Status-Änderung)
-    const { error } = await supabase.rpc("approve_mannschaftsanfrage", {
-      anfrage_id: anfrage.id,
-    });
-
-    if (error) {
-      setFehler("Fehler beim Genehmigen: " + error.message);
-    } else {
-      setErfolg(
-        `Anfrage von ${anfrage.vorname} ${anfrage.nachname} genehmigt.`
-      );
-      ladeMannschaftsanfragen();
-      ladeNutzer();
-    }
-  };
-
-  const mannschaftsanfrageAblehnen = async (anfrage: Mannschaftsanfrage) => {
-    setFehler("");
-    setErfolg("");
-
-    const { error } = await supabase
-      .from("mannschaftsanfragen")
-      .update({ status: "abgelehnt" })
-      .eq("id", anfrage.id);
-
-    if (error) {
-      setFehler("Fehler beim Ablehnen: " + error.message);
-    } else {
-      setErfolg(
-        `Anfrage von ${anfrage.vorname} ${anfrage.nachname} abgelehnt.`
-      );
-      ladeMannschaftsanfragen();
-    }
   };
 
   const rolleAendern = async (userId: string, neueRolle: string) => {
@@ -196,55 +115,6 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
         <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50">
           {erfolg}
         </p>
-      )}
-
-      {/* Offene Mannschaftsanfragen (über den ausstehenden Rollenanfragen) */}
-      {mannschaftsanfragen.length > 0 && (
-        <section>
-          <h2 className="text-lg font-semibold mb-3">
-            Offene Mannschaftsanfragen ({mannschaftsanfragen.length})
-          </h2>
-          <div className="space-y-3">
-            {mannschaftsanfragen.map((a) => (
-              <div
-                key={a.id}
-                className="border border-blue-400 rounded p-4 bg-blue-50 dark:bg-blue-900/20"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">
-                      {a.vorname} {a.nachname}
-                    </p>
-                    <p className="text-sm opacity-80">
-                      {a.typ === "hinzufuegen"
-                        ? `möchte ${a.mannschaft} hinzufügen`
-                        : `möchte ${a.mannschaft} entfernen`}
-                    </p>
-                    {a.begruendung && (
-                      <p className="text-sm opacity-70 mt-1">
-                        Begründung: {a.begruendung}
-                      </p>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => mannschaftsanfrageGenehmigen(a)}
-                      className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition"
-                    >
-                      Genehmigen
-                    </button>
-                    <button
-                      onClick={() => mannschaftsanfrageAblehnen(a)}
-                      className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
-                    >
-                      Ablehnen
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
       )}
 
       {/* Ausstehende Anfragen */}
