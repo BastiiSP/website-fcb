@@ -18,8 +18,9 @@ export default function TooltipContent({
   onEdit,
   onDelete,
 }: Props) {
-  // Nur Ersteller oder Vorstand darf bearbeiten/löschen
-  const darfBearbeiten = rolle === "vorstand" || props.user_id === userId;
+  // Ersteller, Vorstand oder Admin darf bearbeiten/löschen (admin = höchste Instanz)
+  const darfBearbeiten =
+    rolle === "vorstand" || rolle === "admin" || props.user_id === userId;
 
   return (
     <div className="text-sm space-y-1">

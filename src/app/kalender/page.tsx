@@ -18,6 +18,7 @@ import LoeschenModal from "@/components/LoeschenModal";
 import BearbeitenModal, { type Buchung } from "@/components/BearbeitenModal";
 import TooltipContent from "@/components/TooltipContent";
 import { fetchEvents } from "@/utils/fetchEvents";
+import { PLATZ_FARBEN } from "@/utils/getEventColor";
 
 const supabase = createClient();
 
@@ -147,8 +148,9 @@ export default function KalenderSeite() {
       return;
     }
 
-    // 👮 Zugriffsrechte prüfen
-    const darfAnpassen = rolle === "vorstand" || buchung.user_id === userId;
+    // 👮 Zugriffsrechte prüfen – admin steht über dem Vorstand und darf ebenfalls alles
+    const darfAnpassen =
+      rolle === "vorstand" || rolle === "admin" || buchung.user_id === userId;
     if (!darfAnpassen) {
       info.revert();
       setErrorMessage("❌ Du darfst diese Buchung nicht bearbeiten.");
@@ -262,6 +264,22 @@ export default function KalenderSeite() {
           </div>
         ) : (
           <>
+            {/* 🎨 Farb-Legende: zeigt dauerhaft, welche Farbe für welchen Platz steht */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {Object.entries(PLATZ_FARBEN).map(([platz, farbe]) => (
+                <span
+                  key={platz}
+                  className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-800"
+                >
+                  <span
+                    className="inline-block h-3 w-3 rounded-full"
+                    style={{ backgroundColor: farbe }}
+                  />
+                  {platz.charAt(0).toUpperCase() + platz.slice(1)}
+                </span>
+              ))}
+            </div>
+
             {/* 📆 Kalender */}
             <FullCalendar
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}

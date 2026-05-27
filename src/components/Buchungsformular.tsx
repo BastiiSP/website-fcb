@@ -3,6 +3,7 @@ import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { de } from "date-fns/locale";
 import { fetchEvents } from "@/utils/fetchEvents";
+import { PLATZ_FARBEN } from "@/utils/getEventColor";
 import { SupabaseClient } from "@supabase/supabase-js";
 import type { EventInput } from "@fullcalendar/core";
 
@@ -125,17 +126,38 @@ export default function Buchungsformular({
     <>
       <h2 className="text-xl font-semibold mt-8 mb-2">➕ Neue Buchung</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
-        {/* 📌 Platzwahl */}
-        <div className="flex gap-4 flex-wrap">
-          <select
-            value={platz}
-            onChange={(e) => setPlatz(e.target.value)}
-            required
-            className="form-field bg-[var(--background)]"
+        {/* 📌 Platzwahl als Segmented Control – beide Optionen sichtbar, Farb-Punkt
+            dient zugleich als Legende (gleiche Farben wie Kalender-Events) */}
+        <div className="flex gap-4 flex-wrap items-stretch">
+          <div
+            role="radiogroup"
+            aria-label="Platz"
+            className="inline-flex rounded-lg border border-gray-300 overflow-hidden self-start"
           >
-            <option value="hauptplatz">Hauptplatz</option>
-            <option value="nebenplatz">Nebenplatz</option>
-          </select>
+            {Object.entries(PLATZ_FARBEN).map(([wert, farbe]) => {
+              const aktiv = platz === wert;
+              return (
+                <button
+                  key={wert}
+                  type="button"
+                  role="radio"
+                  aria-checked={aktiv}
+                  onClick={() => setPlatz(wert)}
+                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition border-r last:border-r-0 border-gray-300 ${
+                    aktiv
+                      ? "bg-[var(--foreground)] text-[var(--background)]"
+                      : "bg-[var(--background)] text-[var(--foreground)] hover:opacity-70"
+                  }`}
+                >
+                  <span
+                    className="inline-block h-3 w-3 rounded-full shrink-0"
+                    style={{ backgroundColor: farbe }}
+                  />
+                  {wert.charAt(0).toUpperCase() + wert.slice(1)}
+                </button>
+              );
+            })}
+          </div>
 
           <select
             value={platzanteil}

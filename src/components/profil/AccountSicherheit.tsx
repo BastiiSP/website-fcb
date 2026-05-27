@@ -20,6 +20,7 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
 
   // E-Mail ändern
   const [neueEmail, setNeueEmail] = useState("");
+  const [emailPasswort, setEmailPasswort] = useState("");
   const [emailLaden, setEmailLaden] = useState(false);
   const [emailFehler, setEmailFehler] = useState("");
   const [emailErfolg, setEmailErfolg] = useState("");
@@ -61,15 +62,35 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
       return;
     }
 
+    if (!emailPasswort) {
+      setEmailFehler("Bitte gib zur Bestätigung dein aktuelles Passwort ein.");
+      setEmailLaden(false);
+      return;
+    }
+
+    // Re-Authentifizierung mit aktuellem Passwort vor der Änderung
+    // (gleiches Sicherheitsmuster wie beim Passwort-Ändern weiter unten)
+    const { error: reAuthError } = await supabase.auth.signInWithPassword({
+      email: aktuelleEmail,
+      password: emailPasswort,
+    });
+
+    if (reAuthError) {
+      setEmailFehler("Das aktuelle Passwort ist falsch.");
+      setEmailLaden(false);
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({ email: neueEmail.trim() });
 
     if (error) {
       setEmailFehler("Fehler beim Ändern der E-Mail: " + error.message);
     } else {
       setEmailErfolg(
-        `Eine Bestätigungsmail wurde an ${neueEmail} geschickt. Bitte klicke den Link in der Mail.`
+        `Eine Bestätigungsmail wurde an ${neueEmail} geschickt. Bitte klicke den Link in dieser neuen Mail – danach ist die neue Adresse aktiv.`
       );
       setNeueEmail("");
+      setEmailPasswort("");
     }
     setEmailLaden(false);
   };
@@ -153,6 +174,17 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
               value={neueEmail}
               onChange={(e) => setNeueEmail(e.target.value)}
               placeholder="neue@email.de"
+              required
+              className="form-field"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Aktuelles Passwort</label>
+            <input
+              type="password"
+              value={emailPasswort}
+              onChange={(e) => setEmailPasswort(e.target.value)}
+              placeholder="Zur Bestätigung"
               required
               className="form-field"
             />

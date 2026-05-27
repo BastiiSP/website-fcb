@@ -70,6 +70,25 @@ export default function ProfilPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Wird die E-Mail-Bestätigung im selben Tab/Session abgeschlossen, feuert Supabase
+  // USER_UPDATED mit der neuen Adresse – dann das angezeigte Profil aktualisieren,
+  // ohne dass der Nutzer die Seite neu laden muss.
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      const aktuelleEmail = session?.user?.email;
+      if (aktuelleEmail) {
+        setProfil((vorher) =>
+          vorher && vorher.email !== aktuelleEmail
+            ? { ...vorher, email: aktuelleEmail }
+            : vorher
+        );
+      }
+    });
+
+    return () => listener.subscription.unsubscribe();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleAvatarErfolg = (neueUrl: string) => {
     setAvatarModalOffen(false);
     if (profil) setProfil({ ...profil, avatar_url: neueUrl });

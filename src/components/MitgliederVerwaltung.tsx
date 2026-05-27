@@ -188,7 +188,7 @@ export default function MitgliederVerwaltung({ eigeneUserId }: Props) {
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="form-field sm:w-auto pr-8"
+          className="form-field sm:w-auto pr-10"
         >
           <option value="">Alle Status</option>
           {STATUS_OPTIONEN.map((s) => (
@@ -202,7 +202,7 @@ export default function MitgliederVerwaltung({ eigeneUserId }: Props) {
           <select
             value={filterMannschaft}
             onChange={(e) => setFilterMannschaft(e.target.value)}
-            className="form-field sm:w-auto pr-8"
+            className="form-field sm:w-auto pr-10"
           >
             <option value="">Alle Mannschaften</option>
             {alleMannschaften.map((ms) => (
