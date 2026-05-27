@@ -159,28 +159,44 @@ export default function Buchungsformular({
             })}
           </div>
 
-          <select
-            value={platzanteil}
-            onChange={(e) => setPlatzanteil(e.target.value)}
-            required
-            className="form-field bg-[var(--background)]"
-          >
-            <option value="viertel">1/4 Platz</option>
-            <option value="halb">1/2 Platz</option>
-            <option value="ganz">Ganzer Platz</option>
-          </select>
+          {/* appearance-none entfernt den Browser-/forms-Plugin-Pfeil;
+              SVG-Chevron wird per relativem Wrapper manuell positioniert */}
+          <div className="relative">
+            <select
+              value={platzanteil}
+              onChange={(e) => setPlatzanteil(e.target.value)}
+              required
+              className="form-field appearance-none bg-[var(--background)] pr-8"
+            >
+              <option value="viertel">1/4 Platz</option>
+              <option value="halb">1/2 Platz</option>
+              <option value="ganz">Ganzer Platz</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+              <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
 
-          <select
-            value={anlass}
-            onChange={(e) => setAnlass(e.target.value)}
-            required
-            className="form-field bg-[var(--background)]"
-          >
-            <option value="training">Training</option>
-            <option value="freundschaftsspiel">Freundschaftsspiel</option>
-            <option value="punktspiel">Punktspiel</option>
-            <option value="platzpflege">Platzpflege</option>
-          </select>
+          <div className="relative">
+            <select
+              value={anlass}
+              onChange={(e) => setAnlass(e.target.value)}
+              required
+              className="form-field appearance-none bg-[var(--background)] pr-8"
+            >
+              <option value="training">Training</option>
+              <option value="freundschaftsspiel">Freundschaftsspiel</option>
+              <option value="punktspiel">Punktspiel</option>
+              <option value="platzpflege">Platzpflege</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+              <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 20 20" aria-hidden="true">
+                <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+          </div>
         </div>
 
         {/* ⏱️ Zeitangaben */}

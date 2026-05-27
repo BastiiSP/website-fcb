@@ -83,37 +83,60 @@ export default function BearbeitenModal({
 
         {/* 🧾 Bearbeitungsformular */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 🏟️ Platzwahl, Platzanteil, Anlass */}
+          {/* 🏟️ Platzwahl, Platzanteil, Anlass
+              appearance-none entfernt den Browser-/forms-Plugin-Pfeil;
+              das SVG-Chevron wird manuell über dem Wrapper positioniert */}
           <div className="flex gap-4 flex-wrap">
-            <select
-              value={form.platz}
-              onChange={(e) => handleChange("platz", e.target.value)}
-              className="border p-2 rounded text-[var(--foreground)]"
-            >
-              <option value="hauptplatz">Hauptplatz</option>
-              <option value="nebenplatz">Nebenplatz</option>
-            </select>
+            <div className="relative">
+              <select
+                value={form.platz}
+                onChange={(e) => handleChange("platz", e.target.value)}
+                className="appearance-none border p-2 pr-8 rounded text-[var(--foreground)]"
+              >
+                <option value="hauptplatz">Hauptplatz</option>
+                <option value="nebenplatz">Nebenplatz</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
 
-            <select
-              value={form.platzanteil}
-              onChange={(e) => handleChange("platzanteil", e.target.value)}
-              className="border p-2 rounded text-[var(--foreground)]"
-            >
-              <option value="viertel">1/4 Platz</option>
-              <option value="halb">1/2 Platz</option>
-              <option value="ganz">Ganzer Platz</option>
-            </select>
+            <div className="relative">
+              <select
+                value={form.platzanteil}
+                onChange={(e) => handleChange("platzanteil", e.target.value)}
+                className="appearance-none border p-2 pr-8 rounded text-[var(--foreground)]"
+              >
+                <option value="viertel">1/4 Platz</option>
+                <option value="halb">1/2 Platz</option>
+                <option value="ganz">Ganzer Platz</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
 
-            <select
-              value={form.anlass}
-              onChange={(e) => handleChange("anlass", e.target.value)}
-              className="border p-2 rounded text-[var(--foreground)]"
-            >
-              <option value="training">Training</option>
-              <option value="freundschaftsspiel">Freundschaftsspiel</option>
-              <option value="punktspiel">Punktspiel</option>
-              <option value="platzpflege">Platzpflege</option>
-            </select>
+            <div className="relative">
+              <select
+                value={form.anlass}
+                onChange={(e) => handleChange("anlass", e.target.value)}
+                className="appearance-none border p-2 pr-8 rounded text-[var(--foreground)]"
+              >
+                <option value="training">Training</option>
+                <option value="freundschaftsspiel">Freundschaftsspiel</option>
+                <option value="punktspiel">Punktspiel</option>
+                <option value="platzpflege">Platzpflege</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-2 flex items-center">
+                <svg className="h-4 w-4 opacity-50" fill="none" viewBox="0 0 20 20" aria-hidden="true">
+                  <path d="M5 7l5 5 5-5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+            </div>
           </div>
 
           {/* 🕓 Start- und Endzeit */}

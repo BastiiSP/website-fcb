@@ -30,6 +30,8 @@ export default function MannschaftLizenzen({
   const [mannschaft] = useState<string[]>(initialMannschaft);
   const [lizenzen, setLizenzen] = useState<string[]>(initialLizenzen);
   const [offeneAnfragen, setOffeneAnfragen] = useState<Anfrage[]>([]);
+  // Abgelehnte Anfragen werden separat gespeichert, um ein rotes Banner anzuzeigen
+  const [abgelehnteAnfragen, setAbgelehnteAnfragen] = useState<Anfrage[]>([]);
   const [modal, setModal] = useState<{
     typ: "hinzufuegen" | "entfernen";
     mannschaft?: string;
@@ -39,17 +41,21 @@ export default function MannschaftLizenzen({
   const [lizenzFehler, setLizenzFehler] = useState("");
 
   useEffect(() => {
-    ladeOffeneAnfragen();
+    ladeAnfragen();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const ladeOffeneAnfragen = async () => {
+  // Lädt offene und abgelehnte Anfragen in einem Query – beide Status werden für die UI benötigt
+  const ladeAnfragen = async () => {
     const { data } = await supabase
       .from("mannschaftsanfragen")
       .select("id, typ, mannschaft, status")
       .eq("user_id", userId)
-      .eq("status", "offen");
-    setOffeneAnfragen((data as Anfrage[]) ?? []);
+      .in("status", ["offen", "abgelehnt"]);
+
+    const alle = (data as Anfrage[]) ?? [];
+    setOffeneAnfragen(alle.filter((a) => a.status === "offen"));
+    setAbgelehnteAnfragen(alle.filter((a) => a.status === "abgelehnt"));
   };
 
   const toggleLizenz = (lizenz: string) => {
@@ -78,7 +84,7 @@ export default function MannschaftLizenzen({
 
   const handleAnfrageErfolg = () => {
     setModal(null);
-    ladeOffeneAnfragen();
+    ladeAnfragen();
   };
 
   // Mannschaften, für die noch keine offene Anfrage läuft
@@ -98,6 +104,21 @@ export default function MannschaftLizenzen({
         <p className="text-sm opacity-60 mb-3">
           Mannschaftszuweisungen werden vom Vorstand verwaltet. Du kannst Anfragen stellen.
         </p>
+
+        {/* Abgelehnte Anfragen als rote Fehlermeldungs-Cards */}
+        {abgelehnteAnfragen.length > 0 && (
+          <div className="space-y-2 mb-4">
+            {abgelehnteAnfragen.map((a) => (
+              <div
+                key={a.id}
+                className="text-sm p-3 border border-red-400 rounded bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+              >
+                Anfrage abgelehnt: <strong>{a.mannschaft}</strong>{" "}
+                {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – vom Vorstand abgelehnt
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Offene Anfragen als gelbe Info-Cards */}
         {offeneAnfragen.length > 0 && (
