@@ -32,8 +32,16 @@ export default function MannschaftLizenzen({
   const [offeneAnfragen, setOffeneAnfragen] = useState<Anfrage[]>([]);
   // Abgelehnte Anfragen werden separat gespeichert, um ein rotes Banner anzuzeigen
   const [abgelehnteAnfragen, setAbgelehnteAnfragen] = useState<Anfrage[]>([]);
-  // Reiner UI-State: vom User weggeklickte abgelehnte Banner (kein DB-Delete)
-  const [geschlosseneAnfragen, setGeschlosseneAnfragen] = useState<string[]>([]);
+  // Abgelehnte Banner, die der User bewusst geschlossen hat – per localStorage dauerhaft gemerkt
+  const lsKey = `fcb_abgelehnte_geschlossen_${userId}`;
+  const [geschlosseneAnfragen, setGeschlosseneAnfragen] = useState<string[]>(() => {
+    try {
+      const raw = localStorage.getItem(lsKey);
+      return raw ? (JSON.parse(raw) as string[]) : [];
+    } catch {
+      return [];
+    }
+  });
   const [modal, setModal] = useState<{
     typ: "hinzufuegen" | "entfernen";
     mannschaft?: string;
@@ -135,12 +143,16 @@ export default function MannschaftLizenzen({
                     Anfrage abgelehnt: <strong>{a.mannschaft}</strong>{" "}
                     {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – vom Vorstand abgelehnt
                   </span>
-                  {/* Schließen blendet das Banner nur aus (reiner UI-State, kein DB-Delete) */}
+                  {/* Schließen merkt sich die ID dauerhaft im localStorage – Banner erscheint nicht mehr */}
                   <button
                     type="button"
-                    onClick={() =>
-                      setGeschlosseneAnfragen((prev) => [...prev, a.id])
-                    }
+                    onClick={() => {
+                      setGeschlosseneAnfragen((prev) => {
+                        const next = [...prev, a.id];
+                        try { localStorage.setItem(lsKey, JSON.stringify(next)); } catch { /* ignore */ }
+                        return next;
+                      });
+                    }}
                     className="shrink-0 text-lg leading-none font-bold opacity-60 hover:opacity-100 transition"
                     aria-label="Meldung ausblenden"
                   >
