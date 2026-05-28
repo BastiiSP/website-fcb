@@ -19,7 +19,7 @@ export default function PitchSvg() {
       transition: {
         delay: 0.2 + i * 0.08,
         duration: 1.2,
-        ease: [0.65, 0, 0.35, 1],
+        ease: [0.65, 0, 0.35, 1] as [number, number, number, number],
       },
     }),
   };
