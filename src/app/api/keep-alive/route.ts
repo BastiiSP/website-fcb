@@ -1,5 +1,8 @@
 import { createClient } from "@/lib/supabaseClient";
 
+// Verhindert statisches Prerendering beim Build – Route braucht Supabase-Env-Vars zur Laufzeit
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   const supabase = createClient();
   
