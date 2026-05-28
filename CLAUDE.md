@@ -43,7 +43,7 @@ Niemals ohne Rücksprache ändern. Das Rollensystem ist das Herzstück der Zugan
 | `vorname` | TEXT | NOT NULL |
 | `nachname` | TEXT | NOT NULL |
 | `telefonnummer` | TEXT | optional |
-| `rolle` | TEXT | DEFAULT 'ausstehend', CHECK (ausstehend/trainer/vorstand/admin) |
+| `rolle` | TEXT | DEFAULT 'ausstehend', CHECK (ausstehend/mitglied/trainer/vorstand/admin) |
 | `mannschaft` | TEXT[] | Mehrfachauswahl möglich |
 | `created_at` | TIMESTAMPTZ | auto |
 | `updated_at` | TIMESTAMPTZ | auto via Trigger |
@@ -186,6 +186,43 @@ git add -A
 git commit -m "feat: [beschreibung]"
 git push
 ```
+
+## Design-Spec (abgestimmt mit Claudian – Stand 2026-05-28)
+
+Alle Designentscheidungen wurden gemeinsam mit Basti besprochen und sind verbindlich.
+Bei neuen Komponenten und Änderungen **immer** diese Spec einhalten.
+Die vollständige Designdokumentation liegt in der Obsidian-Projektdatei `02 Projekte/Website FCB.md`.
+
+### Vereinskontext
+- **FCB** = 1. FC 1911 Burgkunstadt – Mannschaften: 2× Herren, E-/F-/G-Jugend
+- **JFG** = JFG Kunstadt-Obermain – Leistungsjugend: A-/B-/C-/D-Jugend (teils B1+B2)
+- FCB und JFG teilen dieselbe Basis-Palette, unterscheiden sich durch ihre Akzentfarbe
+
+### Farbpalette
+Tokens sind in `tailwind.config.ts` unter `fcb.*` definiert:
+
+| Token | Klasse | Hex | Verwendung |
+|---|---|---|---|
+| Hintergrund | `bg-fcb-bg` | `#0a0a0a` | Seiten-BG, Hero, dunkle Sections |
+| Surface | `bg-fcb-surface` | `#161616` | Cards, Panels, Modals |
+| Border | `border-fcb-border` | `#2a2a2a` | Trennlinien, Rahmen |
+| Text | `text-fcb-text` | `#ffffff` | Primärtext |
+| Muted | `text-fcb-muted` | `#888888` | Datum, Metainfo |
+| Navbar | `bg-fcb-nav` | `#52525b` | Navbar-Hintergrund |
+| FCB-Blau | `text-fcb-blue` / `bg-fcb-blue` | `#1d5fad` | FCB-Akzent: Links, aktive States, CTAs |
+| JFG-Rot | `text-fcb-red` / `bg-fcb-red` | `#cc1f1f` | JFG-Bereich-Akzent |
+
+### Typografie
+- **Display / Headlines**: `font-display` → Oswald (Google Font, Variable) – Gewicht 600–700, gerne Großbuchstaben
+- **Fließtext / UI**: `font-sans` → Inter – Gewicht 400/500
+
+### Design-Prinzipien
+- **Keine Emojis** in der UI – ausschließlich Lucide-Icons
+- **Smart-Sticky-Nav**: verschwindet beim Scrollen nach unten, erscheint beim Scrollen nach oben (Framer Motion)
+- **Framer Motion** für alle Animationen (Einblendungen, Hover, Übergänge)
+- **Ladescreen**: Beim ersten Aufruf kurzer FCB-Ladescreen (~1,5 Sek.) mit Wappen auf schwarzem Hintergrund
+- **Accessibility**: Kontrast WCAG AA einhalten, Fokus-States immer sichtbar
+- **Keine magic hex-values** im Code – immer `fcb.*`-Tokens verwenden
 
 ## Arbeitsweise: Plan-Modus
 
