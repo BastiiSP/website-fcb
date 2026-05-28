@@ -11,6 +11,8 @@ interface Anfrage {
   typ: "hinzufuegen" | "entfernen";
   mannschaft: string;
   status: string;
+  // NULL = Banner sichtbar; Timestamp = Nutzer hat das abgelehnt-Banner geschlossen (geräteübergreifend in DB)
+  banner_geschlossen_am: string | null;
 }
 
 interface MannschaftLizenzenProps {
@@ -30,18 +32,8 @@ export default function MannschaftLizenzen({
   const [mannschaft] = useState<string[]>(initialMannschaft);
   const [lizenzen, setLizenzen] = useState<string[]>(initialLizenzen);
   const [offeneAnfragen, setOffeneAnfragen] = useState<Anfrage[]>([]);
-  // Abgelehnte Anfragen werden separat gespeichert, um ein rotes Banner anzuzeigen
+  // Abgelehnte Anfragen inkl. banner_geschlossen_am – Filterung erfolgt am DB-Feld, nicht im lokalen State
   const [abgelehnteAnfragen, setAbgelehnteAnfragen] = useState<Anfrage[]>([]);
-  // Abgelehnte Banner, die der User bewusst geschlossen hat – per localStorage dauerhaft gemerkt
-  const lsKey = `fcb_abgelehnte_geschlossen_${userId}`;
-  const [geschlosseneAnfragen, setGeschlosseneAnfragen] = useState<string[]>(() => {
-    try {
-      const raw = localStorage.getItem(lsKey);
-      return raw ? (JSON.parse(raw) as string[]) : [];
-    } catch {
-      return [];
-    }
-  });
   const [modal, setModal] = useState<{
     typ: "hinzufuegen" | "entfernen";
     mannschaft?: string;
@@ -51,6 +43,9 @@ export default function MannschaftLizenzen({
   const [lizenzFehler, setLizenzFehler] = useState("");
 
   useEffect(() => {
+    // Einmaliger Cleanup: alter localStorage-Key aus der Vorgängerversion entfernen,
+    // da der „geschlossen"-Zustand jetzt geräteübergreifend in der DB lebt.
+    try { localStorage.removeItem(`fcb_abgelehnte_geschlossen_${userId}`); } catch { /* ignore */ }
     ladeAnfragen();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -59,13 +54,33 @@ export default function MannschaftLizenzen({
   const ladeAnfragen = async () => {
     const { data } = await supabase
       .from("mannschaftsanfragen")
-      .select("id, typ, mannschaft, status")
+      .select("id, typ, mannschaft, status, banner_geschlossen_am")
       .eq("user_id", userId)
       .in("status", ["offen", "abgelehnt"]);
 
     const alle = (data as Anfrage[]) ?? [];
     setOffeneAnfragen(alle.filter((a) => a.status === "offen"));
     setAbgelehnteAnfragen(alle.filter((a) => a.status === "abgelehnt"));
+  };
+
+  // Schließt das rote Banner für eine abgelehnte Anfrage geräteübergreifend.
+  // Optimistic Update: UI reagiert sofort, RPC schreibt im Hintergrund in die DB.
+  // Bei Fehler wird der lokale State zurückgesetzt, damit das Banner wieder erscheint.
+  const schliesseBanner = async (id: string) => {
+    setAbgelehnteAnfragen((prev) =>
+      prev.map((a) =>
+        a.id === id ? { ...a, banner_geschlossen_am: new Date().toISOString() } : a
+      )
+    );
+    const { error } = await supabase.rpc("close_mannschaftsanfrage_banner", {
+      anfrage_id: id,
+    });
+    if (error) {
+      console.error("Fehler beim Schließen des Banners:", error.message);
+      setAbgelehnteAnfragen((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, banner_geschlossen_am: null } : a))
+      );
+    }
   };
 
   const toggleLizenz = (lizenz: string) => {
@@ -129,11 +144,11 @@ export default function MannschaftLizenzen({
           Mannschaftszuweisungen werden vom Vorstand verwaltet. Du kannst Anfragen stellen.
         </p>
 
-        {/* Abgelehnte Anfragen als rote Fehlermeldungs-Cards (vom User wegklickbar) */}
-        {abgelehnteAnfragen.filter((a) => !geschlosseneAnfragen.includes(a.id)).length > 0 && (
+        {/* Abgelehnte Anfragen als rote Fehlermeldungs-Cards (vom User wegklickbar, Status in DB) */}
+        {abgelehnteAnfragen.filter((a) => !a.banner_geschlossen_am).length > 0 && (
           <div className="space-y-2 mb-4">
             {abgelehnteAnfragen
-              .filter((a) => !geschlosseneAnfragen.includes(a.id))
+              .filter((a) => !a.banner_geschlossen_am)
               .map((a) => (
                 <div
                   key={a.id}
@@ -143,16 +158,10 @@ export default function MannschaftLizenzen({
                     Anfrage abgelehnt: <strong>{a.mannschaft}</strong>{" "}
                     {a.typ === "hinzufuegen" ? "hinzufügen" : "entfernen"} – vom Vorstand abgelehnt
                   </span>
-                  {/* Schließen merkt sich die ID dauerhaft im localStorage – Banner erscheint nicht mehr */}
+                  {/* Schließen schreibt banner_geschlossen_am via RPC – wirkt geräteübergreifend */}
                   <button
                     type="button"
-                    onClick={() => {
-                      setGeschlosseneAnfragen((prev) => {
-                        const next = [...prev, a.id];
-                        try { localStorage.setItem(lsKey, JSON.stringify(next)); } catch { /* ignore */ }
-                        return next;
-                      });
-                    }}
+                    onClick={() => schliesseBanner(a.id)}
                     className="shrink-0 text-lg leading-none font-bold opacity-60 hover:opacity-100 transition"
                     aria-label="Meldung ausblenden"
                   >
