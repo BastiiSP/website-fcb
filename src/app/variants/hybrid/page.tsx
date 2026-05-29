@@ -13,8 +13,7 @@ import RotatingText from "./_components/RotatingText";
  * Layering (DOM-Order = Stack-Order bei absolute inset-0):
  *   HybridCanvas       (Dots, pointer-events:none)
  *   HybridPitch        (Spielfeld, pointer-events:none)
- *   Watermark          (Spitzname „Schuhstädter" als dezentes Hintergrundwort)
- *   Vignette           (Lesbarkeits-Gradient, dimmt Watermark zum Rand hin)
+ *   Vignette           (Lesbarkeits-Gradient)
  *   Content (z-10)     (Wappen, Headline, Subheadline, CTAs)
  */
 const HEADLINE_LINES = ["FUSSBALL.", "CHARAKTER.", "BURGKUNSTADT."];
@@ -28,21 +27,6 @@ export default function HybridPage() {
 
       {/* Spielfeld-SVG – liegt über dem Canvas, beide absolute inset-0 */}
       <HybridPitch />
-
-      {/* Watermark: Spitzname als großes, dezentes Hintergrundwort hinter dem Content.
-          Liegt vor Pitch/Canvas, aber vor der Vignette – diese dimmt ihn zu den
-          Rändern hin zusätzlich ab, was die Lesbarkeit im Zentrum betont. */}
-      <motion.div
-        aria-hidden
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6, duration: 1.4 }}
-        className="pointer-events-none absolute inset-0 flex items-center justify-center"
-      >
-        <span className="font-oswald font-bold uppercase tracking-[0.05em] text-[clamp(4rem,14vw,14rem)] text-white/[0.06] select-none whitespace-nowrap">
-          Schuhstädter
-        </span>
-      </motion.div>
 
       {/* Vignette für Lesbarkeit des Inhalts */}
       <div
