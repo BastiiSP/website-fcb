@@ -31,7 +31,7 @@ export default function ConditionalChrome({
   return (
     <>
       <Header />
-      <main className="pt-6">{children}</main>
+      <main className="pt-14">{children}</main>
       <Footer />
     </>
   );

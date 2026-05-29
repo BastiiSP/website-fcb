@@ -76,7 +76,7 @@ export default function UserDropdown() {
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button className="flex items-center justify-center w-10 h-10 rounded-full bg-[var(--foreground)] text-[var(--background)] font-bold overflow-hidden">
+      <Menu.Button className="flex items-center justify-center w-10 h-10 rounded-full bg-fcb-blue text-white font-bold overflow-hidden">
         {isLoggedIn ? (
           user?.avatar_url ? (
             <img
@@ -85,7 +85,7 @@ export default function UserDropdown() {
               className="w-10 h-10 object-cover rounded-full"
             />
           ) : (
-            <span className="text-sm text-[var(--background)]">
+            <span className="text-sm text-white">
               {getInitials()}
             </span>
           )
@@ -94,24 +94,24 @@ export default function UserDropdown() {
         )}
       </Menu.Button>
 
-      <Menu.Items className="absolute right-0 mt-2 w-52 origin-top-right rounded-md bg-[var(--background)] text-[var(--foreground)] shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none z-[9999] px-2 pb-2">
+      <Menu.Items className="absolute right-0 mt-2 w-52 origin-top-right rounded-md bg-fcb-surface text-fcb-text border border-fcb-border shadow-lg focus:outline-none z-[9999] px-2 pb-2">
         {isLoggedIn ? (
           <>
-            <div className="px-2 pt-2 text-sm mb-2">
-              👋 Hallo {user?.vorname?.trim() ? user.vorname : "Nutzer"}
+            <div className="px-2 pt-2 text-sm font-medium mb-1">
+              Hallo {user?.vorname?.trim() ? user.vorname : "Nutzer"}
             </div>
-            <div className="px-2 text-sm mb-1">
-              E-Mail: {user?.email ?? "Unbekannt"}
+            <div className="px-2 text-xs text-fcb-muted mb-2">
+              {user?.email ?? ""}
             </div>
             <Menu.Item>
               {({ active }) => (
                 <Link
                   href="/profil"
-                  className={`mt-2 px-4 py-2 w-full text-sm text-center rounded border block ${
+                  className={`mt-1 px-4 py-2 w-full text-sm text-center rounded border block transition ${
                     active
-                      ? "bg-gray-200 border-gray-300 dark:bg-gray-700"
-                      : "bg-transparent border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                  } transition`}
+                      ? "bg-fcb-border border-fcb-border"
+                      : "bg-transparent border-fcb-border hover:bg-fcb-border"
+                  }`}
                 >
                   Profil bearbeiten
                 </Link>
@@ -121,11 +121,11 @@ export default function UserDropdown() {
               {({ active }) => (
                 <button
                   onClick={handleLogout}
-                  className={`mt-2 px-4 py-2 w-full font-bold text-sm text-center rounded border ${
+                  className={`mt-2 px-4 py-2 w-full font-bold text-sm text-center rounded border transition ${
                     active
                       ? "bg-red-700 border-red-800"
                       : "bg-red-600 hover:bg-red-700 border-red-700"
-                  } text-white transition`}
+                  } text-white`}
                 >
                   Logout
                 </button>
@@ -137,11 +137,11 @@ export default function UserDropdown() {
             {({ active }) => (
               <button
                 onClick={() => router.push("/login")}
-                className={`mt-3 px-4 py-2 w-full font-bold text-sm text-center rounded border ${
+                className={`mt-3 px-4 py-2 w-full font-bold text-sm text-center rounded border transition ${
                   active
-                    ? "bg-green-700 border-green-800"
-                    : "bg-green-600 hover:bg-green-700 border-green-700"
-                } text-white transition`}
+                    ? "bg-fcb-blue/80 border-fcb-blue"
+                    : "bg-fcb-blue hover:bg-fcb-blue/80 border-fcb-blue"
+                } text-white`}
               >
                 Login
               </button>

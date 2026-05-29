@@ -38,7 +38,7 @@ export default function HomePage() {
     <main className="min-h-screen bg-fcb-bg text-fcb-text">
 
       {/* Hero-Section */}
-      <section className="relative min-h-[calc(100vh-6rem)] overflow-hidden">
+      <section className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden">
 
         {/* Dot-Grid Hintergrund */}
         <HybridCanvas />

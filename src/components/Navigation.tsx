@@ -35,7 +35,12 @@ const NAV_LINKS: Record<string, { href: string; label: string }[]> = {
   ],
 };
 
-export default function Navigation() {
+interface NavigationProps {
+  /** Optionaler Callback – wird nach einem Link-Klick aufgerufen (z. B. Mobile-Menü schließen) */
+  onLinkClick?: () => void;
+}
+
+export default function Navigation({ onLinkClick }: NavigationProps) {
   const supabase = createClient();
   const pathname = usePathname();
   const [links, setLinks] = useState<{ href: string; label: string }[]>([]);
@@ -61,10 +66,11 @@ export default function Navigation() {
           <Link
             key={href}
             href={href}
+            onClick={onLinkClick}
             className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
               aktiv
-                ? "bg-[var(--foreground)] text-[var(--background)]"
-                : "hover:bg-[var(--foreground)]/10 text-[var(--foreground)]"
+                ? "text-fcb-blue font-semibold"
+                : "text-white/85 hover:text-fcb-blue"
             }`}
           >
             {label}
