@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 
 /**
- * Spielfeld-SVG für die Hybrid-Variante, Sichtbarkeit erhöht:
+ * Spielfeld-SVG für den Hybrid-Hero, Sichtbarkeit erhöht:
  * - Globale opacity: 0.55
  * - Haupt-Linien strokeWidth: 2.7 (Feldumrandung, Mittellinie, Kreise, Strafräume)
  * - Detail-Linien strokeWidth: 2.3 (5er-Räume, Eckkreise)

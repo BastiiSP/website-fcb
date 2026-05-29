@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Dot-Grid für die Hybrid-Variante – zwei Effekte überlagert:
+ * Dot-Grid für den Hybrid-Hero – zwei Effekte überlagert:
  *
  * 1. Zentrum-Fokus: Dots in der Hero-Mitte sind größer, heller und reagieren
  *    stärker auf die Maus. Nach außen hin nehmen Größe, Helligkeit und Push-

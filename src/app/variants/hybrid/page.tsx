@@ -2,9 +2,9 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import HybridCanvas from "./_components/HybridCanvas";
-import HybridPitch from "./_components/HybridPitch";
-import RotatingText from "./_components/RotatingText";
+import HybridCanvas from "@/components/hero/HybridCanvas";
+import HybridPitch from "@/components/hero/HybridPitch";
+import RotatingText from "@/components/hero/RotatingText";
 
 /**
  * Hybrid-Hero – vereint V1 Nexus (Dot-Grid) und V2 Graphic (Spielfeld-SVG).
