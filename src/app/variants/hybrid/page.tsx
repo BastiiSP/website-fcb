@@ -92,10 +92,12 @@ export default function HybridPage() {
 
             // Dezenter Rahmen statt Glow: F & C bekommen blauen Stroke
             // (auf weißer Schrift sichtbar), B bekommt weißen Stroke
-            // (auf blauer Schrift sichtbar). Stroke-Mitte liegt auf der
-            // Glyph-Outline → 2 px wirken bei der Display-Größe dezent.
+            // (auf blauer Schrift sichtbar).
+            // Blau auf Weiß hat geringeren Kontrast als Weiß auf Blau,
+            // deshalb braucht F/C mehr Stroke-Breite (4 px) als B (2 px),
+            // damit die Rahmen optisch gleich präsent wirken.
             const fcbBorder = {
-              WebkitTextStroke: isLast ? "2px #ffffff" : "2px #1d5fad",
+              WebkitTextStroke: isLast ? "2px #ffffff" : "4px #1d5fad",
             };
 
             const motionProps = {
