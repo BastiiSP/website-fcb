@@ -3,9 +3,11 @@
 import { motion } from "framer-motion";
 
 /**
- * Spielfeld-SVG aus V2 Graphic, Sichtbarkeit erhöht für die Hybrid-Variante:
- * - Globale opacity: 0.22 → 0.32
- * - Diagonal-Linien strokeOpacity: 0.5 → 0.7
+ * Spielfeld-SVG aus V2 Graphic, Sichtbarkeit nochmals erhöht:
+ * - Globale opacity: 0.32 → 0.55
+ * - Haupt-Linien strokeWidth: 1.2 → 2.0 (Feldumrandung, Mittellinie, Kreise)
+ * - Detail-Linien strokeWidth: 1.0 → 1.6 (5er-Räume, Eckkreise)
+ * - Diagonal-Linien strokeOpacity: 0.7 → 0.9, strokeWidth: 0.8 → 1.2
  *
  * pointer-events: none, damit der Canvas-Layer Maus-Events empfangen kann.
  */
@@ -29,7 +31,7 @@ export default function HybridPitch() {
       className="absolute inset-0 h-full w-full"
       viewBox="0 0 1600 900"
       preserveAspectRatio="xMidYMid slice"
-      style={{ opacity: 0.32, pointerEvents: "none" }}
+      style={{ opacity: 0.55, pointerEvents: "none" }}
     >
       <defs>
         <radialGradient id="hybridPitchVignette" cx="50%" cy="50%" r="70%">
@@ -42,21 +44,21 @@ export default function HybridPitch() {
       {/* Feldumrandung */}
       <motion.rect
         x="60" y="60" width="1480" height="780"
-        fill="none" stroke="#1d5fad" strokeWidth="1.2"
+        fill="none" stroke="#1d5fad" strokeWidth="2.0"
         variants={lineVariants} initial="hidden" animate="visible" custom={0}
       />
 
       {/* Mittellinie */}
       <motion.line
         x1="800" y1="60" x2="800" y2="840"
-        stroke="#1d5fad" strokeWidth="1.2"
+        stroke="#1d5fad" strokeWidth="2.0"
         variants={lineVariants} initial="hidden" animate="visible" custom={1}
       />
 
       {/* Mittelkreis */}
       <motion.circle
         cx="800" cy="450" r="120"
-        fill="none" stroke="#1d5fad" strokeWidth="1.2"
+        fill="none" stroke="#1d5fad" strokeWidth="2.0"
         variants={lineVariants} initial="hidden" animate="visible" custom={2}
       />
 
@@ -72,60 +74,60 @@ export default function HybridPitch() {
       {/* Strafraum links */}
       <motion.rect
         x="60" y="240" width="220" height="420"
-        fill="none" stroke="#1d5fad" strokeWidth="1.2"
+        fill="none" stroke="#1d5fad" strokeWidth="2.0"
         variants={lineVariants} initial="hidden" animate="visible" custom={3}
       />
       {/* 5er-Raum links */}
       <motion.rect
         x="60" y="340" width="90" height="220"
-        fill="none" stroke="#1d5fad" strokeWidth="1"
+        fill="none" stroke="#1d5fad" strokeWidth="1.6"
         variants={lineVariants} initial="hidden" animate="visible" custom={4}
       />
 
       {/* Strafraum rechts */}
       <motion.rect
         x="1320" y="240" width="220" height="420"
-        fill="none" stroke="#1d5fad" strokeWidth="1.2"
+        fill="none" stroke="#1d5fad" strokeWidth="2.0"
         variants={lineVariants} initial="hidden" animate="visible" custom={5}
       />
       {/* 5er-Raum rechts */}
       <motion.rect
         x="1450" y="340" width="90" height="220"
-        fill="none" stroke="#1d5fad" strokeWidth="1"
+        fill="none" stroke="#1d5fad" strokeWidth="1.6"
         variants={lineVariants} initial="hidden" animate="visible" custom={6}
       />
 
       {/* Eckkreise */}
       <motion.path
         d="M 60 80 A 20 20 0 0 1 80 60"
-        fill="none" stroke="#1d5fad" strokeWidth="1"
+        fill="none" stroke="#1d5fad" strokeWidth="1.6"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       <motion.path
         d="M 1540 60 A 20 20 0 0 1 1540 80"
-        fill="none" stroke="#1d5fad" strokeWidth="1"
+        fill="none" stroke="#1d5fad" strokeWidth="1.6"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       <motion.path
         d="M 80 840 A 20 20 0 0 1 60 820"
-        fill="none" stroke="#1d5fad" strokeWidth="1"
+        fill="none" stroke="#1d5fad" strokeWidth="1.6"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       <motion.path
         d="M 1520 840 A 20 20 0 0 1 1540 820"
-        fill="none" stroke="#1d5fad" strokeWidth="1"
+        fill="none" stroke="#1d5fad" strokeWidth="1.6"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
 
-      {/* Diagonale Akzent-Linien – erhöhte Sichtbarkeit: strokeOpacity 0.5 → 0.7 */}
+      {/* Diagonale Akzent-Linien */}
       <motion.line
         x1="280" y1="240" x2="1320" y2="660"
-        stroke="#1d5fad" strokeOpacity="0.7" strokeWidth="0.8" strokeDasharray="2 6"
+        stroke="#1d5fad" strokeOpacity="0.9" strokeWidth="1.2" strokeDasharray="2 6"
         variants={lineVariants} initial="hidden" animate="visible" custom={9}
       />
       <motion.line
         x1="280" y1="660" x2="1320" y2="240"
-        stroke="#1d5fad" strokeOpacity="0.7" strokeWidth="0.8" strokeDasharray="2 6"
+        stroke="#1d5fad" strokeOpacity="0.9" strokeWidth="1.2" strokeDasharray="2 6"
         variants={lineVariants} initial="hidden" animate="visible" custom={10}
       />
     </svg>

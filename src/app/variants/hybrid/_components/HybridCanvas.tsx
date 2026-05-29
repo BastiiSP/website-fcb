@@ -3,12 +3,14 @@
 import { useEffect, useRef } from "react";
 
 /**
- * Verstärkte Version des Nexus Dot-Grids für die Hybrid-Variante.
- * Parameter gegenüber V1 erhöht: dichteres Grid (26 statt 38), größerer
- * Push-Radius (180), stärkere Abstoßung (0.6) und höheres Alpha-Range
- * (0.35–0.95) damit Punkte auch ohne Mausnähe sichtbar sind.
+ * Dot-Grid für die Hybrid-Variante – zwei Effekte überlagert:
  *
- * pointer-events: none, damit der SVG-Spielfeld-Layer darunter nicht blockiert wird.
+ * 1. Zentrum-Fokus: Dots in der Hero-Mitte sind größer, heller und reagieren
+ *    stärker auf die Maus. Nach außen hin nehmen Größe, Helligkeit und Push-
+ *    Stärke kontinuierlich ab – der Effekt "wächst" aus der Mitte.
+ *
+ * 2. Maus-Reaktion (Push-Physik): Punkte weichen vom Cursor weg und federn
+ *    mit Spring-Damping zurück.
  */
 export default function HybridCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -35,10 +37,9 @@ export default function HybridCanvas() {
     let height = 0;
     let dpr = 1;
 
-    // Verstärkte Parameter gegenüber V1 Nexus
-    const SPACING = 26;   // dichter: 38 → 26
-    const RADIUS = 180;   // weiter: 130 → 180
-    const PUSH = 0.6;     // stärker: 0.45 → 0.6
+    const SPACING = 26;
+    const RADIUS = 180;   // Maus-Wirkbereich
+    const PUSH = 0.6;     // maximale Push-Stärke (skaliert mit centerFade)
     const SPRING = 0.08;
     const FRICTION = 0.86;
 
@@ -70,14 +71,30 @@ export default function HybridCanvas() {
 
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
+      // Maximale Distanz von der Mitte: Diagonale des Viewports
+      const maxDistFromCenter = Math.hypot(width / 2, height / 2);
 
       for (const d of dots) {
+        // Abstand vom Dot-Ursprung zur Canvas-Mitte
+        const dxC = d.ox - width / 2;
+        const dyC = d.oy - height / 2;
+        const distFromCenter = Math.hypot(dxC, dyC);
+        // centerFade: 1 in der Mitte, 0 an den Ecken
+        const centerFade = Math.max(0, 1 - distFromCenter / maxDistFromCenter);
+
+        // Pro Dot: Größe und Basis-Helligkeit skalieren mit centerFade
+        const dotRadius = 1.4 + centerFade * 1.8;     // Rand: 1.4 – Mitte: 3.2
+        const baseAlpha = 0.06 + centerFade * 0.34;   // Rand: 0.06 – Mitte: 0.40
+        const pushScale = 0.2 + centerFade * 0.8;     // Rand: 0.2 – Mitte: 1.0
+
+        // Maus-Abstand und Push-Physik
         const dxM = d.x - mx;
         const dyM = d.y - my;
         const dist = Math.hypot(dxM, dyM);
 
         if (dist < RADIUS && dist > 0.001) {
-          const force = (1 - dist / RADIUS) * PUSH;
+          // Push-Stärke fällt linear mit Distanz ab, außerdem zentrumsabhängig
+          const force = (1 - dist / RADIUS) * PUSH * pushScale;
           d.vx += (dxM / dist) * force * 3;
           d.vy += (dyM / dist) * force * 3;
         }
@@ -89,11 +106,13 @@ export default function HybridCanvas() {
         d.x += d.vx;
         d.y += d.vy;
 
-        // Erhöhtes Alpha-Range: 0.35–0.95 (V1: 0.18–0.85) – Punkte grundsätzlich sichtbarer
-        const alpha = Math.min(0.95, 0.35 + (1 - Math.min(dist, RADIUS) / RADIUS) * 0.5);
+        // Maus-Boost addiert sich zur Basis-Helligkeit
+        const mouseBoost = (1 - Math.min(dist, RADIUS) / RADIUS) * 0.55;
+        const alpha = Math.min(0.95, baseAlpha + mouseBoost);
+
         ctx.fillStyle = `rgba(29, 95, 173, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, 1.6, 0, Math.PI * 2); // leicht größer: 1.4 → 1.6
+        ctx.arc(d.x, d.y, dotRadius, 0, Math.PI * 2);
         ctx.fill();
       }
 
