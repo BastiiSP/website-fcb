@@ -76,7 +76,10 @@ export default function HybridPage() {
          * Browser Justify nur zwischen Wörtern verteilen, nicht zwischen
          * Buchstaben innerhalb eines einzelnen Worts.
          *
-         * FCB-Easter-Egg: F, C, B mit kräftigem mehrlagigem FCB-Blau-Glow.
+         * FCB-Easter-Egg: F & C bekommen einen dezenten FCB-Blau-Rahmen
+         * (blauer Stroke auf weißer Schrift), B bekommt einen weißen
+         * Rahmen (weißer Stroke auf blauer Schrift). Realisiert über
+         * `-webkit-text-stroke` – keine neuen Farben.
          */}
         <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-white">
           {HEADLINE_LINES.map((line, i) => {
@@ -87,10 +90,12 @@ export default function HybridPage() {
             const longestLength = Math.max(...HEADLINE_LINES.map((l) => l.length));
             const isLongest = line.length === longestLength;
 
-            // Mehrlagiger Glow – sichtbar, aber nicht hart konturiert.
-            const fcbGlow = {
-              textShadow:
-                "0 0 24px rgba(29, 95, 173, 1), 0 0 12px rgba(29, 95, 173, 0.9), 0 0 4px rgba(29, 95, 173, 0.7)",
+            // Dezenter Rahmen statt Glow: F & C bekommen blauen Stroke
+            // (auf weißer Schrift sichtbar), B bekommt weißen Stroke
+            // (auf blauer Schrift sichtbar). Stroke-Mitte liegt auf der
+            // Glyph-Outline → 2 px wirken bei der Display-Größe dezent.
+            const fcbBorder = {
+              WebkitTextStroke: isLast ? "2px #ffffff" : "2px #1d5fad",
             };
 
             const motionProps = {
@@ -114,7 +119,7 @@ export default function HybridPage() {
                   {...motionProps}
                   className="block text-[clamp(2.25rem,5vw,5rem)]"
                 >
-                  <span style={fcbGlow}>{line[0]}</span>
+                  <span style={fcbBorder}>{line[0]}</span>
                   {line.slice(1)}
                 </motion.span>
               );
@@ -127,7 +132,7 @@ export default function HybridPage() {
                 className="flex justify-between text-[clamp(2.25rem,5vw,5rem)]"
               >
                 {Array.from(line).map((char, idx) => (
-                  <span key={idx} style={idx === 0 ? fcbGlow : undefined}>
+                  <span key={idx} style={idx === 0 ? fcbBorder : undefined}>
                     {char}
                   </span>
                 ))}
