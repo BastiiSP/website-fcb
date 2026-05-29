@@ -65,49 +65,72 @@ export default function HybridPage() {
         </motion.div>
 
         {/*
-         * Headline – drei gleich breite Zeilen (Justify-Spreizung auf die
-         * Breite des längsten Worts „BURGKUNSTADT.") mit dezent
-         * hervorgehobenen Anfangsbuchstaben F, C, B als FCB-Easter-Egg.
+         * Headline – drei gleich breite Zeilen:
+         *   - Die längste Zeile („BURGKUNSTADT.") bleibt im normalen Block-Flow
+         *     und gibt damit die intrinsische Breite der h1 vor.
+         *   - Die kürzeren Zeilen werden als `flex justify-between` mit jedem
+         *     Buchstaben als eigenem Span gerendert – sie spreizen sich auf
+         *     die Container-Breite (= Breite von BURGKUNSTADT.).
+         *
+         * Hinweis: `text-align-last: justify` würde hier nicht greifen, weil
+         * Browser Justify nur zwischen Wörtern verteilen, nicht zwischen
+         * Buchstaben innerhalb eines einzelnen Worts.
+         *
+         * FCB-Easter-Egg: F, C, B mit kräftigem mehrlagigem FCB-Blau-Glow.
          */}
         <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-white">
           {HEADLINE_LINES.map((line, i) => {
-            const firstLetter = line[0];
-            const rest = line.slice(1);
             const isLast = i === HEADLINE_LINES.length - 1;
+            // Längste Zeile bestimmt die Container-Breite – ihre Position
+            // im Array ist bekannt, aber wir leiten sie zur Sicherheit aus
+            // der maximalen Länge ab.
+            const longestLength = Math.max(...HEADLINE_LINES.map((l) => l.length));
+            const isLongest = line.length === longestLength;
+
+            // Mehrlagiger Glow – sichtbar, aber nicht hart konturiert.
+            const fcbGlow = {
+              textShadow:
+                "0 0 24px rgba(29, 95, 173, 1), 0 0 12px rgba(29, 95, 173, 0.9), 0 0 4px rgba(29, 95, 173, 0.7)",
+            };
+
+            const motionProps = {
+              initial: { y: 40, opacity: 0 },
+              animate: { y: 0, opacity: 1 },
+              transition: {
+                delay: 0.3 + i * 0.18,
+                duration: 0.55,
+                ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+              },
+              style: {
+                // Letzte Zeile FCB-Blau – verleiht der Stadt das Gewicht
+                color: isLast ? "#1d5fad" : undefined,
+              },
+            };
+
+            if (isLongest) {
+              return (
+                <motion.span
+                  key={line}
+                  {...motionProps}
+                  className="block text-[clamp(2.25rem,5vw,5rem)]"
+                >
+                  <span style={fcbGlow}>{line[0]}</span>
+                  {line.slice(1)}
+                </motion.span>
+              );
+            }
+
             return (
               <motion.span
                 key={line}
-                initial={{ y: 40, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{
-                  delay: 0.3 + i * 0.18,
-                  duration: 0.55,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className="block text-[clamp(2.25rem,5vw,5rem)]"
-                style={{
-                  // Letzte Zeile FCB-Blau – verleiht der Stadt das Gewicht
-                  color: isLast ? "#1d5fad" : undefined,
-                  // Kürzere Worte werden auf die Breite des längsten gespreizt.
-                  // `textAlignLast: justify` greift für die (einzige) Zeile jedes Blocks.
-                  textAlign: "justify",
-                  textAlignLast: "justify",
-                }}
+                {...motionProps}
+                className="flex justify-between text-[clamp(2.25rem,5vw,5rem)]"
               >
-                {/*
-                 * FCB-Easter-Egg: F, C, B mit subtilem Blau-Glow.
-                 * Für die ersten beiden Zeilen liegt der Glow auf weißer
-                 * Schrift, für die dritte Zeile auf bereits blauer Schrift –
-                 * dort erzeugt der Glow einen feinen Halo-Effekt.
-                 */}
-                <span
-                  style={{
-                    textShadow: "0 0 10px rgba(29, 95, 173, 0.55)",
-                  }}
-                >
-                  {firstLetter}
-                </span>
-                {rest}
+                {Array.from(line).map((char, idx) => (
+                  <span key={idx} style={idx === 0 ? fcbGlow : undefined}>
+                    {char}
+                  </span>
+                ))}
               </motion.span>
             );
           })}
