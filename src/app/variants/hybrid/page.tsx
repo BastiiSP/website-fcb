@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowRight, CalendarDays } from "lucide-react";
 import HybridCanvas from "./_components/HybridCanvas";
 import HybridPitch from "./_components/HybridPitch";
 import RotatingText from "./_components/RotatingText";
@@ -158,27 +157,30 @@ export default function HybridPage() {
           />
         </motion.p>
 
-        {/* CTAs */}
+        {/*
+         * CTA-Slot – aktuell mit dem typografischen Element
+         * „1911 Schuhstädter" belegt. Bewusst nicht klickbar, kein
+         * Button-Charakter (Ghost-Button ohne Hover wäre UX-Anti-Pattern).
+         *
+         * Wenn echte CTAs ergänzt werden sollen, die beiden <span>-Blöcke
+         * unten durch <a>- oder <button>-Elemente ersetzen – die
+         * umgebende motion.div behält Spacing (mt-10) und Einblend-
+         * Animation (delay 1.25 s, duration 0.5 s).
+         */}
         <motion.div
           initial={{ y: 16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 1.25, duration: 0.5 }}
-          className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:gap-4"
+          className="mt-10 flex items-center justify-center gap-4 sm:gap-5"
         >
-          <a
-            href="#verein"
-            className="group inline-flex items-center gap-2 rounded-full bg-fcb-blue px-7 py-3.5 font-inter text-sm font-semibold uppercase tracking-wider text-white shadow-lg shadow-fcb-blue/30 transition hover:bg-fcb-blue/90"
-          >
-            Zum Verein
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </a>
-          <a
-            href="#spielplan"
-            className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/5 px-7 py-3.5 font-inter text-sm font-semibold uppercase tracking-wider text-white backdrop-blur-sm transition hover:bg-white/10"
-          >
-            <CalendarDays className="h-4 w-4" />
-            Spielplan
-          </a>
+          <span className="font-oswald text-base font-bold uppercase tracking-[0.2em] text-fcb-blue sm:text-xl">
+            1911
+          </span>
+          {/* Vertikale Trennlinie zwischen Jahreszahl und Spitzname */}
+          <span aria-hidden className="h-4 w-px bg-white/30 sm:h-5" />
+          <span className="font-oswald text-base font-medium uppercase tracking-[0.2em] text-white/85 sm:text-xl">
+            Schuhstädter
+          </span>
         </motion.div>
       </div>
     </section>
