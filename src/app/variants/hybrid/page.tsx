@@ -173,14 +173,16 @@ export default function HybridPage() {
           transition={{ delay: 1.25, duration: 0.5 }}
           className="mt-10 flex items-center justify-center gap-4 sm:gap-5"
         >
+          {/* Linke Zierlinie – rahmt den Schriftzug als zusammenhängende Einheit ein */}
+          <span aria-hidden className="h-px w-8 bg-white/30 sm:w-12" />
           <span className="font-oswald text-base font-bold uppercase tracking-[0.2em] text-fcb-blue sm:text-xl">
             1911
           </span>
-          {/* Vertikale Trennlinie zwischen Jahreszahl und Spitzname */}
-          <span aria-hidden className="h-4 w-px bg-white/30 sm:h-5" />
           <span className="font-oswald text-base font-medium uppercase tracking-[0.2em] text-white/85 sm:text-xl">
             Schuhstädter
           </span>
+          {/* Rechte Zierlinie – Spiegelbild zur linken */}
+          <span aria-hidden className="h-px w-8 bg-white/30 sm:w-12" />
         </motion.div>
       </div>
     </section>
