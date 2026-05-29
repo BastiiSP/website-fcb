@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 /**
  * Spielfeld-SVG für die Hybrid-Variante, Sichtbarkeit erhöht:
  * - Globale opacity: 0.55
- * - Haupt-Linien strokeWidth: 2.4 (Feldumrandung, Mittellinie, Kreise, Strafräume)
- * - Detail-Linien strokeWidth: 2.0 (5er-Räume, Eckkreise)
+ * - Haupt-Linien strokeWidth: 2.7 (Feldumrandung, Mittellinie, Kreise, Strafräume)
+ * - Detail-Linien strokeWidth: 2.3 (5er-Räume, Eckkreise)
  *
  * Zeigt ausschließlich echte Fußballfeld-Elemente.
  * pointer-events: none, damit der Canvas-Layer Maus-Events empfangen kann.
@@ -44,21 +44,21 @@ export default function HybridPitch() {
       {/* Feldumrandung */}
       <motion.rect
         x="60" y="60" width="1480" height="780"
-        fill="none" stroke="#1d5fad" strokeWidth="2.4"
+        fill="none" stroke="#1d5fad" strokeWidth="2.7"
         variants={lineVariants} initial="hidden" animate="visible" custom={0}
       />
 
       {/* Mittellinie */}
       <motion.line
         x1="800" y1="60" x2="800" y2="840"
-        stroke="#1d5fad" strokeWidth="2.4"
+        stroke="#1d5fad" strokeWidth="2.7"
         variants={lineVariants} initial="hidden" animate="visible" custom={1}
       />
 
       {/* Mittelkreis */}
       <motion.circle
         cx="800" cy="450" r="120"
-        fill="none" stroke="#1d5fad" strokeWidth="2.4"
+        fill="none" stroke="#1d5fad" strokeWidth="2.7"
         variants={lineVariants} initial="hidden" animate="visible" custom={2}
       />
 
@@ -74,48 +74,48 @@ export default function HybridPitch() {
       {/* Strafraum links */}
       <motion.rect
         x="60" y="240" width="220" height="420"
-        fill="none" stroke="#1d5fad" strokeWidth="2.4"
+        fill="none" stroke="#1d5fad" strokeWidth="2.7"
         variants={lineVariants} initial="hidden" animate="visible" custom={3}
       />
       {/* 5er-Raum links */}
       <motion.rect
         x="60" y="340" width="90" height="220"
-        fill="none" stroke="#1d5fad" strokeWidth="2.0"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3"
         variants={lineVariants} initial="hidden" animate="visible" custom={4}
       />
 
       {/* Strafraum rechts */}
       <motion.rect
         x="1320" y="240" width="220" height="420"
-        fill="none" stroke="#1d5fad" strokeWidth="2.4"
+        fill="none" stroke="#1d5fad" strokeWidth="2.7"
         variants={lineVariants} initial="hidden" animate="visible" custom={5}
       />
       {/* 5er-Raum rechts */}
       <motion.rect
         x="1450" y="340" width="90" height="220"
-        fill="none" stroke="#1d5fad" strokeWidth="2.0"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3"
         variants={lineVariants} initial="hidden" animate="visible" custom={6}
       />
 
       {/* Eckkreise */}
       <motion.path
         d="M 60 80 A 20 20 0 0 1 80 60"
-        fill="none" stroke="#1d5fad" strokeWidth="2.0"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       <motion.path
         d="M 1540 60 A 20 20 0 0 1 1540 80"
-        fill="none" stroke="#1d5fad" strokeWidth="2.0"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       <motion.path
         d="M 80 840 A 20 20 0 0 1 60 820"
-        fill="none" stroke="#1d5fad" strokeWidth="2.0"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       <motion.path
         d="M 1520 840 A 20 20 0 0 1 1540 820"
-        fill="none" stroke="#1d5fad" strokeWidth="2.0"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
 

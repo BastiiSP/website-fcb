@@ -64,27 +64,53 @@ export default function HybridPage() {
           />
         </motion.div>
 
-        {/* Headline – gewinnt Gewicht gegenüber dem Wappen (clamp 1.75rem–4rem → 2.25rem–5rem) */}
+        {/*
+         * Headline – drei gleich breite Zeilen (Justify-Spreizung auf die
+         * Breite des längsten Worts „BURGKUNSTADT.") mit dezent
+         * hervorgehobenen Anfangsbuchstaben F, C, B als FCB-Easter-Egg.
+         */}
         <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-white">
-          {HEADLINE_LINES.map((line, i) => (
-            <motion.span
-              key={line}
-              initial={{ y: 40, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{
-                delay: 0.3 + i * 0.18,
-                duration: 0.55,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-              className="block text-[clamp(2.25rem,5vw,5rem)]"
-              style={{
-                // Letzte Zeile FCB-Blau – verleiht der Stadt das Gewicht
-                color: i === HEADLINE_LINES.length - 1 ? "#1d5fad" : undefined,
-              }}
-            >
-              {line}
-            </motion.span>
-          ))}
+          {HEADLINE_LINES.map((line, i) => {
+            const firstLetter = line[0];
+            const rest = line.slice(1);
+            const isLast = i === HEADLINE_LINES.length - 1;
+            return (
+              <motion.span
+                key={line}
+                initial={{ y: 40, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{
+                  delay: 0.3 + i * 0.18,
+                  duration: 0.55,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="block text-[clamp(2.25rem,5vw,5rem)]"
+                style={{
+                  // Letzte Zeile FCB-Blau – verleiht der Stadt das Gewicht
+                  color: isLast ? "#1d5fad" : undefined,
+                  // Kürzere Worte werden auf die Breite des längsten gespreizt.
+                  // `textAlignLast: justify` greift für die (einzige) Zeile jedes Blocks.
+                  textAlign: "justify",
+                  textAlignLast: "justify",
+                }}
+              >
+                {/*
+                 * FCB-Easter-Egg: F, C, B mit subtilem Blau-Glow.
+                 * Für die ersten beiden Zeilen liegt der Glow auf weißer
+                 * Schrift, für die dritte Zeile auf bereits blauer Schrift –
+                 * dort erzeugt der Glow einen feinen Halo-Effekt.
+                 */}
+                <span
+                  style={{
+                    textShadow: "0 0 10px rgba(29, 95, 173, 0.55)",
+                  }}
+                >
+                  {firstLetter}
+                </span>
+                {rest}
+              </motion.span>
+            );
+          })}
         </h1>
 
         {/* Subheadline mit rotierendem Begriff */}
