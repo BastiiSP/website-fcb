@@ -3,12 +3,12 @@
 import { motion } from "framer-motion";
 
 /**
- * Spielfeld-SVG aus V2 Graphic, Sichtbarkeit nochmals erhöht:
- * - Globale opacity: 0.32 → 0.55
- * - Haupt-Linien strokeWidth: 1.2 → 2.0 (Feldumrandung, Mittellinie, Kreise)
- * - Detail-Linien strokeWidth: 1.0 → 1.6 (5er-Räume, Eckkreise)
- * - Diagonal-Linien strokeOpacity: 0.7 → 0.9, strokeWidth: 0.8 → 1.2
+ * Spielfeld-SVG für die Hybrid-Variante, Sichtbarkeit erhöht:
+ * - Globale opacity: 0.55
+ * - Haupt-Linien strokeWidth: 2.0 (Feldumrandung, Mittellinie, Kreise, Strafräume)
+ * - Detail-Linien strokeWidth: 1.6 (5er-Räume, Eckkreise)
  *
+ * Zeigt ausschließlich echte Fußballfeld-Elemente.
  * pointer-events: none, damit der Canvas-Layer Maus-Events empfangen kann.
  */
 export default function HybridPitch() {
@@ -119,17 +119,6 @@ export default function HybridPitch() {
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
 
-      {/* Diagonale Akzent-Linien */}
-      <motion.line
-        x1="280" y1="240" x2="1320" y2="660"
-        stroke="#1d5fad" strokeOpacity="0.9" strokeWidth="1.2" strokeDasharray="2 6"
-        variants={lineVariants} initial="hidden" animate="visible" custom={9}
-      />
-      <motion.line
-        x1="280" y1="660" x2="1320" y2="240"
-        stroke="#1d5fad" strokeOpacity="0.9" strokeWidth="1.2" strokeDasharray="2 6"
-        variants={lineVariants} initial="hidden" animate="visible" custom={10}
-      />
     </svg>
   );
 }
