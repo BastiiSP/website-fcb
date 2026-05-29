@@ -174,7 +174,7 @@ export default function HybridPage() {
           className="mt-10 flex items-center justify-center gap-4 sm:gap-5"
         >
           {/* Linke Zierlinie – rahmt den Schriftzug als zusammenhängende Einheit ein */}
-          <span aria-hidden className="h-px w-8 bg-white/30 sm:w-12" />
+          <span aria-hidden className="h-0.5 w-8 bg-white/30 sm:w-12" />
           <span className="font-oswald text-base font-bold uppercase tracking-[0.2em] text-fcb-blue sm:text-xl">
             1911
           </span>
@@ -182,7 +182,7 @@ export default function HybridPage() {
             Schuhstädter
           </span>
           {/* Rechte Zierlinie – Spiegelbild zur linken */}
-          <span aria-hidden className="h-px w-8 bg-white/30 sm:w-12" />
+          <span aria-hidden className="h-0.5 w-8 bg-white/30 sm:w-12" />
         </motion.div>
       </div>
     </section>
