@@ -164,3 +164,84 @@ body {
     transition-delay: 500ms;
   }
 }
+
+/* ============================================================
+   Instagram-Carousel (/instagram/*) – geteilte Effekt-Klassen
+   ============================================================ */
+@layer components {
+  /* Spotlight: mausfolgender Glow. --mx/--my werden per JS (spotlightMove)
+     als lokale Pixel-Koordinaten gesetzt → funktioniert auch innerhalb von
+     3D-Transforms (Varianten B/D), anders als der fixed-Viewport-Trick. */
+  .spotlight-card {
+    --mx: 50%;
+    --my: 50%;
+    position: relative;
+    transition: box-shadow 0.3s ease;
+  }
+  /* Zusätzlicher Außen-Glow, damit der Effekt deutlich spürbar ist.
+     #1d5fad = Wert des fcb-blue-Tokens. */
+  .spotlight-card:hover {
+    box-shadow: 0 0 28px -6px rgba(29, 95, 173, 0.55);
+  }
+
+  /* Prominenter, FCB-blauer Rand-Glow (Gradient-Border via Masken-Trick). */
+  .spotlight-border {
+    position: absolute;
+    inset: 0;
+    z-index: 40;
+    border-radius: inherit;
+    padding: 2px; /* Randdicke des Glows */
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    background: radial-gradient(
+      260px circle at var(--mx) var(--my),
+      #1d5fad 0%,
+      rgba(29, 95, 173, 0.5) 35%,
+      transparent 70%
+    );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+  .spotlight-card:hover .spotlight-border {
+    opacity: 1;
+  }
+
+  /* Dezenter Lichtkegel auf der Kartenoberfläche (subtil, niedrige Alpha). */
+  .spotlight-fill {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    mix-blend-mode: screen;
+    background: radial-gradient(
+      240px circle at var(--mx) var(--my),
+      rgba(29, 95, 173, 0.16) 0%,
+      transparent 65%
+    );
+  }
+  .spotlight-card:hover .spotlight-fill {
+    opacity: 1;
+  }
+
+  /* Instagram-Markengradient für die Insta-Box (kein Magic-Hex im TSX). */
+  .insta-gradient {
+    background: linear-gradient(
+      45deg,
+      #feda75,
+      #fa7e1e,
+      #d62976,
+      #962fbf,
+      #4f5bd5
+    );
+  }
+}

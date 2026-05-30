@@ -14,17 +14,12 @@ const VARIANTS = [
   {
     slug: "b",
     name: "Cylinder",
-    desc: "Rotierender 3D-Zylinder mit Auto-Rotation und Pfeil-Navigation.",
-  },
-  {
-    slug: "c",
-    name: "Stack",
-    desc: "Horizontal gestapelte Cards mit 3D-Tiefe, per Pfeilen durchblätterbar.",
+    desc: "Rotierender 3D-Zylinder, alle 4 Sekunden eine Card weiter, plus Pfeil-Navigation.",
   },
   {
     slug: "d",
     name: "Feature",
-    desc: "Großer Hauptpost zentral, unscharfe Nachbarn – Auto-Wechsel alle 4 Sekunden.",
+    desc: "Großer Hauptpost zentral, unscharfe Nachbarn – Auto-Wechsel alle 4 Sekunden, Swipe-fähig.",
   },
 ];
 

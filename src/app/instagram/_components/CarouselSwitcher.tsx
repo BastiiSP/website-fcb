@@ -11,7 +11,6 @@ import { usePathname } from "next/navigation";
 const VARIANTS = [
   { slug: "a", label: "Spotlight" },
   { slug: "b", label: "Cylinder" },
-  { slug: "c", label: "Stack" },
   { slug: "d", label: "Feature" },
 ];
 

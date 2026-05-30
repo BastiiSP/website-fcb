@@ -4,61 +4,63 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { type InstaPost, formatPostDate } from "@/lib/beholdFeed";
+import { spotlightMove, SpotlightOverlays } from "./Spotlight";
+import InstagramLink from "./InstagramLink";
 
 /**
  * Variante B – „Cylinder".
  *
- * Sechs Posts auf einem rotierenden 3D-Zylinder. Anders als die Referenz
- * (ravikatiyar/circular-gallery, scroll-getrieben) rotiert der Zylinder hier
- * automatisch und lässt sich per Pfeil-Buttons um je eine Card weiterdrehen –
- * die Section ist Teil der Hauptseite und darf keinen eigenen Scroll-Kontext
- * kapern. Bei Hover pausiert die Auto-Rotation.
+ * Sechs Posts auf einem rotierenden 3D-Zylinder. Statt kontinuierlicher
+ * Scroll-/rAF-Rotation (Referenz ravikatiyar/circular-gallery) dreht der
+ * Zylinder hier in Schritten: alle 4 Sekunden eine Card weiter, weich per
+ * CSS-Transition; Pfeile drehen ±1. Pause bei Hover.
  *
- * Caption + Datum liegen als Gradient-Overlay am unteren Card-Rand.
+ * Geometrie bewusst kompakt (kleiner Radius, große Perspektive), damit die
+ * nach vorn skalierte Front-Card vollständig in der Section bleibt und nichts
+ * in den Footer ragt (overflow-hidden auf der Section).
  */
-const RADIUS = 480; // Abstand der Cards zur Zylinderachse (px)
-const AUTO_SPEED = 0.18; // Grad pro Frame bei Auto-Rotation
+const CARD_W = 232;
+const CARD_H = 290;
+const RADIUS = 330; // Abstand zur Zylinderachse – klein = kompakt
+const PERSPECTIVE = 2200; // groß = wenig Front-Zoom (Card passt in die Section)
+const SECTION_H = 480;
+const AUTO_MS = 4000; // jede Card ~4 s sichtbar
 
 export default function CylinderCarousel({ posts }: { posts: InstaPost[] }) {
   const [rotation, setRotation] = useState(0);
   const [paused, setPaused] = useState(false);
-  const frameRef = useRef<number | null>(null);
-
   const anglePerItem = 360 / posts.length;
 
-  // Auto-Rotation per requestAnimationFrame; pausiert bei Hover/Interaktion.
-  useEffect(() => {
-    const tick = () => {
-      if (!paused) setRotation((prev) => prev + AUTO_SPEED);
-      frameRef.current = requestAnimationFrame(tick);
-    };
-    frameRef.current = requestAnimationFrame(tick);
-    return () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-    };
-  }, [paused]);
-
-  // Pfeil-Navigation: um genau eine Card weiterdrehen (sanft per CSS-Transition).
+  // Eine Card weiterdrehen (negativ = nächste Card nach vorne).
   const rotate = useCallback(
     (dir: 1 | -1) => setRotation((prev) => prev - dir * anglePerItem),
     [anglePerItem],
   );
 
+  // stabile Referenz auf „nächste Card" für den Auto-Advance-Interval
+  const nextRef = useRef(() => rotate(1));
+  nextRef.current = () => rotate(1);
+
+  useEffect(() => {
+    if (paused) return;
+    const timer = setInterval(() => nextRef.current(), AUTO_MS);
+    return () => clearInterval(timer);
+  }, [paused]);
+
   return (
     <div
-      className="relative mx-auto flex h-[440px] max-w-5xl items-center justify-center"
-      style={{ perspective: "1800px" }}
+      className="relative mx-auto max-w-5xl overflow-hidden"
+      style={{ height: SECTION_H, perspective: `${PERSPECTIVE}px` }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
     >
-      {/* Rotierende Zylinderachse */}
+      {/* Rotierende Zylinderachse (Mitte der Section) */}
       <div
-        className="relative h-[360px] w-[260px]"
+        className="absolute inset-0"
         style={{
           transformStyle: "preserve-3d",
           transform: `rotateY(${rotation}deg)`,
-          // Beim Klick sanft snappen; während Auto-Rotation ohne Transition.
-          transition: paused ? "transform 0.6s ease" : "none",
+          transition: "transform 0.8s ease",
         }}
       >
         {posts.map((post, i) => {
@@ -66,7 +68,7 @@ export default function CylinderCarousel({ posts }: { posts: InstaPost[] }) {
           // Sichtbarkeit anhand des Winkels zur Front (0°) abblenden.
           const relative = (((itemAngle + rotation) % 360) + 360) % 360;
           const fromFront = relative > 180 ? 360 - relative : relative;
-          const opacity = Math.max(0.25, 1 - fromFront / 150);
+          const opacity = Math.max(0.2, 1 - fromFront / 150);
 
           return (
             <a
@@ -74,25 +76,35 @@ export default function CylinderCarousel({ posts }: { posts: InstaPost[] }) {
               href={post.permalink}
               target="_blank"
               rel="noopener noreferrer"
-              className="absolute left-1/2 top-1/2 h-[360px] w-[260px] -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-xl border border-fcb-border bg-fcb-surface shadow-2xl"
+              aria-label="Beitrag auf Instagram ansehen"
+              onMouseMove={spotlightMove}
+              className="spotlight-card group absolute overflow-hidden rounded-xl border border-fcb-border bg-fcb-surface shadow-2xl"
               style={{
+                width: CARD_W,
+                height: CARD_H,
+                left: "50%",
+                top: "50%",
+                marginLeft: -CARD_W / 2,
+                marginTop: -CARD_H / 2,
                 transform: `rotateY(${itemAngle}deg) translateZ(${RADIUS}px)`,
                 opacity,
-                transition: "opacity 0.3s linear",
+                transition: "opacity 0.4s linear",
               }}
             >
+              <SpotlightOverlays />
               <Image
                 src={post.imageUrl}
                 alt={post.caption.slice(0, 80) || "Instagram-Beitrag"}
                 fill
-                sizes="260px"
+                sizes="232px"
                 className="object-cover"
               />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 pt-12">
-                <p className="font-inter text-[0.7rem] uppercase tracking-wider text-fcb-blue">
+              <InstagramLink className="absolute right-2.5 top-2.5" />
+              <div className="absolute inset-x-0 bottom-0 z-10 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-3 pt-10">
+                <p className="font-inter text-[0.65rem] uppercase tracking-wider text-fcb-blue">
                   {formatPostDate(post.timestamp)}
                 </p>
-                <p className="mt-1 line-clamp-2 font-inter text-sm text-white/90">
+                <p className="mt-1 line-clamp-2 font-inter text-xs text-white/90">
                   {post.caption}
                 </p>
               </div>
@@ -101,12 +113,12 @@ export default function CylinderCarousel({ posts }: { posts: InstaPost[] }) {
         })}
       </div>
 
-      {/* Pfeil-Navigation */}
+      {/* Pfeil-Navigation – vertikal mittig zur Card-Höhe (Section-Mitte) */}
       <button
         type="button"
         onClick={() => rotate(-1)}
         aria-label="Vorheriger Beitrag"
-        className="absolute left-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-blue sm:left-6"
+        className="absolute left-2 top-1/2 z-50 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-blue sm:left-6"
       >
         <ChevronLeft size={22} />
       </button>
@@ -114,7 +126,7 @@ export default function CylinderCarousel({ posts }: { posts: InstaPost[] }) {
         type="button"
         onClick={() => rotate(1)}
         aria-label="Nächster Beitrag"
-        className="absolute right-2 top-1/2 z-10 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-blue sm:right-6"
+        className="absolute right-2 top-1/2 z-50 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-blue sm:right-6"
       >
         <ChevronRight size={22} />
       </button>
