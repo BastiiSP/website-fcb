@@ -34,6 +34,20 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.fna.fbcdn.net",
         pathname: "/**",
+      },
+
+      // ✅ Behold.so – stabile, gehostete Bild-URLs des Instagram-Feeds
+      // (behold.pictures + cdn2.behold.pictures). Wird von den
+      // Instagram-Carousel-Varianten unter /instagram/* genutzt.
+      {
+        protocol: "https",
+        hostname: "**.behold.pictures",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "behold.pictures",
+        pathname: "/**",
       }
     ],
   },
