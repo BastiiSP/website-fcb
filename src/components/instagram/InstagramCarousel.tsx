@@ -79,9 +79,9 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
               rel="noopener noreferrer"
               aria-label="Beitrag auf Instagram ansehen"
               onMouseMove={isCenter ? spotlightMove : undefined}
-              className="spotlight-card group absolute flex w-56 flex-col overflow-hidden rounded-3xl border-2 border-fcb-border bg-fcb-surface shadow-2xl transition-all duration-500 ease-in-out md:w-72"
+              className="spotlight-card group absolute flex w-64 flex-col overflow-hidden rounded-3xl border-2 border-fcb-border bg-fcb-surface shadow-2xl transition-all duration-500 ease-in-out md:w-80"
               style={{
-                transform: `translateX(${pos * 58}%) scale(${
+                transform: `translateX(${pos * 54}%) scale(${
                   isCenter ? 1 : isAdjacent ? 0.82 : 0.68
                 }) rotateY(${pos * -9}deg)`,
                 zIndex: isCenter ? 10 : isAdjacent ? 5 : 1,
@@ -99,7 +99,7 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
                   src={post.imageUrl}
                   alt={post.caption.slice(0, 80) || "Instagram-Beitrag"}
                   fill
-                  sizes="(max-width: 768px) 224px, 288px"
+                  sizes="(max-width: 768px) 256px, 320px"
                   className="object-cover"
                 />
                 {isCenter && <InstagramOverlay className="right-3 top-3" />}
@@ -117,7 +117,7 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
                   </p>
                 )}
                 {body && (
-                  <p className="line-clamp-5 whitespace-pre-line font-inter text-sm leading-relaxed text-white/70">
+                  <p className="line-clamp-4 whitespace-pre-line font-inter text-sm leading-relaxed text-white/70">
                     {body}
                   </p>
                 )}
