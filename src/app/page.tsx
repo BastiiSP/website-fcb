@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect } from "react";
 import { motion } from "framer-motion";
 import HybridCanvas from "@/components/hero/HybridCanvas";
 import HybridPitch from "@/components/hero/HybridPitch";
 import RotatingText from "@/components/hero/RotatingText";
+import InstagramSection from "@/components/instagram/InstagramSection";
 
 /**
  * Homepage – Hybrid-Hero als Startseite.
@@ -16,24 +16,13 @@ import RotatingText from "@/components/hero/RotatingText";
  *   Vignette           (Lesbarkeits-Gradient)
  *   Content (z-10)     (Wappen, Headline, Subheadline, 1911-Element)
  *
- * Unterhalb des Heroes: Instagram-Feed via LightWidget.
+ * Unterhalb des Heroes: „Vereins-News" – das Instagram-Carousel
+ * (InstagramSection lädt den Behold-Feed über /api/instagram).
  */
 const HEADLINE_LINES = ["FUSSBALL.", "CHARAKTER.", "BURGKUNSTADT."];
 const ROTATING_WORDS = ["Leidenschaft", "Heimat", "Gemeinschaft", "Tradition"];
 
 export default function HomePage() {
-
-  // LightWidget-Script für den Instagram-Feed
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src = "https://cdn.lightwidget.com/widgets/lightwidget.js";
-    script.async = true;
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
-
   return (
     <main className="min-h-screen bg-fcb-bg text-fcb-text">
 
@@ -202,25 +191,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Instagram-Feed */}
-      <section className="px-4 py-10 text-center bg-fcb-bg">
-        <h2 className="text-2xl font-oswald font-bold uppercase tracking-wide text-fcb-text mb-4">
-          Vereins-News
-        </h2>
-        <div className="w-full max-w-4xl mx-auto bg-fcb-surface border border-fcb-border rounded-lg p-4">
-          <iframe
-            src="https://cdn.lightwidget.com/widgets/e0ddd3f07e445ffcadd888b4c0f4c053.html"
-            scrolling="no"
-            allowTransparency={true}
-            className="lightwidget-widget w-full"
-            style={{
-              border: 0,
-              overflow: "hidden",
-              minHeight: "400px",
-            }}
-          />
-        </div>
-      </section>
+      {/* Vereins-News – Instagram-Carousel (ersetzt den früheren LightWidget-Feed) */}
+      <InstagramSection />
 
     </main>
   );
