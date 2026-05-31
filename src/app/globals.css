@@ -181,24 +181,25 @@ body {
   /* Zusätzlicher Außen-Glow, damit der Effekt deutlich spürbar ist.
      #1d5fad = Wert des fcb-blue-Tokens. */
   .spotlight-card:hover {
-    box-shadow: 0 0 28px -6px rgba(29, 95, 173, 0.55);
+    box-shadow: 0 0 40px -4px rgba(29, 95, 173, 0.75);
   }
 
-  /* Prominenter, FCB-blauer Rand-Glow (Gradient-Border via Masken-Trick). */
+  /* Prominenter, FCB-blauer Rand-Glow (Gradient-Border via Masken-Trick).
+     Bewusst dick (Runde 3): kräftiger Kern + hohe Deckkraft. */
   .spotlight-border {
     position: absolute;
     inset: 0;
     z-index: 40;
     border-radius: inherit;
-    padding: 2px; /* Randdicke des Glows */
+    padding: 4px; /* Randdicke des Glows (Runde 3: 2 → 4 px) */
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;
     background: radial-gradient(
-      260px circle at var(--mx) var(--my),
+      300px circle at var(--mx) var(--my),
       #1d5fad 0%,
-      rgba(29, 95, 173, 0.5) 35%,
-      transparent 70%
+      rgba(29, 95, 173, 0.85) 45%,
+      transparent 75%
     );
     -webkit-mask:
       linear-gradient(#000 0 0) content-box,
@@ -243,5 +244,81 @@ body {
       #962fbf,
       #4f5bd5
     );
+  }
+
+  /* Instagram-Overlay (Runde 3): poppt beim Card-Hover deutlich auf.
+     Default versteckt (klein, transparent, nach unten versetzt); beim Hover
+     Scale-Overshoot + Slide-up, Icon weiß, kräftiger Glow. Die Gradient-Fläche
+     blendet gestaffelt NACH der Box ein (transition-delay) → spürbares Pop. */
+  .insta-overlay {
+    position: absolute;
+    z-index: 30;
+    display: flex;
+    height: 2.75rem;
+    width: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border-radius: 0.85rem;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background-color: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transform: scale(0.5) translateY(10px);
+    transition:
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      opacity 0.3s ease,
+      box-shadow 0.3s ease;
+  }
+  .group:hover .insta-overlay {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    box-shadow: 0 10px 26px -4px rgba(214, 41, 118, 0.7);
+    transition-delay: 0.05s;
+  }
+
+  .insta-overlay-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .group:hover .insta-overlay-bg {
+    opacity: 1;
+    transition-delay: 0.14s; /* gestaffelt: Fläche nach der Box */
+  }
+
+  .insta-overlay-icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    color: rgba(255, 255, 255, 0.75);
+    transition:
+      color 0.3s ease,
+      transform 0.3s ease;
+  }
+  .group:hover .insta-overlay-icon {
+    color: #ffffff;
+    transform: scale(1.1);
+    transition-delay: 0.2s;
+  }
+  .insta-overlay-icon svg {
+    height: 1.4rem;
+    width: 1.4rem;
+    fill: currentColor;
+  }
+
+  /* Touch-Geräte (kein Hover): Overlay dauerhaft sichtbar/gefüllt. */
+  @media (hover: none) {
+    .insta-overlay {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+    .insta-overlay-bg {
+      opacity: 1;
+    }
+    .insta-overlay-icon {
+      color: #ffffff;
+    }
   }
 }
