@@ -106,6 +106,33 @@ export async function getInstagramPosts(limit = 6): Promise<InstaPost[]> {
   }
 }
 
+/** Eine Caption aufgeteilt in Überschrift (erste Zeile) und Fließtext. */
+export interface CaptionParts {
+  heading: string;
+  body: string;
+}
+
+/**
+ * Trennt die erste Zeile einer Instagram-Caption als Überschrift ab und behält
+ * die übrigen Absätze als Fließtext (Absatzgrenzen via doppeltem Zeilenumbruch).
+ *
+ * Instagram-Captions enthalten echte \n-Umbrüche; ohne diese Aufbereitung
+ * (und CSS `whitespace-pre-line`) liefen alle Absätze als ein Block zusammen.
+ */
+export function splitCaption(caption: string): CaptionParts {
+  // An Zeilenumbrüchen trennen, leere Zeilen verwerfen → einzelne Absätze.
+  const paragraphs = caption
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+
+  if (paragraphs.length === 0) return { heading: "", body: "" };
+
+  const [heading, ...rest] = paragraphs;
+  // Restliche Absätze mit Leerzeile dazwischen zusammenfügen (pre-line rendert sie sichtbar).
+  return { heading, body: rest.join("\n\n") };
+}
+
 /**
  * Formatiert einen ISO-Zeitstempel ins deutsche Datumsformat, z. B. „20. Mai 2026".
  * Wird von allen Varianten genutzt, damit die Datumsanzeige einheitlich ist.

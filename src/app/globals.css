@@ -191,7 +191,7 @@ body {
     inset: 0;
     z-index: 40;
     border-radius: inherit;
-    padding: 4px; /* Randdicke des Glows (Runde 3: 2 → 4 px) */
+    padding: 3px; /* Randdicke des Glows */
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.3s ease;

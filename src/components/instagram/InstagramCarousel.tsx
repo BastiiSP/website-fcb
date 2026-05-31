@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { type InstaPost, formatPostDate } from "@/lib/beholdFeed";
+import { type InstaPost, formatPostDate, splitCaption } from "@/lib/beholdFeed";
 import { spotlightMove, SpotlightOverlays } from "./Spotlight";
 import InstagramOverlay from "./InstagramOverlay";
 
@@ -61,13 +61,15 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
     >
-      <div className="relative flex h-[480px] w-full items-center justify-center [perspective:1200px] md:h-[580px]">
+      <div className="relative flex h-[520px] w-full items-center justify-center [perspective:1200px] md:h-[620px]">
         {posts.map((post, index) => {
           // Position relativ zum aktiven Post in den Bereich [-half, +half].
           let pos = (index - current + total) % total;
           if (pos > Math.floor(total / 2)) pos -= total;
           const isCenter = pos === 0;
           const isAdjacent = Math.abs(pos) === 1;
+          // Erste Zeile als Überschrift abtrennen, restliche Absätze als Fließtext.
+          const { heading, body } = splitCaption(post.caption);
 
           return (
             <a
@@ -103,14 +105,22 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
                 {isCenter && <InstagramOverlay className="right-3 top-3" />}
               </div>
 
-              {/* Text-Zone (abgetrennt, über dem Lichtkegel) */}
+              {/* Text-Zone (abgetrennt, über dem Lichtkegel):
+                  Datum → Überschrift → Fließtext mit erhaltenen Absätzen. */}
               <div className="relative z-10 flex flex-1 flex-col gap-1.5 p-4">
                 <p className="font-inter text-[0.7rem] uppercase tracking-wider text-fcb-blue">
                   {formatPostDate(post.timestamp)}
                 </p>
-                <p className="line-clamp-3 font-inter text-sm leading-relaxed text-white/85">
-                  {post.caption}
-                </p>
+                {heading && (
+                  <p className="line-clamp-2 font-inter text-sm font-semibold text-white">
+                    {heading}
+                  </p>
+                )}
+                {body && (
+                  <p className="line-clamp-5 whitespace-pre-line font-inter text-sm leading-relaxed text-white/70">
+                    {body}
+                  </p>
+                )}
               </div>
             </a>
           );
