@@ -107,6 +107,7 @@ RLS: Nutzer sehen/erstellen nur eigene Anfragen; vorstand und admin verwalten al
 - **TypeScript strict**: Keine `any` Types. Immer explizite Interfaces definieren.
 - **RLS immer aktiv**: Zugangskontrolle läuft in der Datenbank, nicht nur im Frontend
 - **GRANTs nicht vergessen**: Bei jeder neuen Tabelle explizit `GRANT SELECT, INSERT, UPDATE, DELETE ON public.<tabelle> TO authenticated;` ausführen – ohne das greift RLS nie, da Postgres vorher mit „permission denied" abbricht. Bereits zweimal vergessen: `buchungen` (2026-05-22) und `mitglieder` (2026-05-26).
+- **Neue Tabelle anlegen**: Immer das Skill `supabase-tabelle-anlegen` nutzen (`.claude/skills/`) – verifiziertes Rezept mit korrekter Trigger-Funktion (`handle_updated_at()`), RLS-Muster (`get_own_rolle()`), GRANT und Workflow-Checkliste.
 - **Supabase MCP nutzen**: Für alle Datenbankoperationen den MCP-Server verwenden
 - **Keine direkten DB-Calls ohne RLS-Check** in Server Components
 - **Fehlerbehandlung**: Alle Supabase-Calls mit try/catch und aussagekräftigen Fehlermeldungen
