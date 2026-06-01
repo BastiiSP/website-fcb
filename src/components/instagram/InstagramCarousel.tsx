@@ -55,7 +55,8 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
 
   return (
     <div
-      className="relative mx-auto flex w-full max-w-5xl items-center justify-center"
+      // overflow-hidden: verhindert horizontalen Scroll durch Adjacent-Cards (translateX ±54%)
+      className="relative mx-auto flex w-full max-w-5xl items-center justify-center overflow-hidden"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onTouchStart={onTouchStart}
