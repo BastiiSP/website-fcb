@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
 import { FCB_FOOTER } from "../_data";
@@ -8,9 +6,11 @@ import { FCB_FOOTER } from "../_data";
  * Variante „Slim Bar" – maximal kompakt, alles in einer Zeile (~60 px).
  * Vereinsname links, Rechtliches mittig, Social rechts. Auf Mobile gestapelt.
  */
-export default function FooterSlim() {
-  const jahr = new Date().getFullYear();
+// Copyright-Jahr einmal auf Modulebene berechnen – stabil über Server/Client,
+// kein Client-Boundary nötig (reine Server-Komponente).
+const JAHR = new Date().getFullYear();
 
+export default function FooterSlim() {
   return (
     <footer className="w-full border-t border-fcb-border bg-fcb-bg text-fcb-text">
       <div className="mx-auto flex min-h-[60px] max-w-6xl flex-col items-center justify-between gap-2 px-4 py-2 sm:flex-row">
@@ -29,7 +29,7 @@ export default function FooterSlim() {
             Datenschutz
           </Link>
           <span aria-hidden className="text-fcb-border">|</span>
-          <span>© {jahr}</span>
+          <span>© {JAHR}</span>
         </nav>
 
         {/* Rechts: Social */}

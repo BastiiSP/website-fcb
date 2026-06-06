@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
@@ -10,9 +8,11 @@ import { FCB_FOOTER } from "../_data";
  * Variante „Dreispaltig" – klassisches Footer-Layout mit mehr Atemraum.
  * Spalte 1 Vereinsinfo, Spalte 2 Rechtliches, Spalte 3 Social + Copyright.
  */
-export default function FooterDreispaltig() {
-  const jahr = new Date().getFullYear();
+// Copyright-Jahr einmal auf Modulebene berechnen – stabil über Server/Client,
+// kein Client-Boundary nötig (reine Server-Komponente).
+const JAHR = new Date().getFullYear();
 
+export default function FooterDreispaltig() {
   return (
     <footer className="w-full border-t border-fcb-border bg-fcb-bg text-fcb-text">
       <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-10 sm:grid-cols-3">
@@ -85,7 +85,7 @@ export default function FooterDreispaltig() {
             </Link>
           </div>
           <span className="font-inter text-xs text-fcb-muted sm:text-right">
-            © {jahr}
+            © {JAHR}
             <br />
             {FCB_FOOTER.vereinsname}
           </span>

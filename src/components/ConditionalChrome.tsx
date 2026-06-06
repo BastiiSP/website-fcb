@@ -6,13 +6,14 @@ import Footer from "@/components/Footer";
 
 /**
  * Rendert Header + main + Footer für alle bestehenden Routes,
- * unterdrückt aber Header/Footer/main-Padding für die Design-Exploration
- * unter /variants/*. Wird einmalig im root layout.tsx gewrappt.
+ * unterdrückt aber Header/Footer/main-Padding für die Design-Exploration-Routen
+ * unter /variants/* und /footer-preview/*. Wird einmalig im root layout.tsx gewrappt.
  *
- * Hintergrund: Die /variants-Routes brauchen eine eigene Navbar und Full-Bleed-
- * Hintergründe. Statt das gesamte Root-Layout zu duplizieren, blenden wir hier
- * pathname-basiert die globale Chrome aus. So bleibt jede bestehende Route
- * (/, /login, /kalender, /vorstand, ...) optisch 100 % identisch.
+ * Hintergrund: Die /variants- und /footer-preview-Routes brauchen eine eigene
+ * Navbar und Full-Bleed-Hintergründe. Statt das gesamte Root-Layout zu
+ * duplizieren, blenden wir hier pathname-basiert die globale Chrome aus. So
+ * bleibt jede bestehende Route (/, /login, /kalender, /vorstand, ...) optisch
+ * 100 % identisch.
  */
 export default function ConditionalChrome({
   children,

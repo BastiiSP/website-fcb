@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
 import { MapPin } from "lucide-react";
@@ -11,9 +9,11 @@ import { FCB_FOOTER } from "../_data";
  * untere Zeile Rechtliches + Social + Copyright. Großzügiger als Slim,
  * aber noch kompakt.
  */
-export default function FooterZweizeilig() {
-  const jahr = new Date().getFullYear();
+// Copyright-Jahr einmal auf Modulebene berechnen – stabil über Server/Client,
+// kein Client-Boundary nötig (reine Server-Komponente).
+const JAHR = new Date().getFullYear();
 
+export default function FooterZweizeilig() {
   return (
     <footer className="w-full border-t border-fcb-border bg-fcb-bg text-fcb-text">
       <div className="mx-auto max-w-6xl px-4 py-5">
@@ -73,7 +73,7 @@ export default function FooterZweizeilig() {
           </div>
 
           <span className="font-inter text-xs text-fcb-muted">
-            © {jahr} {FCB_FOOTER.vereinsname}
+            © {JAHR} {FCB_FOOTER.vereinsname}
           </span>
         </div>
       </div>
