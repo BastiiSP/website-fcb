@@ -20,11 +20,14 @@ export default function ConditionalChrome({
   children: React.ReactNode;
 }) {
   const pathname = usePathname() ?? "";
-  const isVariantsRoute = pathname.startsWith("/variants");
+  // Preview-Routen mit eigenem Full-Bleed-Layout (Design-Exploration):
+  // /variants/* (Hero, historisch) und /footer-preview/* (Footer-Varianten, Runde 2).
+  const isPreviewRoute =
+    pathname.startsWith("/variants") || pathname.startsWith("/footer-preview");
 
-  if (isVariantsRoute) {
-    // Full-Bleed: kein Header/Footer, kein main-Padding. Das variants/layout.tsx
-    // übernimmt sein eigenes Chrome (Switcher + smart-sticky Navbar).
+  if (isPreviewRoute) {
+    // Full-Bleed: kein globaler Header/Footer, kein main-Padding. Das jeweilige
+    // layout.tsx der Preview-Route übernimmt sein eigenes Chrome.
     return <>{children}</>;
   }
 
