@@ -22,9 +22,13 @@ export default function ConditionalChrome({
 }) {
   const pathname = usePathname() ?? "";
   // Preview-Routen mit eigenem Full-Bleed-Layout (Design-Exploration):
-  // /variants/* (Hero, historisch) und /footer-preview/* (Footer-Varianten, Runde 2).
+  // /variants/* (Hero, historisch), /footer-preview/* (Footer-Varianten, Runde 2)
+  // sowie /navbar-preview/* + /dropdown-preview/* (Auth-Bereich-Varianten, Runde 2).
   const isPreviewRoute =
-    pathname.startsWith("/variants") || pathname.startsWith("/footer-preview");
+    pathname.startsWith("/variants") ||
+    pathname.startsWith("/footer-preview") ||
+    pathname.startsWith("/navbar-preview") ||
+    pathname.startsWith("/dropdown-preview");
 
   if (isPreviewRoute) {
     // Full-Bleed: kein globaler Header/Footer, kein main-Padding. Das jeweilige
