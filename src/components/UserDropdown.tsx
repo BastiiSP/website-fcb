@@ -83,7 +83,7 @@ export default function UserDropdown() {
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.avatar_url}
-              alt="Profilbild"
+              alt={`Profilbild${user.vorname ? ` von ${user.vorname}` : ""}`}
               className="h-10 w-10 rounded-full object-cover"
             />
           ) : (
@@ -134,7 +134,7 @@ export default function UserDropdown() {
                     }`}
                   >
                     <LogOut className="h-4 w-4" />
-                    Logout
+                    Abmelden
                   </button>
                 )}
               </Menu.Item>
