@@ -5,7 +5,7 @@ import { createClient } from "@/lib/supabaseClient";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Menu } from "@headlessui/react";
-import { FiUser } from "react-icons/fi";
+import { LogIn, LogOut, User, UserPlus } from "lucide-react";
 
 interface UserData {
   email: string;
@@ -76,77 +76,116 @@ export default function UserDropdown() {
 
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button className="flex items-center justify-center w-10 h-10 rounded-full bg-fcb-blue text-white font-bold overflow-hidden">
-        {isLoggedIn ? (
-          user?.avatar_url ? (
+      {/* Trigger: eingeloggt → Avatar-Kreis, ausgeloggt → einladender „Anmelden"-Button */}
+      {isLoggedIn ? (
+        <Menu.Button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-bold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav">
+          {user?.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={user.avatar_url}
               alt="Profilbild"
-              className="w-10 h-10 object-cover rounded-full"
+              className="h-10 w-10 rounded-full object-cover"
             />
           ) : (
-            <span className="text-sm text-white">
-              {getInitials()}
-            </span>
-          )
-        ) : (
-          <FiUser className="w-5 h-5" />
-        )}
-      </Menu.Button>
+            <span className="text-sm text-white">{getInitials()}</span>
+          )}
+        </Menu.Button>
+      ) : (
+        <Menu.Button className="flex items-center gap-1.5 rounded-full border border-fcb-blue bg-fcb-blue px-3 py-1.5 font-inter text-sm font-medium text-white transition-colors hover:bg-fcb-blue/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav">
+          <LogIn className="h-4 w-4" />
+          <span>Anmelden</span>
+        </Menu.Button>
+      )}
 
-      <Menu.Items className="absolute right-0 mt-2 w-52 origin-top-right rounded-md bg-fcb-surface text-fcb-text border border-fcb-border shadow-lg focus:outline-none z-[9999] px-2 pb-2">
+      <Menu.Items className="absolute right-0 z-[9999] mt-2 w-56 origin-top-right overflow-hidden rounded-lg border border-fcb-border bg-fcb-surface text-fcb-text shadow-lg focus:outline-none">
         {isLoggedIn ? (
           <>
-            <div className="px-2 pt-2 text-sm font-medium mb-1">
-              Hallo {user?.vorname?.trim() ? user.vorname : "Nutzer"}
+            {/* Kopf: Name + E-Mail klar abgesetzt */}
+            <div className="border-b border-fcb-border px-4 py-3">
+              <p className="font-inter text-sm font-semibold text-fcb-text">
+                {user?.vorname?.trim() ? user.vorname : "Nutzer"}
+              </p>
+              <p className="truncate font-inter text-xs text-fcb-muted">
+                {user?.email ?? ""}
+              </p>
             </div>
-            <div className="px-2 text-xs text-fcb-muted mb-2">
-              {user?.email ?? ""}
+
+            {/* Aktionen */}
+            <div className="p-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href="/profil"
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
+                      active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
+                    }`}
+                  >
+                    <User className="h-4 w-4 text-fcb-muted" />
+                    Profil bearbeiten
+                  </Link>
+                )}
+              </Menu.Item>
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    onClick={handleLogout}
+                    className={`flex w-full items-center gap-2 rounded-md px-3 py-2 font-inter text-sm font-medium text-fcb-red transition-colors ${
+                      active ? "bg-fcb-red/10" : ""
+                    }`}
+                  >
+                    <LogOut className="h-4 w-4" />
+                    Logout
+                  </button>
+                )}
+              </Menu.Item>
             </div>
-            <Menu.Item>
-              {({ active }) => (
-                <Link
-                  href="/profil"
-                  className={`mt-1 px-4 py-2 w-full text-sm text-center rounded border block transition ${
-                    active
-                      ? "bg-fcb-border border-fcb-border"
-                      : "bg-transparent border-fcb-border hover:bg-fcb-border"
-                  }`}
-                >
-                  Profil bearbeiten
-                </Link>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={handleLogout}
-                  className={`mt-2 px-4 py-2 w-full font-bold text-sm text-center rounded border transition ${
-                    active
-                      ? "bg-red-700 border-red-800"
-                      : "bg-red-600 hover:bg-red-700 border-red-700"
-                  } text-white`}
-                >
-                  Logout
-                </button>
-              )}
-            </Menu.Item>
           </>
         ) : (
-          <Menu.Item>
-            {({ active }) => (
-              <button
-                onClick={() => router.push("/login")}
-                className={`mt-3 px-4 py-2 w-full font-bold text-sm text-center rounded border transition ${
-                  active
-                    ? "bg-fcb-blue/80 border-fcb-blue"
-                    : "bg-fcb-blue hover:bg-fcb-blue/80 border-fcb-blue"
-                } text-white`}
-              >
-                Login
-              </button>
-            )}
-          </Menu.Item>
+          <>
+            {/* Kopf: einladender Hinweis für Besucher */}
+            <div className="border-b border-fcb-border px-4 py-3">
+              <p className="font-inter text-sm font-semibold text-fcb-text">
+                Willkommen beim FCB
+              </p>
+              <p className="font-inter text-xs text-fcb-muted">
+                Melde dich an oder registriere dich.
+              </p>
+            </div>
+
+            {/* Login-Pfad */}
+            <div className="p-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <button
+                    onClick={() => router.push("/login")}
+                    className={`flex w-full items-center gap-2 rounded-md px-3 py-2 font-inter text-sm font-medium text-white transition-colors ${
+                      active ? "bg-fcb-blue/90" : "bg-fcb-blue"
+                    }`}
+                  >
+                    <LogIn className="h-4 w-4" />
+                    Login
+                  </button>
+                )}
+              </Menu.Item>
+            </div>
+
+            {/* Registrieren-Pfad – optisch vom Login getrennt */}
+            <div className="border-t border-fcb-border p-1">
+              <Menu.Item>
+                {({ active }) => (
+                  <Link
+                    href="/registrieren"
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
+                      active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
+                    }`}
+                  >
+                    <UserPlus className="h-4 w-4 text-fcb-muted" />
+                    Noch kein Konto? Registrieren
+                  </Link>
+                )}
+              </Menu.Item>
+            </div>
+          </>
         )}
       </Menu.Items>
     </Menu>
