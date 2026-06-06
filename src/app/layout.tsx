@@ -55,8 +55,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${inter.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
       >
         {/* ConditionalChrome rendert Header/Footer und das Main-Padding wie
-            bisher, unterdrückt beides aber auf /variants/* (Design-Exploration
-            mit eigenem Full-Bleed-Layout). */}
+            bisher, unterdrückt beides aber auf den Design-Exploration-Routen
+            /variants/* und /footer-preview/* (eigenes Full-Bleed-Layout). */}
         <ConditionalChrome>{children}</ConditionalChrome>
 
         {/* Vercel Monitoring */}
