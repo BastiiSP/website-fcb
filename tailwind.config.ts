@@ -13,6 +13,7 @@ const config: Config = {
         fcb: {
           bg:          "#0a0a0a", // fast schwarz – Hintergrund, Hero
           surface:     "#161616", // dunkelgrau – Cards, Panels
+          footer:      "#262626", // etwas heller – Footer-Fläche, hebt sich vom bg ab
           border:      "#2a2a2a", // Trennlinien, Rahmen
           text:        "#ffffff", // Primärtext
           muted:       "#888888", // Datum, Metainfo, Sekundärtext

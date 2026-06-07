@@ -24,6 +24,9 @@ const FCB_FOOTER = {
   ort: "96224 Burgkunstadt",
   facebookUrl: "https://www.facebook.com/fc1911?locale=de_DE",
   instagramUrl: "https://www.instagram.com/schuhstaedter1911",
+  // Google-Maps-Suche nach der Vereinsadresse (api=1 öffnet zuverlässig die Karte)
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Alter+Postweg+10%2C+96224+Burgkunstadt",
 } as const;
 
 // Copyright-Jahr einmal auf Modulebene – stabil über Server/Client.
@@ -36,7 +39,7 @@ export default function Footer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full border-t border-white/20 bg-neutral-800 text-fcb-text"
+      className="w-full border-t border-white/20 bg-fcb-footer text-fcb-text"
     >
       {/* Instagram-Brand-Gradient: einmal als SVG-Def hinterlegt, beim Hover per
           fill:url(#...) auf dem Icon referenziert. Stops = Instagrams offizielle
@@ -69,15 +72,21 @@ export default function Footer() {
               {FCB_FOOTER.vereinsname}
             </span>
           </div>
-          <div className="flex items-center gap-2 font-inter text-sm text-fcb-muted">
-            {/* Dezent: etwas kleiner als das Vereinswappen, vertikal zentriert zur Adresse */}
-            <MapPin className="h-8 w-8 shrink-0 text-fcb-blue" />
+          {/* Icon + Adresse als direkter Google-Maps-Link */}
+          <Link
+            href={FCB_FOOTER.mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Vereinsadresse in Google Maps öffnen"
+            className="flex w-fit items-center gap-2 font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
+          >
+            <MapPin className="h-5 w-5 shrink-0 text-fcb-blue" />
             <span>
               {FCB_FOOTER.strasse}
               <br />
               {FCB_FOOTER.ort}
             </span>
-          </div>
+          </Link>
         </div>
 
         {/* Spalte 2: Rechtliches */}
