@@ -186,14 +186,25 @@ Der Supabase MCP-Server ist eingerichtet. Nutze ihn für:
 ```bash
 cd ~/Workspace/website-fcb
 npm run dev        # Entwicklungsserver auf localhost:3000
-npm run build      # Production Build
+npm run build      # Production Build – schlägt LOKAL oft fehl (s. Deployment), Vercel baut sauber
 npm run lint       # ESLint
 ```
+
+**Environment:** `.env.local` mit `NEXT_PUBLIC_SUPABASE_URL` und
+`NEXT_PUBLIC_SUPABASE_ANON_KEY`. `src/lib/supabaseClient.ts` hat Placeholder-Fallbacks,
+damit Preview-Branches ohne Env-Vars trotzdem bauen – auf `main` sind echte Werte gesetzt.
+
+**Tests:** Keine automatisierten Tests (nur `dev`/`build`/`start`/`lint`). Verifikation läuft
+über Lint, `npx tsc --noEmit` und manuelles Testen (s. „Manuell zu testen").
 
 ## Deployment
 
 Push auf `main` → Vercel deployed automatisch.
-Vor dem Push immer `npm run build` lokal prüfen.
+
+**Build-Check vor Push:** `npm run lint` + `npx tsc --noEmit`. Der lokale `npm run build`
+scheitert häufig an Turbopack+FullCalendar (`Can't resolve '@fullcalendar/core'`) – das ist
+KEIN eigener Bug, Vercel nutzt einen anderen Bundler-Pfad und baut sauber. Nur Fehler in
+eigenen Dateien sind echte Blocker.
 
 ```bash
 git add -A
