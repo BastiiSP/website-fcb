@@ -36,7 +36,7 @@ export default function Footer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full border-t border-fcb-border bg-fcb-surface text-fcb-text"
+      className="w-full border-t border-white/10 bg-fcb-surface text-fcb-text"
     >
       {/* Instagram-Brand-Gradient: einmal als SVG-Def hinterlegt, beim Hover per
           fill:url(#...) auf dem Icon referenziert. Stops = Instagrams offizielle

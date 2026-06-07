@@ -51,30 +51,42 @@ export default function Header() {
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
 
-        {/* Vereinswappen + Stadtwappen + Name */}
-        <Link href="/" className="flex items-center gap-2">
-          <Image
-            src="/logo.svg"
-            alt="Vereinslogo 1. FC 1911 Burgkunstadt"
-            width={36}
-            height={36}
-            className="drop-shadow-lg"
-          />
-          {/* Stadtwappen: kleiner + gedämpft – signalisiert Hierarchie (FCB > Stadt) */}
-          <Image
-            src="/stadtwappen-burgkunstadt.svg"
-            alt="Stadtwappen Burgkunstadt"
-            width={24}
-            height={24}
-            className="opacity-70"
-          />
-          <span className="hidden font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text sm:inline">
-            1. FC 1911 Burgkunstadt
-          </span>
-          <span className="font-oswald text-base font-bold uppercase tracking-wide text-fcb-text sm:hidden">
-            FCB
-          </span>
-        </Link>
+        {/* Linke Gruppe: Hamburger (mobil, Konvention links) + Wappen + Name */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setMenuOpen((v) => !v)}
+            aria-label={menuOpen ? "Menü schließen" : "Menü öffnen"}
+            aria-expanded={menuOpen}
+            className="-ml-1 rounded p-1 text-fcb-text transition-colors hover:text-fcb-blue md:hidden"
+          >
+            {menuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+
+          {/* Vereinswappen + Stadtwappen + Name */}
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/logo.svg"
+              alt="Vereinslogo 1. FC 1911 Burgkunstadt"
+              width={36}
+              height={36}
+              className="drop-shadow-lg"
+            />
+            {/* Stadtwappen: kleiner + gedämpft – signalisiert Hierarchie (FCB > Stadt) */}
+            <Image
+              src="/stadtwappen-burgkunstadt.svg"
+              alt="Stadtwappen Burgkunstadt"
+              width={24}
+              height={24}
+              className="opacity-70"
+            />
+            <span className="hidden font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text sm:inline">
+              1. FC 1911 Burgkunstadt
+            </span>
+            <span className="font-oswald text-base font-bold uppercase tracking-wide text-fcb-text sm:hidden">
+              FCB
+            </span>
+          </Link>
+        </div>
 
         {/* Desktop Nav: öffentliche Links + rollenbasierte Links */}
         <div className="hidden items-center gap-6 md:flex">
@@ -90,16 +102,9 @@ export default function Header() {
           <Navigation />
         </div>
 
-        {/* Rechte Seite: UserDropdown + Hamburger */}
-        <div className="flex items-center gap-3">
+        {/* Rechte Seite: Auth (Buttons ausgeloggt / Avatar eingeloggt) */}
+        <div className="flex items-center">
           <UserDropdown />
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label={menuOpen ? "Menü schließen" : "Menü öffnen"}
-            className="rounded p-1 text-fcb-text transition-colors hover:text-fcb-blue md:hidden"
-          >
-            {menuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
         </div>
       </div>
 
