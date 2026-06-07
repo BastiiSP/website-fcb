@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
+import { useConsent } from "@/components/consent/ConsentProvider";
 
 /**
  * Vereins-Footer (Design-Runde 2, dreispaltig).
@@ -33,6 +34,8 @@ const FCB_FOOTER = {
 const JAHR = new Date().getFullYear();
 
 export default function Footer() {
+  // Öffnet das Cookie-Banner erneut – ohne Reload oder Cookie-Löschen.
+  const { openSettings } = useConsent();
   return (
     <motion.footer
       initial={{ opacity: 0, y: 24 }}
@@ -110,6 +113,15 @@ export default function Footer() {
           >
             Datenschutz
           </Link>
+          {/* Cookie-Einstellungen jederzeit erneut öffnen (kein Reload nötig).
+              Button statt Link, da es eine In-App-Aktion ist, keine Navigation. */}
+          <button
+            type="button"
+            onClick={openSettings}
+            className="w-fit text-left font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+          >
+            Cookie-Einstellungen
+          </button>
         </div>
 
         {/* Spalte 3: Social + Copyright */}
