@@ -36,7 +36,7 @@ export default function Footer() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full border-t border-white/20 bg-fcb-surface text-fcb-text"
+      className="w-full border-t border-white/20 bg-neutral-800 text-fcb-text"
     >
       {/* Instagram-Brand-Gradient: einmal als SVG-Def hinterlegt, beim Hover per
           fill:url(#...) auf dem Icon referenziert. Stops = Instagrams offizielle
@@ -70,8 +70,8 @@ export default function Footer() {
             </span>
           </div>
           <div className="flex items-center gap-2 font-inter text-sm text-fcb-muted">
-            {/* Icon-Höhe = die beiden Adresszeilen (2× text-sm Zeilenhöhe ≈ h-10) */}
-            <MapPin className="h-10 w-10 shrink-0 text-fcb-blue" />
+            {/* Dezent: etwas kleiner als das Vereinswappen, vertikal zentriert zur Adresse */}
+            <MapPin className="h-8 w-8 shrink-0 text-fcb-blue" />
             <span>
               {FCB_FOOTER.strasse}
               <br />
