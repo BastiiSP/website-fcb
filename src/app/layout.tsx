@@ -4,9 +4,8 @@ import "./globals.css";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/react";
 
-// ConditionalChrome blendet Header/Footer ausschließlich auf den
-// Design-Exploration-Routen unter /variants/* aus. Alle bestehenden Routes
-// (/, /login, /kalender, ...) bekommen Header und Footer wie gewohnt.
+// ConditionalChrome rendert Header/Footer + main-Padding um alle Routen.
+// (Die früheren Design-Exploration-Routen wurden nach Runde 2 entfernt.)
 import ConditionalChrome from "@/components/ConditionalChrome";
 
 const geistSans = Geist({
@@ -19,8 +18,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-// Zusatz-Schriften für die Hero-Varianten (Oswald = Headlines, Inter = Body).
-// Werden nur in Komponenten unter /variants/* via font-oswald/font-inter aktiviert.
+// Marken-Schriften (Oswald = Headlines, Inter = Body) als CSS-Variablen.
+// Werden in modernen Komponenten via font-oswald / font-inter genutzt.
 const oswald = Oswald({
   variable: "--font-oswald",
   subsets: ["latin"],
@@ -49,14 +48,11 @@ export default function RootLayout({
   return (
     <html lang="de" className="light">
       <body
-        // Oswald & Inter werden als zusätzliche CSS-Variablen verfügbar gemacht;
-        // aktiv genutzt werden sie aber nur in den /variants/* Routes via
-        // font-oswald / font-inter (Tailwind-Tokens).
+        // Oswald & Inter werden als CSS-Variablen verfügbar gemacht und in
+        // modernen Komponenten via font-oswald / font-inter (Tailwind) genutzt.
         className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${inter.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
       >
-        {/* ConditionalChrome rendert Header/Footer und das Main-Padding wie
-            bisher, unterdrückt beides aber auf den Design-Exploration-Routen
-            /variants/* und /footer-preview/* (eigenes Full-Bleed-Layout). */}
+        {/* ConditionalChrome rendert Header/Footer und das Main-Padding. */}
         <ConditionalChrome>{children}</ConditionalChrome>
 
         {/* Vercel Monitoring */}
