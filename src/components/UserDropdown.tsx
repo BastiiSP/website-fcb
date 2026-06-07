@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Menu } from "@headlessui/react";
-import { FiUser } from "react-icons/fi";
+import { LogOut, User, UserPlus } from "lucide-react";
 
 interface UserData {
   email: string;
@@ -16,7 +15,6 @@ interface UserData {
 
 export default function UserDropdown() {
   const supabase = createClient();
-  const router = useRouter();
 
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -74,80 +72,99 @@ export default function UserDropdown() {
     return `${vor}${nach}`.toUpperCase();
   };
 
+  // Ausgeloggt → Split-Variante: zwei eigenständige Buttons direkt in der Navbar,
+  // kein Dropdown. „Anmelden" als Outline (weniger dominant), „Registrieren" gefüllt.
+  if (!isLoggedIn) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link
+          href="/login"
+          className="rounded-full border border-fcb-blue bg-transparent px-3 py-1.5 font-inter text-sm font-medium text-fcb-blue transition-colors hover:bg-fcb-blue/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav"
+        >
+          Anmelden
+        </Link>
+        <Link
+          href="/registrieren"
+          className="flex items-center gap-1.5 rounded-full border border-fcb-blue bg-fcb-blue px-3 py-1.5 font-inter text-sm font-medium text-white transition-colors hover:bg-fcb-blue/85 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav"
+        >
+          <UserPlus className="h-4 w-4" />
+          <span>Registrieren</span>
+        </Link>
+      </div>
+    );
+  }
+
+  // Eingeloggt → Avatar-Trigger öffnet das Card-Style-Dropdown.
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button className="flex items-center justify-center w-10 h-10 rounded-full bg-fcb-blue text-white font-bold overflow-hidden">
-        {isLoggedIn ? (
-          user?.avatar_url ? (
-            <img
-              src={user.avatar_url}
-              alt="Profilbild"
-              className="w-10 h-10 object-cover rounded-full"
-            />
-          ) : (
-            <span className="text-sm text-white">
-              {getInitials()}
-            </span>
-          )
+      <Menu.Button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-bold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav">
+        {user?.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={user.avatar_url}
+            alt={`Profilbild${user.vorname ? ` von ${user.vorname}` : ""}`}
+            className="h-10 w-10 rounded-full object-cover"
+          />
         ) : (
-          <FiUser className="w-5 h-5" />
+          <span className="text-sm text-white">{getInitials()}</span>
         )}
       </Menu.Button>
 
-      <Menu.Items className="absolute right-0 mt-2 w-52 origin-top-right rounded-md bg-fcb-surface text-fcb-text border border-fcb-border shadow-lg focus:outline-none z-[9999] px-2 pb-2">
-        {isLoggedIn ? (
-          <>
-            <div className="px-2 pt-2 text-sm font-medium mb-1">
-              Hallo {user?.vorname?.trim() ? user.vorname : "Nutzer"}
-            </div>
-            <div className="px-2 text-xs text-fcb-muted mb-2">
+      {/* Card-Style-Dropdown: Avatar prominent oben, darunter Aktionen */}
+      <Menu.Items className="absolute right-0 z-[9999] mt-2 w-72 origin-top-right overflow-hidden rounded-lg border border-fcb-border bg-fcb-surface text-fcb-text shadow-lg focus:outline-none">
+        {/* Kopf: Avatar + Name/E-Mail, zentriert */}
+        <div className="flex flex-col items-center gap-2 px-4 pb-3 pt-5 text-center">
+          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-inter text-lg font-bold text-white">
+            {user?.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.avatar_url}
+                alt={`Profilbild${user.vorname ? ` von ${user.vorname}` : ""}`}
+                className="h-14 w-14 rounded-full object-cover"
+              />
+            ) : (
+              getInitials()
+            )}
+          </div>
+          <div>
+            <p className="font-inter text-sm font-semibold text-fcb-text">
+              {user?.vorname?.trim() ? user.vorname : "Nutzer"}
+            </p>
+            <p className="truncate font-inter text-xs text-fcb-muted">
               {user?.email ?? ""}
-            </div>
-            <Menu.Item>
-              {({ active }) => (
-                <Link
-                  href="/profil"
-                  className={`mt-1 px-4 py-2 w-full text-sm text-center rounded border block transition ${
-                    active
-                      ? "bg-fcb-border border-fcb-border"
-                      : "bg-transparent border-fcb-border hover:bg-fcb-border"
-                  }`}
-                >
-                  Profil bearbeiten
-                </Link>
-              )}
-            </Menu.Item>
-            <Menu.Item>
-              {({ active }) => (
-                <button
-                  onClick={handleLogout}
-                  className={`mt-2 px-4 py-2 w-full font-bold text-sm text-center rounded border transition ${
-                    active
-                      ? "bg-red-700 border-red-800"
-                      : "bg-red-600 hover:bg-red-700 border-red-700"
-                  } text-white`}
-                >
-                  Logout
-                </button>
-              )}
-            </Menu.Item>
-          </>
-        ) : (
+            </p>
+          </div>
+        </div>
+
+        {/* Aktionen */}
+        <div className="border-t border-fcb-border p-1">
+          <Menu.Item>
+            {({ active }) => (
+              <Link
+                href="/profil"
+                className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
+                  active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
+                }`}
+              >
+                <User className="h-4 w-4 text-fcb-muted" />
+                Profil bearbeiten
+              </Link>
+            )}
+          </Menu.Item>
           <Menu.Item>
             {({ active }) => (
               <button
-                onClick={() => router.push("/login")}
-                className={`mt-3 px-4 py-2 w-full font-bold text-sm text-center rounded border transition ${
-                  active
-                    ? "bg-fcb-blue/80 border-fcb-blue"
-                    : "bg-fcb-blue hover:bg-fcb-blue/80 border-fcb-blue"
-                } text-white`}
+                onClick={handleLogout}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 font-inter text-sm font-medium text-fcb-red transition-colors ${
+                  active ? "bg-fcb-red/10" : ""
+                }`}
               >
-                Login
+                <LogOut className="h-4 w-4" />
+                Abmelden
               </button>
             )}
           </Menu.Item>
-        )}
+        </div>
       </Menu.Items>
     </Menu>
   );

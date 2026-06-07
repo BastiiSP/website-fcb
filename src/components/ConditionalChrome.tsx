@@ -1,33 +1,18 @@
-"use client";
-
-import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 /**
- * Rendert Header + main + Footer für alle bestehenden Routes,
- * unterdrückt aber Header/Footer/main-Padding für die Design-Exploration
- * unter /variants/*. Wird einmalig im root layout.tsx gewrappt.
- *
- * Hintergrund: Die /variants-Routes brauchen eine eigene Navbar und Full-Bleed-
- * Hintergründe. Statt das gesamte Root-Layout zu duplizieren, blenden wir hier
- * pathname-basiert die globale Chrome aus. So bleibt jede bestehende Route
- * (/, /login, /kalender, /vorstand, ...) optisch 100 % identisch.
+ * Rendert die globale Chrome (Header + main-Padding + Footer) um alle Routen.
+ * Früher wurden Design-Exploration-Routen (/variants, /footer-preview,
+ * /navbar-preview, /dropdown-preview) hier per pathname ausgeblendet – diese
+ * Preview-Routen wurden nach Abschluss von Design-Runde 2 entfernt, daher
+ * rendert die Chrome jetzt bedingungslos. Wird einmalig im Root-Layout gewrappt.
  */
 export default function ConditionalChrome({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname() ?? "";
-  const isVariantsRoute = pathname.startsWith("/variants");
-
-  if (isVariantsRoute) {
-    // Full-Bleed: kein Header/Footer, kein main-Padding. Das variants/layout.tsx
-    // übernimmt sein eigenes Chrome (Switcher + smart-sticky Navbar).
-    return <>{children}</>;
-  }
-
   return (
     <>
       <Header />
