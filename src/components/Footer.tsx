@@ -83,7 +83,7 @@ export default function Footer() {
             {/* Icon-Slot in Wappenbreite (w-9 = 36px), damit der Adresstext exakt
                 unter dem Vereinsnamen beginnt (Logo ist ebenfalls 36px breit). */}
             <span className="flex w-9 shrink-0 justify-center">
-              <MapPin className="h-6 w-6 text-fcb-blue" />
+              <MapPin className="h-7 w-7 text-fcb-blue" />
             </span>
             <span>
               {FCB_FOOTER.strasse}
