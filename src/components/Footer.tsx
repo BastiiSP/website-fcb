@@ -120,8 +120,10 @@ export default function Footer() {
               aria-label="Instagram"
               className="group text-fcb-muted"
             >
-              {/* Hover: Icon-Fill wechselt vom muted-Grau auf den Instagram-Gradient */}
-              <InstagramIcon className="h-6 w-6 transition-colors group-hover:[fill:url(#fcb-ig-gradient)]" />
+              {/* Hover: Icon-Fill wechselt auf den Instagram-Gradient. Kein
+                  transition-colors – ein Gradient-Fill ist nicht interpolierbar
+                  und würde ohnehin hart umschalten. */}
+              <InstagramIcon className="h-6 w-6 group-hover:[fill:url(#fcb-ig-gradient)]" />
             </Link>
           </div>
           <span className="font-inter text-xs text-fcb-muted sm:text-right">
