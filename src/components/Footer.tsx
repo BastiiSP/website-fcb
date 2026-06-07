@@ -80,7 +80,11 @@ export default function Footer() {
             aria-label="Vereinsadresse in Google Maps öffnen"
             className="flex w-fit items-center gap-2 font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
           >
-            <MapPin className="h-6 w-6 shrink-0 text-fcb-blue" />
+            {/* Icon-Slot in Wappenbreite (w-9 = 36px), damit der Adresstext exakt
+                unter dem Vereinsnamen beginnt (Logo ist ebenfalls 36px breit). */}
+            <span className="flex w-9 shrink-0 justify-center">
+              <MapPin className="h-6 w-6 text-fcb-blue" />
+            </span>
             <span>
               {FCB_FOOTER.strasse}
               <br />
