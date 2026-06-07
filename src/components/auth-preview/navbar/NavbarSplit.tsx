@@ -5,12 +5,12 @@ import PreviewStage from "./PreviewStage";
 
 /**
  * Variante B – Split: zwei Buttons direkt in der Navbar sichtbar.
- * „Anmelden" als Ghost-Button, „Registrieren" gefüllt. Kein Dropdown für Besucher.
+ * „Anmelden“ als Ghost-Button, „Registrieren“ gefüllt. Kein Dropdown für Besucher.
  */
 export default function NavbarSplit() {
   return (
     <PreviewStage
-      beschreibung={`Variante B – Split: Zwei Buttons direkt sichtbar – „Anmelden" als Ghost-Button, „Registrieren" gefüllt. Kein Dropdown für Besucher nötig.`}
+      beschreibung={`Variante B – Split: Zwei Buttons direkt sichtbar – „Anmelden“ als Ghost-Button, „Registrieren“ gefüllt. Kein Dropdown für Besucher nötig.`}
       ausgeloggt={
         <NavbarMock>
           {/* Ghost-Button – nur Text, transparenter Hintergrund */}

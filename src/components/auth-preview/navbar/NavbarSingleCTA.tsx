@@ -4,13 +4,13 @@ import AvatarKreis from "./AvatarKreis";
 import PreviewStage from "./PreviewStage";
 
 /**
- * Variante A – Single CTA: ein gefüllter blauer Pill-Button „Anmelden".
+ * Variante A – Single CTA: ein gefüllter blauer Pill-Button „Anmelden“.
  * Der Klick würde das Dropdown öffnen (siehe /dropdown-preview).
  */
 export default function NavbarSingleCTA() {
   return (
     <PreviewStage
-      beschreibung={`Variante A – Single CTA: Ein gefüllter blauer Pill-Button „Anmelden". Ein klarer Einstieg; der Klick öffnet das Dropdown (siehe /dropdown-preview).`}
+      beschreibung={`Variante A – Single CTA: Ein gefüllter blauer Pill-Button „Anmelden“. Ein klarer Einstieg; der Klick öffnet das Dropdown (siehe /dropdown-preview).`}
       ausgeloggt={
         <NavbarMock>
           {/* Rein visueller Mock – span statt button (kein echter Klick nötig) */}

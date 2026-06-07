@@ -9,7 +9,7 @@ import PreviewStage from "./PreviewStage";
 export default function NavbarTextlinks() {
   return (
     <PreviewStage
-      beschreibung={`Variante C – Textlinks: Zwei dezente Textlinks „Anmelden · Registrieren". Sehr minimal, kein Button-Styling.`}
+      beschreibung={`Variante C – Textlinks: Zwei dezente Textlinks „Anmelden · Registrieren“. Sehr minimal, kein Button-Styling.`}
       ausgeloggt={
         <NavbarMock>
           <div className="flex items-center gap-2 font-inter text-sm text-white/90">
