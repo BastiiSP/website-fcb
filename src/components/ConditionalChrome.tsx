@@ -1,12 +1,14 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { ConsentProvider } from "@/components/consent/ConsentProvider";
+import CookieBanner from "@/components/consent/CookieBanner";
 
 /**
  * Rendert die globale Chrome (Header + main-Padding + Footer) um alle Routen.
- * Früher wurden Design-Exploration-Routen (/variants, /footer-preview,
- * /navbar-preview, /dropdown-preview) hier per pathname ausgeblendet – diese
- * Preview-Routen wurden nach Abschluss von Design-Runde 2 entfernt, daher
- * rendert die Chrome jetzt bedingungslos. Wird einmalig im Root-Layout gewrappt.
+ * Seit Einführung der DSGVO-Consent-Verwaltung umschließt der ConsentProvider
+ * die gesamte Chrome – so können Header, Footer und alle Seiten-Inhalte den
+ * Consent-Status über useConsent() lesen. Das CookieBanner wird global (z-60,
+ * über allem) innerhalb des Providers gerendert.
  */
 export default function ConditionalChrome({
   children,
@@ -14,10 +16,11 @@ export default function ConditionalChrome({
   children: React.ReactNode;
 }) {
   return (
-    <>
+    <ConsentProvider>
       <Header />
       <main className="pt-14">{children}</main>
       <Footer />
-    </>
+      <CookieBanner />
+    </ConsentProvider>
   );
 }
