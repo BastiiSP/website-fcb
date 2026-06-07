@@ -14,10 +14,12 @@ Website des 1. FC 1911 Burgkunstadt – ein echter Fußballverein aus Burgkunsta
 
 - **Next.js 16** mit App Router
 - **React 19** / **TypeScript 5** (strict mode)
-- **Tailwind CSS 3**
+- **Tailwind CSS 3** (v3.4 – NICHT v4: Tokens in `tailwind.config.ts`, keine `@theme`-CSS-Directive)
+- **Framer Motion 12** (alle Animationen)
 - **Supabase** (PostgreSQL + Auth + RLS)
 - **FullCalendar 6** (Buchungskalender)
 - **Vercel** (Hosting + Analytics)
+- **UI-Libs**: `@headlessui/react`, `lucide-react` (Icons), `react-select`, `react-datepicker`, `react-easy-crop`, `@tippyjs/react`, `date-fns`. Brand-/Social-Icons via `src/components/icons/BrandIcons.tsx` (Lucide hat keine). `react-icons` ist Altlast – nicht für Neues nutzen.
 
 ## Rollenkonzept – KRITISCH
 
@@ -108,6 +110,7 @@ RLS: Nutzer sehen/erstellen nur eigene Anfragen; vorstand und admin verwalten al
 - **RLS immer aktiv**: Zugangskontrolle läuft in der Datenbank, nicht nur im Frontend
 - **GRANTs nicht vergessen**: Bei jeder neuen Tabelle explizit `GRANT SELECT, INSERT, UPDATE, DELETE ON public.<tabelle> TO authenticated;` ausführen – ohne das greift RLS nie, da Postgres vorher mit „permission denied" abbricht. Bereits zweimal vergessen: `buchungen` (2026-05-22) und `mitglieder` (2026-05-26).
 - **Neue Tabelle anlegen**: Immer das Skill `supabase-tabelle-anlegen` nutzen (`.claude/skills/`) – verifiziertes Rezept mit korrekter Trigger-Funktion (`handle_updated_at()`), RLS-Muster (`get_own_rolle()`), GRANT und Workflow-Checkliste.
+- **Komponente bauen/ändern**: Immer das Skill `fcb-komponente-bauen` nutzen (`.claude/skills/`) – verifizierte Werte für Tokens, Fonts, Icons, Framer Motion, A11y + die Migrations-Eigenheit (neu = `fcb.*`/dunkel, Legacy = noch hell, nicht blind kopieren).
 - **Supabase MCP nutzen**: Für alle Datenbankoperationen den MCP-Server verwenden
 - **Keine direkten DB-Calls ohne RLS-Check** in Server Components
 - **Fehlerbehandlung**: Alle Supabase-Calls mit try/catch und aussagekräftigen Fehlermeldungen
@@ -128,16 +131,26 @@ src/
 │   ├── registrieren/page.tsx
 │   └── confirm-email/page.tsx
 ├── components/
-│   ├── Navigation.tsx             ← Rollenbasierte Navigation
-│   ├── Header.tsx / Footer.tsx
-│   ├── UserDropdown.tsx           ← Nutzer-Menü in der Nav
+│   ├── Navigation.tsx             ← Rollenbasierte Navigation (modern, fcb-Tokens)
+│   ├── Header.tsx                 ← Smart-Sticky-Nav, kanonisches Design-Vorbild (modern)
+│   ├── Footer.tsx
+│   ├── ConditionalChrome.tsx      ← Blendet Header/Footer auf Preview-Routen aus
+│   ├── UserDropdown.tsx           ← Nutzer-Menü in der Nav (modern, fcb-Tokens)
+│   ├── ThemeToggle.tsx            ← Hell/Dunkel-Umschaltung (darkMode: 'class')
 │   ├── Buchungsformular.tsx
 │   ├── BenutzerListe.tsx          ← Nutzerverwaltung + Mannschaftsanfragen im Vorstand-Bereich
+│   ├── MannschaftsanfragenVerwaltung.tsx
 │   ├── BearbeitenModal.tsx / LoeschenModal.tsx
 │   ├── MitgliederVerwaltung.tsx   ← Mitgliederverwaltung (Phase 2)
 │   ├── MitgliedBearbeitenModal.tsx
 │   ├── TrainerVerzeichnis.tsx
+│   ├── NewsCard.tsx / NewsSection.tsx  ← Neuigkeiten (NewsCard noch Legacy-hell)
+│   ├── TooltipContent.tsx
 │   ├── ToastMessage.tsx           ← Globale Erfolgs-/Fehlermeldungen
+│   ├── icons/BrandIcons.tsx       ← Facebook/Instagram als Inline-SVG (Lucide hat keine Brand-Icons)
+│   ├── instagram/                 ← InstagramSection / InstagramCarousel (modern)
+│   ├── hero/                      ← Hero-Varianten (Design-Exploration)
+│   ├── auth-preview/              ← TEMPORÄR (design-round-2): navbar/ + dropdown/ Varianten, nach Auswahl löschen
 │   └── profil/                    ← Profil-Unterkomponenten
 │       ├── PersoenlicheDaten.tsx
 │       ├── AccountSicherheit.tsx
@@ -194,6 +207,15 @@ Alle Designentscheidungen wurden gemeinsam mit Basti besprochen und sind verbind
 Bei neuen Komponenten und Änderungen **immer** diese Spec einhalten.
 Die vollständige Designdokumentation liegt in der Obsidian-Projektdatei `02 Projekte/Website FCB.md`.
 
+> **Migrationsstatus (wichtig!):** Das Projekt zieht schrittweise auf dieses Design um.
+> Die `fcb.*`-Token-Optik (dunkel, Oswald/Inter) ist bereits in den **neuen/überarbeiteten**
+> Komponenten umgesetzt (`Header`, `Navigation`, `UserDropdown`, `instagram/`, Homepage, alle
+> Preview-Routen). **Viele Legacy-Seiten sind noch hell** (`gray-*`, `var(--background)`,
+> Geist/Arial-Body in `globals.css`): u. a. `login`, `registrieren`, `profil`, `vorstand`,
+> `kalender`, `mitglieder`, `NewsCard`. → **Beim Bauen das moderne Vorbild `Header.tsx` nehmen,
+> NICHT die Legacy-Komponenten kopieren.** Legacy-Seiten nur dann aufs neue Design ziehen, wenn
+> Basti das ausdrücklich beauftragt – nie ungefragt „mitmigrieren".
+
 ### Vereinskontext
 - **FCB** = 1. FC 1911 Burgkunstadt – Mannschaften: 2× Herren, E-/F-/G-Jugend
 - **JFG** = JFG Kunstadt-Obermain – Leistungsjugend: A-/B-/C-/D-Jugend (teils B1+B2)
@@ -214,8 +236,8 @@ Tokens sind in `tailwind.config.ts` unter `fcb.*` definiert:
 | JFG-Rot | `text-fcb-red` / `bg-fcb-red` | `#cc1f1f` | JFG-Bereich-Akzent |
 
 ### Typografie
-- **Display / Headlines**: `font-display` → Oswald (Google Font, Variable) – Gewicht 600–700, gerne Großbuchstaben
-- **Fließtext / UI**: `font-sans` → Inter – Gewicht 400/500
+- **Display / Headlines**: `font-oswald` → Oswald (via `next/font/google`, CSS-Variable – lädt zuverlässig) – Gewicht 600–700, gerne Großbuchstaben. **Hinweis:** `font-display` existiert ebenfalls, ist aber NICHT an `next/font` gebunden → für neue Komponenten `font-oswald` nehmen.
+- **Fließtext / UI**: `font-inter` → Inter – Gewicht 400/500. (Globaler Default in `layout.tsx` ist aktuell noch Geist; Oswald/Inter werden per Klasse aktiviert.)
 
 ### Design-Prinzipien
 - **Keine Emojis** in der UI – ausschließlich Lucide-Icons
