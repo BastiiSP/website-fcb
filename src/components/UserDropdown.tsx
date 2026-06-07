@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Menu } from "@headlessui/react";
-import { LogIn, LogOut, User, UserPlus } from "lucide-react";
+import { LogOut, User, UserPlus } from "lucide-react";
 
 interface UserData {
   email: string;
@@ -16,7 +15,6 @@ interface UserData {
 
 export default function UserDropdown() {
   const supabase = createClient();
-  const router = useRouter();
 
   const [user, setUser] = useState<UserData | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -74,119 +72,99 @@ export default function UserDropdown() {
     return `${vor}${nach}`.toUpperCase();
   };
 
+  // Ausgeloggt → Split-Variante: zwei eigenständige Buttons direkt in der Navbar,
+  // kein Dropdown. „Anmelden" als Outline (weniger dominant), „Registrieren" gefüllt.
+  if (!isLoggedIn) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link
+          href="/login"
+          className="rounded-full border border-fcb-blue bg-transparent px-3 py-1.5 font-inter text-sm font-medium text-fcb-blue transition-colors hover:bg-fcb-blue/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav"
+        >
+          Anmelden
+        </Link>
+        <Link
+          href="/registrieren"
+          className="flex items-center gap-1.5 rounded-full border border-fcb-blue bg-fcb-blue px-3 py-1.5 font-inter text-sm font-medium text-white transition-colors hover:bg-fcb-blue/85 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav"
+        >
+          <UserPlus className="h-4 w-4" />
+          <span>Registrieren</span>
+        </Link>
+      </div>
+    );
+  }
+
+  // Eingeloggt → Avatar-Trigger öffnet das Card-Style-Dropdown.
   return (
     <Menu as="div" className="relative inline-block text-left">
-      {/* Trigger: eingeloggt → Avatar-Kreis, ausgeloggt → einladender „Anmelden"-Button */}
-      {isLoggedIn ? (
-        <Menu.Button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-bold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav">
-          {user?.avatar_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={user.avatar_url}
-              alt={`Profilbild${user.vorname ? ` von ${user.vorname}` : ""}`}
-              className="h-10 w-10 rounded-full object-cover"
-            />
-          ) : (
-            <span className="text-sm text-white">{getInitials()}</span>
-          )}
-        </Menu.Button>
-      ) : (
-        <Menu.Button className="flex items-center gap-1.5 rounded-full border border-fcb-blue bg-fcb-blue px-3 py-1.5 font-inter text-sm font-medium text-white transition-colors hover:bg-fcb-blue/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav">
-          <LogIn className="h-4 w-4" />
-          <span>Anmelden</span>
-        </Menu.Button>
-      )}
-
-      <Menu.Items className="absolute right-0 z-[9999] mt-2 w-56 origin-top-right overflow-hidden rounded-lg border border-fcb-border bg-fcb-surface text-fcb-text shadow-lg focus:outline-none">
-        {isLoggedIn ? (
-          <>
-            {/* Kopf: Name + E-Mail klar abgesetzt */}
-            <div className="border-b border-fcb-border px-4 py-3">
-              <p className="font-inter text-sm font-semibold text-fcb-text">
-                {user?.vorname?.trim() ? user.vorname : "Nutzer"}
-              </p>
-              <p className="truncate font-inter text-xs text-fcb-muted">
-                {user?.email ?? ""}
-              </p>
-            </div>
-
-            {/* Aktionen */}
-            <div className="p-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <Link
-                    href="/profil"
-                    className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
-                      active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
-                    }`}
-                  >
-                    <User className="h-4 w-4 text-fcb-muted" />
-                    Profil bearbeiten
-                  </Link>
-                )}
-              </Menu.Item>
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    onClick={handleLogout}
-                    className={`flex w-full items-center gap-2 rounded-md px-3 py-2 font-inter text-sm font-medium text-fcb-red transition-colors ${
-                      active ? "bg-fcb-red/10" : ""
-                    }`}
-                  >
-                    <LogOut className="h-4 w-4" />
-                    Abmelden
-                  </button>
-                )}
-              </Menu.Item>
-            </div>
-          </>
+      <Menu.Button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-bold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav">
+        {user?.avatar_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={user.avatar_url}
+            alt={`Profilbild${user.vorname ? ` von ${user.vorname}` : ""}`}
+            className="h-10 w-10 rounded-full object-cover"
+          />
         ) : (
-          <>
-            {/* Kopf: einladender Hinweis für Besucher */}
-            <div className="border-b border-fcb-border px-4 py-3">
-              <p className="font-inter text-sm font-semibold text-fcb-text">
-                Willkommen beim FCB
-              </p>
-              <p className="font-inter text-xs text-fcb-muted">
-                Melde dich an oder registriere dich.
-              </p>
-            </div>
-
-            {/* Login-Pfad */}
-            <div className="p-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <button
-                    onClick={() => router.push("/login")}
-                    className={`flex w-full items-center gap-2 rounded-md px-3 py-2 font-inter text-sm font-medium text-white transition-colors ${
-                      active ? "bg-fcb-blue/90" : "bg-fcb-blue"
-                    }`}
-                  >
-                    <LogIn className="h-4 w-4" />
-                    Login
-                  </button>
-                )}
-              </Menu.Item>
-            </div>
-
-            {/* Registrieren-Pfad – optisch vom Login getrennt */}
-            <div className="border-t border-fcb-border p-1">
-              <Menu.Item>
-                {({ active }) => (
-                  <Link
-                    href="/registrieren"
-                    className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
-                      active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
-                    }`}
-                  >
-                    <UserPlus className="h-4 w-4 text-fcb-muted" />
-                    Noch kein Konto? Registrieren
-                  </Link>
-                )}
-              </Menu.Item>
-            </div>
-          </>
+          <span className="text-sm text-white">{getInitials()}</span>
         )}
+      </Menu.Button>
+
+      {/* Card-Style-Dropdown: Avatar prominent oben, darunter Aktionen */}
+      <Menu.Items className="absolute right-0 z-[9999] mt-2 w-72 origin-top-right overflow-hidden rounded-lg border border-fcb-border bg-fcb-surface text-fcb-text shadow-lg focus:outline-none">
+        {/* Kopf: Avatar + Name/E-Mail, zentriert */}
+        <div className="flex flex-col items-center gap-2 px-4 pb-3 pt-5 text-center">
+          <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-inter text-lg font-bold text-white">
+            {user?.avatar_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={user.avatar_url}
+                alt={`Profilbild${user.vorname ? ` von ${user.vorname}` : ""}`}
+                className="h-14 w-14 rounded-full object-cover"
+              />
+            ) : (
+              getInitials()
+            )}
+          </div>
+          <div>
+            <p className="font-inter text-sm font-semibold text-fcb-text">
+              {user?.vorname?.trim() ? user.vorname : "Nutzer"}
+            </p>
+            <p className="truncate font-inter text-xs text-fcb-muted">
+              {user?.email ?? ""}
+            </p>
+          </div>
+        </div>
+
+        {/* Aktionen */}
+        <div className="border-t border-fcb-border p-1">
+          <Menu.Item>
+            {({ active }) => (
+              <Link
+                href="/profil"
+                className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
+                  active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
+                }`}
+              >
+                <User className="h-4 w-4 text-fcb-muted" />
+                Profil bearbeiten
+              </Link>
+            )}
+          </Menu.Item>
+          <Menu.Item>
+            {({ active }) => (
+              <button
+                onClick={handleLogout}
+                className={`flex w-full items-center gap-2 rounded-md px-3 py-2 font-inter text-sm font-medium text-fcb-red transition-colors ${
+                  active ? "bg-fcb-red/10" : ""
+                }`}
+              >
+                <LogOut className="h-4 w-4" />
+                Abmelden
+              </button>
+            )}
+          </Menu.Item>
+        </div>
       </Menu.Items>
     </Menu>
   );
