@@ -16,9 +16,9 @@ export function RechtstextLayout({
   stand,
   children,
 }: {
-  /** Seitentitel (H1), z. B. „Impressum". */
+  /** Seitentitel (H1), z. B. „Impressum“. */
   titel: string;
-  /** Stand der letzten Aktualisierung, z. B. „Juni 2026". */
+  /** Stand der letzten Aktualisierung, z. B. „Juni 2026“. */
   stand: string;
   children: ReactNode;
 }) {
