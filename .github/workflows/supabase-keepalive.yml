@@ -1,0 +1,64 @@
+name: Supabase Keep-Alive
+
+# ──────────────────────────────────────────────────────────────────────────
+# ZWECK
+# Verhindert, dass das Supabase-Free-Tier-Projekt nach 7 Tagen ohne
+# Datenbankaktivität automatisch pausiert. Ein pausiertes Projekt legt Login,
+# Buchungen und alle DB-Funktionen für alle Nutzer lahm.
+#
+# MECHANISMUS
+# Alle 3 Tage wird ein read-only-SELECT gegen die Tabelle `profiles` über die
+# PostgREST-API abgesetzt. Das ist eine harmlose, nicht-schreibende Anfrage,
+# die Postgres erreicht und damit als Aktivität zählt. Es werden KEINE Daten
+# verändert und KEINE bestehenden Funktionen berührt.
+#
+# ──────────────────────────────────────────────────────────────────────────
+# EINMALIGE EINRICHTUNG (nach dem Merge)
+# GitHub-Repo -> Settings -> Secrets and variables -> Actions
+#   -> New repository secret
+# Folgende ZWEI Secrets anlegen (Werte stehen lokal in .env.local):
+#   SUPABASE_URL       = Wert von NEXT_PUBLIC_SUPABASE_URL
+#                        (entspricht https://jktvmckqfklfziszfsxf.supabase.co)
+#   SUPABASE_ANON_KEY  = Wert von NEXT_PUBLIC_SUPABASE_ANON_KEY
+# Danach läuft der Workflow vollautomatisch. Manueller Test:
+#   Actions -> "Supabase Keep-Alive" -> Run workflow.
+# ──────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # Minute 0, 06:00 UTC, an jedem 3. Tag des Monats (1,4,7,...,28,31).
+    # Maximaler Abstand zwischen zwei Läufen ist 3 Tage – auch über
+    # Monatsgrenzen hinweg deutlich unter dem 7-Tage-Pausierungsfenster.
+    - cron: "0 6 */3 * *"
+  # Erlaubt manuelles Auslösen über die GitHub-Actions-UI (zum Testen).
+  workflow_dispatch:
+
+# Minimale Rechte – der Workflow braucht keinerlei Repo-Schreibrechte
+# und checkt den Code nicht aus.
+permissions:
+  contents: read
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase (read-only)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        # Der Schritt endet IMMER mit Exit-Code 0: Schlägt der Ping fehl
+        # (Netzwerk, falsches Secret, Supabase-Wartung), wird das nur geloggt –
+        # es gibt KEINE Fehler-Mail und KEINEN roten Lauf. Ein einzelner
+        # verpasster Keep-Alive-Ping ist unkritisch; der nächste folgt in 3 Tagen.
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${SUPABASE_URL}/rest/v1/profiles?select=id&limit=1" \
+            -H "apikey: ${SUPABASE_ANON_KEY}" \
+            -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            --max-time 30 || echo "000")
+          echo "Supabase keep-alive HTTP-Status: ${status}"
+          if [ "${status}" = "200" ]; then
+            echo "Keep-Alive erfolgreich – Projekt aktiv gehalten."
+          else
+            echo "Keep-Alive-Ping nicht erfolgreich (Status ${status}). Wird ignoriert."
+          fi
