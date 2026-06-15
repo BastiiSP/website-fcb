@@ -51,3 +51,6 @@ node_modules
 .env
 .DS_Store
 *.log
+
+# Superpowers-Planungsdokumente – lokale Arbeitsartefakte, gehören nicht ins Repo
+docs/superpowers/
