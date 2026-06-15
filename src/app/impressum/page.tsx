@@ -1,57 +1,77 @@
-"use client";
+import type { Metadata } from "next";
+import {
+  RechtstextLayout,
+  RechtstextSektion,
+} from "@/components/rechtstexte/RechtstextLayout";
+
+export const metadata: Metadata = {
+  title: "Impressum – 1. FC 1911 Burgkunstadt",
+  description: "Impressum und Anbieterkennzeichnung des 1. FC 1911 Burgkunstadt e.V.",
+};
 
 export default function ImpressumPage() {
   return (
-    <main className="min-h-screen p-6 max-w-3xl mx-auto text-[var(--foreground)]">
-      <h1 className="text-3xl font-bold mb-4">Impressum</h1>
-      <p>
-        <strong>Angaben gemäß § 5 TMG</strong>
-      </p>
-      <p>
-        1. FC 1911 Burgkunstadt e.V.
-        <br />
-        Alter Postweg 10
-        <br />
-        96224 Burgkunstadt
-      </p>
+    <RechtstextLayout titel="Impressum" stand="Juni 2026">
+      {/* Anbieterkennzeichnung: § 5 TMG wurde am 14.05.2024 durch § 5 DDG
+          (Digitale-Dienste-Gesetz) abgelöst. */}
+      <RechtstextSektion titel="Angaben gemäß § 5 DDG">
+        <p>
+          1. FC 1911 Burgkunstadt e.V.
+          <br />
+          Alter Postweg 10
+          <br />
+          96224 Burgkunstadt
+        </p>
+      </RechtstextSektion>
 
-      <h2 className="text-2xl font-semibold mt-6 mb-2">
-        Eintragung im Vereinsregister
-      </h2>
-      <p>
-        Eingetragen im Vereinsregister beim Amtsgericht Coburg unter der Nummer
-        VR 20074
-      </p>
+      <RechtstextSektion titel="Vertreten durch">
+        <p>1. Vorsitzender: Wolfgang Strassgürtel</p>
+      </RechtstextSektion>
 
-      <h2 className="text-2xl font-semibold mt-6 mb-2">Vertreten durch:</h2>
-      <p>1. Vorsitzender: Wolfgang Strassgürtel</p>
+      <RechtstextSektion titel="Eintragung im Vereinsregister">
+        <p>
+          Eingetragen im Vereinsregister beim Amtsgericht Coburg unter der
+          Nummer VR 20074.
+        </p>
+      </RechtstextSektion>
 
-      <h2 className="text-2xl font-semibold mt-6 mb-2">Kontakt</h2>
-      <p>
-        Telefon: 09572 2090152
-        <br />
-        E-Mail: info@fcburgkunstadt.de
-      </p>
+      <RechtstextSektion titel="Kontakt">
+        <p>
+          Telefon: 09572 2090152
+          <br />
+          E-Mail:{" "}
+          <a
+            href="mailto:info@fcburgkunstadt.de"
+            className="text-fcb-blue hover:underline"
+          >
+            info@fcburgkunstadt.de
+          </a>
+        </p>
+      </RechtstextSektion>
 
-      <h2 className="text-2xl font-semibold mt-6 mb-2">
-        Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV
-      </h2>
-      <p>
-        Wolfgang Strassgürtel
-        <br />
-        Alter Postweg 10
-        <br />
-        96224 Burgkunstadt
-      </p>
+      {/* § 55 Abs. 2 RStV ist seit Nov. 2020 außer Kraft – korrekt: § 18 Abs. 2 MStV. */}
+      <RechtstextSektion titel="Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV">
+        <p>
+          Wolfgang Strassgürtel
+          <br />
+          Alter Postweg 10
+          <br />
+          96224 Burgkunstadt
+        </p>
+      </RechtstextSektion>
 
-      <h2 className="text-2xl font-semibold mt-6 mb-2">Haftungsausschluss</h2>
-      <p>
-        Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt erstellt.
-        Für die Richtigkeit, Vollständigkeit und Aktualität übernehmen wir
-        jedoch keine Gewähr.
-      </p>
-
-      <p className="mt-8 text-sm opacity-60">Letzte Aktualisierung: Mai 2025</p>
-    </main>
+      <RechtstextSektion titel="Haftungsausschluss">
+        <p>
+          Die Inhalte dieser Website wurden mit größtmöglicher Sorgfalt
+          erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der
+          Inhalte können wir jedoch keine Gewähr übernehmen.
+        </p>
+        <p>
+          Unsere Seiten enthalten Links zu externen Websites Dritter, auf deren
+          Inhalte wir keinen Einfluss haben. Für die Inhalte der verlinkten
+          Seiten ist stets der jeweilige Anbieter verantwortlich.
+        </p>
+      </RechtstextSektion>
+    </RechtstextLayout>
   );
 }
