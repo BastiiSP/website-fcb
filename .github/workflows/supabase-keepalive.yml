@@ -1,4 +1,4 @@
-name: Supabase Keep-Alive
+name: Supabase Keep-Alive Website-FCB
 
 # ──────────────────────────────────────────────────────────────────────────
 # ZWECK
@@ -21,7 +21,7 @@ name: Supabase Keep-Alive
 #                        (entspricht https://jktvmckqfklfziszfsxf.supabase.co)
 #   SUPABASE_ANON_KEY  = Wert von NEXT_PUBLIC_SUPABASE_ANON_KEY
 # Danach läuft der Workflow vollautomatisch. Manueller Test:
-#   Actions -> "Supabase Keep-Alive" -> Run workflow.
+#   Actions -> "Supabase Keep-Alive Website-FCB" -> Run workflow.
 # ──────────────────────────────────────────────────────────────────────────
 
 on:
