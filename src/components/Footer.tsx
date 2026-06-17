@@ -159,6 +159,18 @@ export default function Footer() {
           </span>
         </div>
       </div>
+
+      {/* Dezente Kurzbeschreibung des Mitgliederbereichs – erklärt den Zweck des
+          Logins (relevant für Googles OAuth-Brand-Verifizierung), ohne den
+          Seiten-Flow zu dominieren. Bewusst sichtbar (NICHT versteckt). */}
+      <div className="border-t border-white/10 px-4 py-4">
+        <p className="mx-auto max-w-6xl font-inter text-xs leading-relaxed text-fcb-muted">
+          Mitgliederbereich: Mitglieder, Trainer und Vorstand des 1. FC 1911
+          Burgkunstadt melden sich an, um Platzbuchungen vorzunehmen, den
+          Vereinskalender zu nutzen und auf interne Bereiche zuzugreifen – per
+          E-Mail oder Google-Konto.
+        </p>
+      </div>
     </motion.footer>
   );
 }
