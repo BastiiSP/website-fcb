@@ -1,242 +1,149 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { MailCheck } from "lucide-react";
 import { createClient } from "@/lib/supabaseClient";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { signInWithGoogle } from "@/lib/auth/signInWithGoogle";
 import {
   berechnePasswortFeedback,
   berechnePasswortStaerke,
-  passwortStaerkeLabel,
-  passwortStaerkefarbe,
-  type PasswortFeedback,
 } from "@/utils/passwortStaerke";
+import PitchAuthShell from "@/components/auth/PitchAuthShell";
+import GoogleButton from "@/components/auth/GoogleButton";
+import AuthDivider from "@/components/auth/AuthDivider";
+import AuthTextField from "@/components/auth/AuthTextField";
+import AuthPasswordField from "@/components/auth/AuthPasswordField";
+import PasswordStrengthMeter from "@/components/auth/PasswordStrengthMeter";
+import AuthSubmitButton from "@/components/auth/AuthSubmitButton";
+import AuthErrorBanner from "@/components/auth/AuthErrorBanner";
+import AuthInfoBanner from "@/components/auth/AuthInfoBanner";
+import AuthSwitchPrompt from "@/components/auth/AuthSwitchPrompt";
 
-export default function Registrierungsseite() {
+export default function RegistrierungsSeite() {
   const supabase = createClient();
-
+  const [vorname, setVorname] = useState("");
+  const [nachname, setNachname] = useState("");
   const [email, setEmail] = useState("");
   const [passwort, setPasswort] = useState("");
   const [passwortBestaetigung, setPasswortBestaetigung] = useState("");
   const [fehler, setFehler] = useState("");
-  // Ersetzt den alten erfolg-String: zeigt dedizierte Erfolgs-Card statt Text im Formular
-  const [registrierungAbgeschlossen, setRegistrierungAbgeschlossen] = useState(false);
-  const [passwortAnzeigen, setPasswortAnzeigen] = useState(false);
+  const [googleHinweis, setGoogleHinweis] = useState("");
+  const [abgeschlossen, setAbgeschlossen] = useState(false);
 
-  const [vorname, setVorname] = useState("");
-  const [nachname, setNachname] = useState("");
-  const [telefonnummer, setTelefonnummer] = useState("");
+  const feedback = useMemo(() => berechnePasswortFeedback(passwort), [passwort]);
+  const staerke = useMemo(() => berechnePasswortStaerke(feedback), [feedback]);
+  const passwoerterGleich =
+    passwort.length > 0 && passwort === passwortBestaetigung;
+  // Mindestlänge 8 (konsistent mit Stärke-Meter; vorher Legacy 6).
+  const gueltig =
+    Boolean(vorname && nachname && email) &&
+    passwort.length >= 8 &&
+    passwoerterGleich;
 
-  const [passwortStarke, setPasswortStarke] = useState(0);
-  const [passwortFeedback, setPasswortFeedback] = useState<PasswortFeedback>({
-    hasLower: false,
-    hasUpper: false,
-    hasNumber: false,
-    hasSymbol: false,
-    hasMinLength: false,
-  });
-
-  const handlePasswortChange = (value: string) => {
-    setPasswort(value);
-    const feedback = berechnePasswortFeedback(value);
-    setPasswortFeedback(feedback);
-    setPasswortStarke(berechnePasswortStaerke(feedback));
-  };
-
-  const handleRegistrierung = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setFehler("");
-
     if (!vorname || !nachname) {
-      setFehler("❌ Bitte Vor- und Nachname ausfüllen.");
+      setFehler("Bitte Vor- und Nachname ausfüllen.");
       return;
     }
-
-    if (passwort !== passwortBestaetigung) {
-      setFehler("❌ Die Passwörter stimmen nicht überein.");
+    if (!passwoerterGleich) {
+      setFehler("Die Passwörter stimmen nicht überein.");
       return;
     }
-
     const { error } = await supabase.auth.signUp({
       email,
       password: passwort,
       options: {
-        emailRedirectTo: "https://www.fcbuku.de/confirm-email",
-        data: {
-          vorname,
-          nachname,
-          telefonnummer: telefonnummer || null,
-        },
+        // origin-relativ: lokal, Preview und Produktion zeigen jeweils korrekt
+        // (vorher hart auf www.fcbuku.de verdrahtet).
+        emailRedirectTo: `${window.location.origin}/confirm-email`,
+        // Telefonnummer entfällt bewusst – Trigger schreibt dann NULL.
+        data: { vorname, nachname },
       },
     });
-
     if (error) {
       console.error("Supabase-Fehler:", error.message);
-      setFehler(`❌ Registrierung fehlgeschlagen: ${error.message}`);
+      setFehler(`Registrierung fehlgeschlagen: ${error.message}`);
     } else {
-      setRegistrierungAbgeschlossen(true);
+      setAbgeschlossen(true);
     }
   };
 
-  const istFormularGueltig =
-    email && passwort.length >= 6 && passwort === passwortBestaetigung;
+  const handleGoogle = async () => {
+    setGoogleHinweis("");
+    const { error } = await signInWithGoogle();
+    if (error) setGoogleHinweis("Google-Anmeldung ist derzeit nicht verfügbar.");
+  };
 
-  // Erfolgs-Card ersetzt das Formular vollständig – keine weitere Bearbeitung möglich
-  if (registrierungAbgeschlossen) {
+  // --- Zwischenseite nach erfolgreichem Absenden ("E-Mail bestätigen") ---
+  if (abgeschlossen) {
     return (
-      <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center px-4">
-        <div className="w-full max-w-xl bg-[#f9f9f9] p-8 rounded shadow mt-20 text-center space-y-4">
-          <h1 className="text-2xl font-bold">✅ Registrierung erfolgreich!</h1>
-          <p className="text-sm">
+      <PitchAuthShell>
+        <div className="mt-7 flex flex-col items-center text-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full border border-fcb-blue/40 bg-fcb-blue/10 text-fcb-blue">
+            <MailCheck className="h-8 w-8" aria-hidden="true" />
+          </div>
+          <h1 className="mt-5 font-oswald text-3xl font-bold uppercase tracking-wide text-fcb-text">
+            Fast geschafft
+          </h1>
+          <p className="mt-3 font-inter text-sm leading-relaxed text-fcb-muted">
             Wir haben dir eine Bestätigungs-E-Mail an{" "}
-            <strong>{email}</strong> geschickt. Bitte klicke den Link in der
-            Mail, um deine Adresse zu bestätigen.
+            <span className="text-fcb-text">{email}</span> geschickt. Bitte
+            klicke den Link in der Mail. Dein Konto wird geprüft und
+            freigeschaltet. Bei Fragen wende dich an die Vorstandschaft oder den
+            IT-Verantwortlichen.
           </p>
-          <p className="text-sm">
-            Anschließend prüft der Vorstand dein Konto und schaltet es frei.
-          </p>
-          <p className="text-xs text-gray-500">
-            ℹ️ Keine Mail erhalten? Schau im Spam-Ordner nach.
-          </p>
+          <div className="mt-5 w-full">
+            <AuthInfoBanner message="Keine Mail erhalten? Schau im Spam-Ordner nach." />
+          </div>
+          {/* Prominenter CTA statt unscheinbarem Text-Link */}
           <Link
             href="/"
-            className="inline-block mt-4 px-5 py-2 border border-[var(--foreground)] rounded hover:bg-gray-100 transition"
+            className="mt-6 w-full rounded-lg bg-fcb-blue px-4 py-3 text-center font-oswald text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fcb-blue/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-bg"
           >
-            🏠 Zur Startseite
+            Zur Startseite
           </Link>
         </div>
-      </main>
+      </PitchAuthShell>
     );
   }
 
+  // --- Formular ---
   return (
-    <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)] flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-xl bg-[#f9f9f9] p-6 rounded shadow mt-20">
-        <h1 className="text-2xl font-bold text-center mb-4">📝 Registrieren</h1>
-        <form onSubmit={handleRegistrierung} className="space-y-4">
-          {/* Vorname / Nachname */}
-          <div className="flex flex-wrap gap-4">
-            <input
-              type="text"
-              placeholder="Vorname"
-              value={vorname}
-              onChange={(e) => setVorname(e.target.value)}
-              className="flex-1 p-2 border rounded text-[var(--foreground)]"
-            />
-            <input
-              type="text"
-              placeholder="Nachname"
-              value={nachname}
-              onChange={(e) => setNachname(e.target.value)}
-              className="flex-1 p-2 border rounded text-[var(--foreground)]"
-            />
-          </div>
+    <PitchAuthShell>
+      <form onSubmit={handleRegister} className="mt-7 space-y-5">
+        <div className="text-center">
+          <h1 className="font-oswald text-3xl font-bold uppercase tracking-wide text-fcb-text">
+            Werde Teil des Vereins
+          </h1>
+          <p className="mt-1 font-inter text-sm text-fcb-muted">
+            Registrieren und dabei sein
+          </p>
+        </div>
 
-          {/* Telefonnummer */}
-          <div>
-            <input
-              type="tel"
-              placeholder="Telefonnummer (optional)"
-              value={telefonnummer}
-              onChange={(e) => setTelefonnummer(e.target.value)}
-              className="w-full p-2 border rounded text-[var(--foreground)]"
-            />
-            <p className="text-xs text-gray-500 mt-1">
-              ℹ️ Wird benötigt, um dich bei kurzfristigen Änderungen zu
-              erreichen.
-            </p>
-          </div>
+        <GoogleButton modus="register" onClick={handleGoogle} />
+        <AuthInfoBanner message={googleHinweis} />
+        <AuthDivider />
 
-          {/* E-Mail */}
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="E-Mail-Adresse"
-            required
-            className="w-full p-2 border rounded text-[var(--foreground)]"
-          />
-
-          {/* Passwortfeld mit Live-Feedback */}
-          <input
-            type={passwortAnzeigen ? "text" : "password"}
-            value={passwort}
-            onChange={(e) => handlePasswortChange(e.target.value)}
-            placeholder="Passwort"
-            required
-            className="w-full p-2 border rounded text-[var(--foreground)]"
-          />
-
-          <div className="text-sm mt-2 space-y-1">
-            <div>{passwortFeedback.hasLower ? "✅" : "❌"} Kleinbuchstaben</div>
-            <div>{passwortFeedback.hasUpper ? "✅" : "❌"} Großbuchstaben</div>
-            <div>{passwortFeedback.hasNumber ? "✅" : "❌"} Zahl</div>
-            <div>{passwortFeedback.hasSymbol ? "✅" : "❌"} Sonderzeichen</div>
-            <div>
-              {passwortFeedback.hasMinLength ? "✅" : "❌"} Mind. 8 Zeichen
-            </div>
-          </div>
-
-          <div className="mt-2 h-2 w-full rounded bg-gray-300 overflow-hidden">
-            <div className={`h-full transition-all duration-300 ${passwortStaerkefarbe(passwortStarke)}`} />
-          </div>
-          <p className="text-xs mt-1">{passwortStaerkeLabel(passwortStarke)}</p>
-
-          {/* Passwort bestätigen */}
-          <div className="relative">
-            <input
-              type={passwortAnzeigen ? "text" : "password"}
-              value={passwortBestaetigung}
-              onChange={(e) => setPasswortBestaetigung(e.target.value)}
-              placeholder="Passwort bestätigen"
-              required
-              className="w-full p-2 border rounded text-[var(--foreground)] pr-10"
-            />
-            {passwortBestaetigung && (
-              <span className="absolute top-2 right-3">
-                {passwort === passwortBestaetigung ? (
-                  <FaCheckCircle className="text-green-600" />
-                ) : (
-                  <FaTimesCircle className="text-red-500" />
-                )}
-              </span>
-            )}
-          </div>
-
-          {/* Passwort anzeigen */}
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={passwortAnzeigen}
-              onChange={() => setPasswortAnzeigen((prev) => !prev)}
-            />
-            Passwort anzeigen
-          </label>
-
-          <button
-            type="submit"
-            disabled={!istFormularGueltig}
-            className={`w-full px-4 py-2 rounded text-white transition ${
-              istFormularGueltig
-                ? "bg-black hover:bg-gray-800 cursor-pointer"
-                : "bg-gray-400 cursor-not-allowed"
-            }`}
-          >
-            ➡️ Jetzt registrieren
-          </button>
-
-          {fehler && (
-            <p className="text-red-500 text-sm text-center">{fehler}</p>
-          )}
-        </form>
-
-        <p className="text-sm text-center mt-6">
-          Bereits registriert?{" "}
-          <a href="/login" className="underline hover:text-gray-500">
-            Hier einloggen
-          </a>
-        </p>
-      </div>
-    </main>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <AuthTextField label="Vorname" value={vorname} onChange={setVorname} autoComplete="given-name" required />
+          <AuthTextField label="Nachname" value={nachname} onChange={setNachname} autoComplete="family-name" required />
+        </div>
+        <AuthTextField label="E-Mail" type="email" value={email} onChange={setEmail} autoComplete="email" required />
+        <AuthPasswordField label="Passwort" value={passwort} onChange={setPasswort} autoComplete="new-password" />
+        <PasswordStrengthMeter feedback={feedback} staerke={staerke} />
+        <AuthPasswordField
+          label="Passwort bestätigen"
+          value={passwortBestaetigung}
+          onChange={setPasswortBestaetigung}
+          autoComplete="new-password"
+        />
+        <AuthErrorBanner message={fehler} />
+        <AuthSubmitButton disabled={!gueltig}>Jetzt registrieren</AuthSubmitButton>
+        <AuthSwitchPrompt frage="Bereits registriert?" aktion="Hier einloggen" href="/login" />
+      </form>
+    </PitchAuthShell>
   );
 }
