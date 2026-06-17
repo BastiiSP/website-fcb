@@ -165,10 +165,7 @@ export default function Footer() {
           Seiten-Flow zu dominieren. Bewusst sichtbar (NICHT versteckt). */}
       <div className="border-t border-white/10 px-4 py-4">
         <p className="mx-auto max-w-6xl font-inter text-xs leading-relaxed text-fcb-muted">
-          Mitgliederbereich: Mitglieder, Trainer und Vorstand des 1. FC 1911
-          Burgkunstadt melden sich an, um Platzbuchungen vorzunehmen, den
-          Vereinskalender zu nutzen und auf interne Bereiche zuzugreifen – per
-          E-Mail oder Google-Konto.
+          Mitglieder können sich anmelden, um auf interne Bereiche zuzugreifen.
         </p>
       </div>
     </motion.footer>
