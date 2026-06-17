@@ -30,7 +30,9 @@ export default function PitchAuthShell({ children }: { children: React.ReactNode
       <div className="relative z-10 flex min-h-screen items-center justify-center px-5 py-16">
         <motion.div
           {...cardMotion}
-          className="w-full max-w-md rounded-2xl border border-fcb-blue/30 bg-fcb-surface/80 p-6 shadow-[0_0_40px_-12px_rgba(29,95,173,0.45)] backdrop-blur-xl sm:p-8"
+          // Border-Glow ist statisch dezent; beim Hover wird er sanft verstärkt
+          // (hellerer Rand + kräftigerer Schatten), weicher Übergang.
+          className="w-full max-w-md rounded-2xl border border-fcb-blue/30 bg-fcb-surface/80 p-6 shadow-[0_0_40px_-12px_rgba(29,95,173,0.45)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 hover:border-fcb-blue/60 hover:shadow-[0_0_60px_-10px_rgba(29,95,173,0.65)] sm:p-8"
         >
           {/* Wappen-Glow-Header – Wappen verlinkt zurück zur Startseite (Ausstieg). */}
           <div className="flex flex-col items-center text-center">
