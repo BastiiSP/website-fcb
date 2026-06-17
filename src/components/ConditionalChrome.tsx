@@ -6,17 +6,21 @@ import Footer from "@/components/Footer";
 import { ConsentProvider } from "@/components/consent/ConsentProvider";
 import CookieBanner from "@/components/consent/CookieBanner";
 
+// Auth-Seiten sind immersive Vollbild-Erlebnisse (Pitch-Look): kein globaler
+// Header/Footer, kein main-Padding. Consent bleibt aktiv (DSGVO gilt überall).
+const AUTH_ROUTES = ["/login", "/registrieren", "/confirm-email", "/auth/callback"];
+
 export default function ConditionalChrome({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const pathname = usePathname() ?? "";
-  // Design-Preview-Routen sind Standalone-Erlebnisse: kein globaler Header/Footer,
-  // kein main-Padding. Consent bleibt aktiv (DSGVO gilt auch auf Preview-Routen).
-  const isPreviewRoute = pathname.startsWith("/auth-preview");
+  const isAuthRoute = AUTH_ROUTES.some(
+    (r) => pathname === r || pathname.startsWith(`${r}/`),
+  );
 
-  if (isPreviewRoute) {
+  if (isAuthRoute) {
     return (
       <ConsentProvider>
         {children}
