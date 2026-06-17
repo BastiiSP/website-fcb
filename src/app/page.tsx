@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import HybridCanvas from "@/components/hero/HybridCanvas";
 import HybridPitch from "@/components/hero/HybridPitch";
@@ -189,6 +190,46 @@ export default function HomePage() {
           </motion.div>
 
         </div>
+      </section>
+
+      {/*
+       * Mitgliederbereich – erklärt den Zweck des Logins/der Anmeldung.
+       * Erfüllt Googles Brand-Verifizierungs-Anforderung „Homepage erklärt den
+       * App-Zweck" und ist zugleich echter UX-Mehrwert (sichtbarer Einstieg in
+       * den Login-/Registrierungs-Bereich).
+       */}
+      <section className="border-t border-fcb-border bg-fcb-bg px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="mx-auto max-w-3xl text-center"
+        >
+          <h2 className="font-oswald text-2xl font-bold uppercase tracking-wide text-fcb-text sm:text-3xl">
+            Mitgliederbereich
+          </h2>
+          <p className="mt-4 font-inter text-sm leading-relaxed text-fcb-muted sm:text-base">
+            Mitglieder, Trainer und Vorstand des 1. FC 1911 Burgkunstadt melden
+            sich hier mit ihrem Konto an, um Platzbuchungen vorzunehmen, den
+            Vereinskalender zu nutzen und auf interne Vereinsbereiche
+            zuzugreifen. Die Anmeldung ist per E-Mail oder Google-Konto möglich.
+          </p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/registrieren"
+              className="rounded-lg bg-fcb-blue px-6 py-3 font-oswald text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fcb-blue/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-bg"
+            >
+              Registrieren
+            </Link>
+            <Link
+              href="/login"
+              className="rounded-lg border border-fcb-border px-6 py-3 font-oswald text-sm font-semibold uppercase tracking-wide text-fcb-text transition-colors hover:border-fcb-muted hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+            >
+              Anmelden
+            </Link>
+          </div>
+        </motion.div>
       </section>
 
       {/* Vereins-News – Instagram-Carousel (ersetzt den früheren LightWidget-Feed) */}
