@@ -27,6 +27,17 @@ interface ProfilDaten {
   rolle: string;
 }
 
+// Read-only Anzeige der aktuellen Rolle im Profil. Ändert NICHTS am
+// Rollenkonzept (Vergabe bleibt Vorstand/Admin vorbehalten) – reine Information
+// für den Nutzer, v. a. für den Status 'ausstehend'.
+const ROLLEN_ANZEIGE: Record<string, { label: string; klasse: string }> = {
+  ausstehend: { label: "Ausstehend", klasse: "bg-yellow-100 text-yellow-800 border-yellow-300" },
+  mitglied: { label: "Mitglied", klasse: "bg-blue-100 text-blue-800 border-blue-300" },
+  trainer: { label: "Trainer", klasse: "bg-green-100 text-green-800 border-green-300" },
+  vorstand: { label: "Vorstand", klasse: "bg-purple-100 text-purple-800 border-purple-300" },
+  admin: { label: "Admin", klasse: "bg-red-100 text-red-800 border-red-300" },
+};
+
 export default function ProfilPage() {
   const supabase = createClient();
 
@@ -133,7 +144,32 @@ export default function ProfilPage() {
 
   return (
     <main className="min-h-screen p-4 sm:p-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Mein Profil</h1>
+      {/* Titel + read-only Rollen-Badge */}
+      <div className="mb-6 flex flex-wrap items-center gap-3">
+        <h1 className="text-2xl font-bold">Mein Profil</h1>
+        {(() => {
+          const r =
+            ROLLEN_ANZEIGE[profil.rolle] ?? {
+              label: profil.rolle,
+              klasse: "bg-gray-100 text-gray-800 border-gray-300",
+            };
+          return (
+            <span
+              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${r.klasse}`}
+            >
+              Rolle: {r.label}
+            </span>
+          );
+        })()}
+      </div>
+
+      {/* Hinweis für noch nicht freigeschaltete Konten */}
+      {profil.rolle === "ausstehend" && (
+        <p className="mb-8 rounded border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
+          Dein Konto wird geprüft und freigeschaltet. Bei Fragen wende dich an
+          die Vorstandschaft oder den IT-Verantwortlichen.
+        </p>
+      )}
 
       {/* Tab-Navigation */}
       <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 mb-8">

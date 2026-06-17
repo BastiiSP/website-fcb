@@ -1,20 +1,34 @@
+"use client";
+
+import { usePathname } from "next/navigation";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ConsentProvider } from "@/components/consent/ConsentProvider";
 import CookieBanner from "@/components/consent/CookieBanner";
 
-/**
- * Rendert die globale Chrome (Header + main-Padding + Footer) um alle Routen.
- * Seit Einführung der DSGVO-Consent-Verwaltung umschließt der ConsentProvider
- * die gesamte Chrome – so können Header, Footer und alle Seiten-Inhalte den
- * Consent-Status über useConsent() lesen. Das CookieBanner wird global (z-60,
- * über allem) innerhalb des Providers gerendert.
- */
+// Auth-Seiten sind immersive Vollbild-Erlebnisse (Pitch-Look): kein globaler
+// Header/Footer, kein main-Padding. Consent bleibt aktiv (DSGVO gilt überall).
+const AUTH_ROUTES = ["/login", "/registrieren", "/confirm-email", "/auth/callback"];
+
 export default function ConditionalChrome({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname() ?? "";
+  const isAuthRoute = AUTH_ROUTES.some(
+    (r) => pathname === r || pathname.startsWith(`${r}/`),
+  );
+
+  if (isAuthRoute) {
+    return (
+      <ConsentProvider>
+        {children}
+        <CookieBanner />
+      </ConsentProvider>
+    );
+  }
+
   return (
     <ConsentProvider>
       <Header />

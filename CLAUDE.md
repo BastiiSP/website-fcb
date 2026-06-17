@@ -134,7 +134,7 @@ src/
 │   ├── Navigation.tsx             ← Rollenbasierte Navigation (modern, fcb-Tokens)
 │   ├── Header.tsx                 ← Smart-Sticky-Nav, kanonisches Design-Vorbild (modern)
 │   ├── Footer.tsx
-│   ├── ConditionalChrome.tsx      ← Blendet Header/Footer auf Preview-Routen aus
+│   ├── ConditionalChrome.tsx      ← Blendet Header/Footer auf Auth-Routen aus
 │   ├── UserDropdown.tsx           ← Nutzer-Menü in der Nav (modern, fcb-Tokens)
 │   ├── ThemeToggle.tsx            ← Hell/Dunkel-Umschaltung (darkMode: 'class')
 │   ├── Buchungsformular.tsx
@@ -150,7 +150,7 @@ src/
 │   ├── icons/BrandIcons.tsx       ← Facebook/Instagram als Inline-SVG (Lucide hat keine Brand-Icons)
 │   ├── instagram/                 ← InstagramSection / InstagramCarousel (modern)
 │   ├── hero/                      ← Hero-Varianten (Design-Exploration)
-│   ├── auth-preview/              ← TEMPORÄR (design-round-2): navbar/ + dropdown/ Varianten, nach Auswahl löschen
+│   ├── auth/                      ← Permanente Auth-UI (Pitch-Look: Shell, Background, Felder, Google-Button)
 │   └── profil/                    ← Profil-Unterkomponenten
 │       ├── PersoenlicheDaten.tsx
 │       ├── AccountSicherheit.tsx

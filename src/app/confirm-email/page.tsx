@@ -1,41 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
+import { CheckCircle2 } from "lucide-react";
+import PitchAuthShell from "@/components/auth/PitchAuthShell";
+import AuthInfoBanner from "@/components/auth/AuthInfoBanner";
 
+/**
+ * Seite nach Klick auf den Bestätigungslink in der E-Mail. Supabase parst den
+ * Token automatisch (detectSessionInUrl=Default). Der Nutzer ist hier i. d. R.
+ * frisch eingeloggt → einladender, prominenter CTA zur Profilvervollständigung.
+ */
 export default function ConfirmEmailPage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 bg-[var(--background)] text-[var(--foreground)]">
-      <div className="bg-[#f9f9f9] border border-gray-300 rounded-lg p-8 max-w-md w-full text-center shadow-md space-y-4">
-        <div className="flex justify-center">
-          <Image src="/logo.svg" alt="Vereinswappen" width={60} height={60} />
+    <PitchAuthShell>
+      <div className="mt-7 flex flex-col items-center text-center">
+        <div className="flex h-16 w-16 items-center justify-center rounded-full border border-fcb-blue/40 bg-fcb-blue/10 text-fcb-blue">
+          <CheckCircle2 className="h-8 w-8" aria-hidden="true" />
         </div>
-
-        <h1 className="text-2xl font-bold">
-          🎉 Willkommen beim 1. FC 1911 Burgkunstadt!
+        <h1 className="mt-5 font-oswald text-3xl font-bold uppercase tracking-wide text-fcb-text">
+          Willkommen beim FCB
         </h1>
-
-        <p className="text-sm">
-          Deine E-Mail-Adresse wurde erfolgreich bestätigt.
+        <p className="mt-3 font-inter text-sm leading-relaxed text-fcb-muted">
+          Deine E-Mail-Adresse wurde erfolgreich bestätigt. Dein Konto wird
+          geprüft und freigeschaltet. Bei Fragen wende dich an die Vorstandschaft
+          oder den IT-Verantwortlichen.
         </p>
-
-        <p className="text-sm">
-          <strong>Dein Konto wird nun vom Vorstand geprüft.</strong> Sobald es
-          freigeschaltet ist, kannst du Plätze buchen und auf die internen
-          Bereiche zugreifen.
-        </p>
-
-        <p className="text-sm text-gray-500">
-          Wir melden uns bei dir, sobald es so weit ist.
-        </p>
-
+        <div className="mt-5 w-full">
+          <AuthInfoBanner message="Vervollständige schon jetzt dein Profil – so können wir dich schneller zuordnen und freischalten." />
+        </div>
+        {/* Einladender, prominenter CTA zur Profilvervollständigung */}
+        <Link
+          href="/profil"
+          className="mt-6 w-full rounded-lg bg-fcb-blue px-4 py-3 text-center font-oswald text-sm font-semibold uppercase tracking-wide text-white transition-colors hover:bg-fcb-blue/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-bg"
+        >
+          Profil vervollständigen
+        </Link>
         <Link
           href="/"
-          className="inline-block mt-4 px-5 py-2 border border-[var(--foreground)] rounded hover:bg-gray-100 transition"
+          className="mt-3 font-inter text-sm font-medium text-fcb-muted underline-offset-2 transition-colors hover:text-fcb-text hover:underline"
         >
-          🏠 Zur Startseite
+          Später, zur Startseite
         </Link>
       </div>
-    </main>
+    </PitchAuthShell>
   );
 }
