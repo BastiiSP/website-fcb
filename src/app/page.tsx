@@ -26,8 +26,12 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-fcb-bg text-fcb-text">
 
-      {/* Hero-Section */}
-      <section className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden">
+      {/*
+       * Hero-Section – Marken-Showcase-Band, intentionell in BEIDEN Themes dunkel.
+       * `.dark` scopt die fcb-*-CSS-Variablen auf diesen Subtree, sodass `bg-fcb-bg`
+       * immer das dunkle #0a0a0a malt – auch wenn <html> im Light-Theme ist.
+       */}
+      <section className="dark relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-fcb-bg">
 
         {/* Dot-Grid Hintergrund */}
         <HybridCanvas />
