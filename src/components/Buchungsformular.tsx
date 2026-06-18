@@ -6,8 +6,12 @@ import { fetchEvents } from "@/utils/fetchEvents";
 import { PLATZ_FARBEN } from "@/utils/getEventColor";
 import { SupabaseClient } from "@supabase/supabase-js";
 import type { EventInput } from "@fullcalendar/core";
+import TextField from "@/components/ui/TextField";
+import Select from "@/components/ui/Select";
+import Textarea from "@/components/ui/Textarea";
+import Button from "@/components/ui/Button";
 
-// 🗓️ Registrierung der deutschen Sprache für das DatePicker-Modul
+// Deutsch-Locale für react-datepicker registrieren
 registerLocale("de", de);
 
 type Props = {
@@ -18,6 +22,20 @@ type Props = {
   setErrorMessage: (msg: string) => void;
 };
 
+// Optionslisten für die Auswahl-Felder
+const PLATZANTEIL_OPTIONEN = [
+  { value: "viertel", label: "1/4 Platz" },
+  { value: "halb", label: "1/2 Platz" },
+  { value: "ganz", label: "Ganzer Platz" },
+];
+
+const ANLASS_OPTIONEN = [
+  { value: "training", label: "Training" },
+  { value: "freundschaftsspiel", label: "Freundschaftsspiel" },
+  { value: "punktspiel", label: "Punktspiel" },
+  { value: "platzpflege", label: "Platzpflege" },
+];
+
 export default function Buchungsformular({
   userId,
   supabase,
@@ -25,7 +43,7 @@ export default function Buchungsformular({
   setSuccessMessage,
   setErrorMessage,
 }: Props) {
-  // 🧠 Formular-Zustände
+  // Formular-Zustände – Logik unverändert
   const [platz, setPlatz] = useState("hauptplatz");
   const [platzanteil, setPlatzanteil] = useState("ganz");
   const [anlass, setAnlass] = useState("training");
@@ -35,25 +53,25 @@ export default function Buchungsformular({
   const [buchendePerson, setBuchendePerson] = useState("");
   const [bemerkung, setBemerkung] = useState("");
 
-  // 📨 Formularübermittlung + Logik zur Platzbelegung
+  // Formularübermittlung + Platzbelegungs-Logik (unverändert)
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // ❗ Validierung: Start- und Endzeit müssen vorhanden sein
+    // Validierung: Start- und Endzeit müssen vorhanden sein
     if (!startzeit || !endzeit) {
-      setErrorMessage("❌ Bitte Start- und Endzeit auswählen.");
+      setErrorMessage("Bitte Start- und Endzeit auswählen.");
       return;
     }
 
     if (endzeit <= startzeit) {
-      setErrorMessage("❌ Die Endzeit muss nach der Startzeit liegen.");
+      setErrorMessage("Die Endzeit muss nach der Startzeit liegen.");
       return;
     }
 
     const startISO = startzeit.toISOString();
     const endISO = endzeit.toISOString();
 
-    // 🔄 Abfrage aller bestehenden Buchungen für diesen Platz im selben Zeitraum
+    // Abfrage aller bestehenden Buchungen für diesen Platz im selben Zeitraum
     const { data: existing, error: fetchError } = await supabase
       .from("buchungen")
       .select("startzeit, endzeit, platzanteil")
@@ -62,11 +80,11 @@ export default function Buchungsformular({
       .lte("startzeit", endISO);
 
     if (fetchError) {
-      setErrorMessage("❌ Fehler beim Abrufen bestehender Buchungen.");
+      setErrorMessage("Fehler beim Abrufen bestehender Buchungen.");
       return;
     }
 
-    // 📊 Überschneidungsprüfung auf Basis von Platzanteilen
+    // Überschneidungsprüfung auf Basis von Platzanteilen
     const anteilWerte: Record<string, number> = {
       viertel: 0.25,
       halb: 0.5,
@@ -87,11 +105,11 @@ export default function Buchungsformular({
 
     const neuerWert = anteilWerte[platzanteil];
     if (belegung + neuerWert > 1) {
-      setErrorMessage("❌ Der Platz ist zu diesem Zeitpunkt bereits belegt.");
+      setErrorMessage("Der Platz ist zu diesem Zeitpunkt bereits belegt.");
       return;
     }
 
-    // ✅ Speichern der neuen Buchung
+    // Speichern der neuen Buchung – Supabase-Call unverändert
     const { error: insertError } = await supabase.from("buchungen").insert({
       platz,
       platzanteil,
@@ -105,89 +123,94 @@ export default function Buchungsformular({
     });
 
     if (insertError) {
-      setErrorMessage("❌ Fehler beim Speichern. Bitte versuche es erneut.");
+      setErrorMessage("Fehler beim Speichern. Bitte versuche es erneut.");
       return;
     }
 
-    // 🔄 Formular zurücksetzen + Erfolgsmeldung anzeigen
+    // Formular zurücksetzen + Erfolgsmeldung anzeigen
     setMannschaft("");
     setBuchendePerson("");
     setBemerkung("");
     setStartzeit(null);
     setEndzeit(null);
     setErrorMessage("");
-    setSuccessMessage("✅ Die Buchung wurde erfolgreich gespeichert.");
+    setSuccessMessage("Die Buchung wurde erfolgreich gespeichert.");
 
-    // 🔁 Kalender-Einträge aktualisieren
+    // Kalender-Einträge aktualisieren
     await fetchEvents(supabase, setEvents);
   };
 
   return (
     <>
-      <h2 className="text-xl font-semibold mt-8 mb-2">➕ Neue Buchung</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* 📌 Platzwahl als Segmented Control – beide Optionen sichtbar, Farb-Punkt
-            dient zugleich als Legende (gleiche Farben wie Kalender-Events) */}
-        <div className="flex gap-4 flex-wrap items-stretch">
-          <div
-            role="radiogroup"
-            aria-label="Platz"
-            className="inline-flex rounded-lg border border-gray-300 overflow-hidden self-start"
-          >
-            {Object.entries(PLATZ_FARBEN).map(([wert, farbe]) => {
-              const aktiv = platz === wert;
-              return (
-                <button
-                  key={wert}
-                  type="button"
-                  role="radio"
-                  aria-checked={aktiv}
-                  onClick={() => setPlatz(wert)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition border-r last:border-r-0 border-gray-300 ${
-                    aktiv
-                      ? "bg-[var(--foreground)] text-[var(--background)]"
-                      : "bg-[var(--background)] text-[var(--foreground)] hover:opacity-70"
-                  }`}
-                >
-                  <span
-                    className="inline-block h-3 w-3 rounded-full shrink-0"
-                    style={{ backgroundColor: farbe }}
-                  />
-                  {wert.charAt(0).toUpperCase() + wert.slice(1)}
-                </button>
-              );
-            })}
+      <h2 className="font-oswald text-2xl font-semibold uppercase tracking-wide text-fcb-text mt-8 mb-4">
+        Neue Buchung
+      </h2>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Platzwahl als Segmented Control – Farb-Punkte dienen als Legende
+            (gleiche Farben wie die Kalender-Events) */}
+        <div className="flex gap-4 flex-wrap items-end">
+          <div className="space-y-1.5">
+            <span className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Platz
+            </span>
+            <div
+              role="radiogroup"
+              aria-label="Platz"
+              className="inline-flex rounded-lg border border-fcb-border overflow-hidden self-start"
+            >
+              {Object.entries(PLATZ_FARBEN).map(([wert, farbe]) => {
+                const aktiv = platz === wert;
+                return (
+                  <button
+                    key={wert}
+                    type="button"
+                    role="radio"
+                    aria-checked={aktiv}
+                    onClick={() => setPlatz(wert)}
+                    className={`inline-flex items-center gap-2 px-4 py-2.5 font-inter text-sm font-medium transition border-r last:border-r-0 border-fcb-border ${
+                      aktiv
+                        ? "bg-fcb-blue text-white"
+                        : "bg-fcb-bg text-fcb-text hover:bg-fcb-surface"
+                    }`}
+                  >
+                    <span
+                      className="inline-block h-3 w-3 rounded-full shrink-0"
+                      style={{ backgroundColor: farbe }}
+                    />
+                    {wert.charAt(0).toUpperCase() + wert.slice(1)}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <select
-            value={platzanteil}
-            onChange={(e) => setPlatzanteil(e.target.value)}
-            required
-            className="select-field w-full"
-          >
-            <option value="viertel">1/4 Platz</option>
-            <option value="halb">1/2 Platz</option>
-            <option value="ganz">Ganzer Platz</option>
-          </select>
+          <div className="flex-1 min-w-[160px]">
+            <Select
+              label="Platzanteil"
+              value={platzanteil}
+              onChange={setPlatzanteil}
+              options={PLATZANTEIL_OPTIONEN}
+              required
+            />
+          </div>
 
-          <select
-            value={anlass}
-            onChange={(e) => setAnlass(e.target.value)}
-            required
-            className="select-field w-full"
-          >
-            <option value="training">Training</option>
-            <option value="freundschaftsspiel">Freundschaftsspiel</option>
-            <option value="punktspiel">Punktspiel</option>
-            <option value="platzpflege">Platzpflege</option>
-          </select>
+          <div className="flex-1 min-w-[160px]">
+            <Select
+              label="Anlass"
+              value={anlass}
+              onChange={setAnlass}
+              options={ANLASS_OPTIONEN}
+              required
+            />
+          </div>
         </div>
 
-        {/* ⏱️ Zeitangaben */}
+        {/* Zeitangaben – react-datepicker Logik unverändert, nur Styling */}
         <div className="flex gap-4 flex-wrap">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Startzeit <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Startzeit <span className="text-fcb-red normal-case">*</span>
             </label>
             <DatePicker
               selected={startzeit}
@@ -198,6 +221,7 @@ export default function Buchungsformular({
                   const minutes = date.getMinutes();
                   const hatUhrzeit = hours !== 0 || minutes !== 0;
 
+                  // Automatischer Endzeit-Vorschlag: +90 Minuten
                   if (!endzeit && hatUhrzeit) {
                     const endzeitVorschlag = new Date(date.getTime() + 90 * 60 * 1000);
                     setEndzeit(endzeitVorschlag);
@@ -210,14 +234,16 @@ export default function Buchungsformular({
               timeIntervals={15}
               dateFormat="dd.MM.yyyy HH:mm"
               placeholderText="Startzeit wählen"
-              className="form-field bg-[var(--background)]"
+              // Wrapper-Klasse: Input-Stil nutzt fcb-Tokens via globals.css-Regeln
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none"
+              wrapperClassName="w-full"
               popperPlacement="bottom-start"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Endzeit <span className="text-red-500">*</span>
+          <div className="space-y-1.5">
+            <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Endzeit <span className="text-fcb-red normal-case">*</span>
             </label>
             <DatePicker
               selected={endzeit}
@@ -228,60 +254,51 @@ export default function Buchungsformular({
               timeIntervals={15}
               dateFormat="dd.MM.yyyy HH:mm"
               placeholderText="Endzeit wählen"
-              className="form-field bg-[var(--background)]"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none"
+              wrapperClassName="w-full"
             />
           </div>
         </div>
 
-        {/* 👥 Person & Mannschaft */}
+        {/* Buchende Person und Mannschaft */}
         <div className="flex gap-4 flex-wrap">
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Buchende Person <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
+          <div className="flex-1 min-w-[200px]">
+            <TextField
+              label="Buchende Person"
               value={buchendePerson}
-              onChange={(e) => setBuchendePerson(e.target.value)}
+              onChange={setBuchendePerson}
               placeholder="Name der buchenden Person"
               required
-              className="form-field bg-[var(--background)] w-full md:w-auto"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Mannschaft <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
+          <div className="flex-1 min-w-[200px]">
+            <TextField
+              label="Mannschaft"
               value={mannschaft}
-              onChange={(e) => setMannschaft(e.target.value)}
+              onChange={setMannschaft}
               placeholder="Mannschaftsname"
               required
-              className="form-field bg-[var(--background)] w-full md:w-auto"
             />
           </div>
         </div>
 
-        {/* 📝 Bemerkung */}
-        <textarea
+        {/* Optionale Bemerkung */}
+        <Textarea
+          label="Bemerkung"
           value={bemerkung}
-          onChange={(e) => setBemerkung(e.target.value)}
+          onChange={setBemerkung}
           placeholder="Weitere Informationen (optional)"
-          className="form-field bg-[var(--background)] w-full"
           rows={3}
+          optional
         />
 
-        {/* ✅ Absenden */}
+        {/* Absenden */}
         <div className="flex items-center gap-4 flex-wrap">
-          <button
-            type="submit"
-            className="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
-          >
+          <Button type="submit" variant="primary">
             Buchung speichern
-          </button>
-          <p className="text-xs text-gray-400">
-            <span className="text-red-500">*</span> Pflichtfeld
+          </Button>
+          <p className="font-inter text-xs text-fcb-muted">
+            <span className="text-fcb-red">*</span> Pflichtfeld
           </p>
         </div>
       </form>

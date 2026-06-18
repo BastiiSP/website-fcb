@@ -19,6 +19,8 @@ import BearbeitenModal, { type Buchung } from "@/components/BearbeitenModal";
 import TooltipContent from "@/components/TooltipContent";
 import { fetchEvents } from "@/utils/fetchEvents";
 import { PLATZ_FARBEN } from "@/utils/getEventColor";
+import PageShell from "@/components/ui/PageShell";
+import PageHeader from "@/components/ui/PageHeader";
 
 const supabase = createClient();
 
@@ -217,9 +219,7 @@ export default function KalenderSeite() {
 
   return (
     <>
-      {/* <ThemeToggle /> */}
-
-      {/* ✅ Toast Meldungen */}
+      {/* Toast-Meldungen liegen über allem anderen */}
       {errorMessage && (
         <ToastMessage
           message={errorMessage}
@@ -235,44 +235,44 @@ export default function KalenderSeite() {
         />
       )}
 
-      <main className="p-4 w-full overflow-x-auto bg-[var(--background)] text-[var(--foreground)]">
-        <h1 className="text-2xl font-bold mb-4">📅 Platzbelegung</h1>
+      <PageShell maxWidth="2xl">
+        <PageHeader title="Platzbelegung" />
 
-        {/* Konto ausstehend */}
+        {/* Zugriff ausstehend oder Profil nicht ladbar */}
         {redirectMessage ? (
-          <div className="text-center font-medium space-y-4">
-            <p className="text-yellow-700">{redirectMessage}</p>
+          <div className="text-center font-inter space-y-4">
+            <p className="text-fcb-muted">{redirectMessage}</p>
             <Link
               href="/"
-              className="inline-block bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded transition"
+              className="inline-block rounded-lg bg-fcb-blue px-4 py-2 font-semibold text-white transition hover:bg-fcb-blue/90"
             >
               Zur Startseite
             </Link>
           </div>
         ) : !isLoggedIn ? (
-          <div className="text-center text-red-600 font-medium space-y-4">
-            <p>
+          <div className="text-center font-inter space-y-4">
+            <p className="text-fcb-muted">
               Du bist nicht eingeloggt. Bitte logge dich ein, um die
               Platzbelegung zu sehen.
             </p>
             <Link
               href="/login"
-              className="inline-block bg-black hover:bg-gray-800 text-white font-semibold py-2 px-4 rounded transition"
+              className="inline-block rounded-lg bg-fcb-blue px-4 py-2 font-semibold text-white transition hover:bg-fcb-blue/90"
             >
-              🔐 zum Login/zur Registrierung
+              Zum Login / zur Registrierung
             </Link>
           </div>
         ) : (
           <>
-            {/* 🎨 Farb-Legende: zeigt dauerhaft, welche Farbe für welchen Platz steht */}
+            {/* Farb-Legende: zeigt dauerhaft, welche Farbe für welchen Platz steht */}
             <div className="flex flex-wrap gap-2 mb-3">
               {Object.entries(PLATZ_FARBEN).map(([platz, farbe]) => (
                 <span
                   key={platz}
-                  className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-white px-3 py-1 text-sm font-medium text-gray-800"
+                  className="inline-flex items-center gap-2 rounded-full border border-fcb-border bg-fcb-surface px-3 py-1 font-inter text-sm font-medium text-fcb-text"
                 >
                   <span
-                    className="inline-block h-3 w-3 rounded-full"
+                    className="inline-block h-3 w-3 rounded-full shrink-0"
                     style={{ backgroundColor: farbe }}
                   />
                   {platz.charAt(0).toUpperCase() + platz.slice(1)}
@@ -280,7 +280,7 @@ export default function KalenderSeite() {
               ))}
             </div>
 
-            {/* 📆 Kalender */}
+            {/* FullCalendar – Konfiguration unverändert */}
             <FullCalendar
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
               initialView="timeGridWeek"
@@ -347,7 +347,7 @@ export default function KalenderSeite() {
               }}
             />
 
-            {/* 🧾 Buchungsformular */}
+            {/* Buchungsformular */}
             <Buchungsformular
               userId={userId!}
               supabase={supabase}
@@ -357,9 +357,9 @@ export default function KalenderSeite() {
             />
           </>
         )}
-      </main>
+      </PageShell>
 
-      {/* 🧨 Lösch-Bestätigung */}
+      {/* Lösch-Bestätigung */}
       <LoeschenModal
         show={loeschenModalOffen}
         onClose={() => setLoeschenModalOffen(false)}
@@ -367,7 +367,7 @@ export default function KalenderSeite() {
         mannschaft={zuLoeschendeMannschaft || ""}
       />
 
-      {/* ✏️ Bearbeiten-Modal */}
+      {/* Bearbeiten-Modal */}
       <BearbeitenModal
         show={!!bearbeiteBuchung}
         onClose={() => setBearbeiteBuchung(null)}

@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { SupabaseClient } from "@supabase/supabase-js";
+import Modal from "@/components/ui/Modal";
+import Select from "@/components/ui/Select";
+import TextField from "@/components/ui/TextField";
+import Textarea from "@/components/ui/Textarea";
+import Button from "@/components/ui/Button";
 
 export type Buchung = {
   id: string;
@@ -24,6 +29,25 @@ type Props = {
   onSave: () => void;
 };
 
+// Optionslisten für die Auswahl-Felder
+const PLATZ_OPTIONEN = [
+  { value: "hauptplatz", label: "Hauptplatz" },
+  { value: "nebenplatz", label: "Nebenplatz" },
+];
+
+const PLATZANTEIL_OPTIONEN = [
+  { value: "viertel", label: "1/4 Platz" },
+  { value: "halb", label: "1/2 Platz" },
+  { value: "ganz", label: "Ganzer Platz" },
+];
+
+const ANLASS_OPTIONEN = [
+  { value: "training", label: "Training" },
+  { value: "freundschaftsspiel", label: "Freundschaftsspiel" },
+  { value: "punktspiel", label: "Punktspiel" },
+  { value: "platzpflege", label: "Platzpflege" },
+];
+
 export default function BearbeitenModal({
   show,
   onClose,
@@ -31,21 +55,21 @@ export default function BearbeitenModal({
   initialData,
   onSave,
 }: Props) {
-  // 📦 Lokaler Zustand für das Formular, wird erst gesetzt, wenn initialData vorhanden ist
+  // Lokaler Zustand für das Formular, wird erst gesetzt wenn initialData vorhanden
   const [form, setForm] = useState<Buchung | null>(initialData || null);
 
-  // 🔁 Wenn sich die übergebenen Props ändern, aktualisiere das Formular
+  // Wenn sich die übergebenen Props ändern, Formular aktualisieren
   useEffect(() => {
     setForm(initialData || null);
   }, [initialData]);
 
-  // 🖊️ Formularfeldänderungen übernehmen
+  // Formularfeldänderungen übernehmen
   const handleChange = (field: keyof Buchung, value: string) => {
     if (!form) return;
     setForm((prev) => ({ ...prev!, [field]: value }));
   };
 
-  // 💾 Speichern der bearbeiteten Daten in Supabase
+  // Speichern der bearbeiteten Daten in Supabase – Logik unverändert
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form) return;
@@ -73,109 +97,109 @@ export default function BearbeitenModal({
     }
   };
 
-  // ⛔ Modal wird nur angezeigt, wenn es aktiv ist und gültige Daten geladen sind
-  if (!show || !form) return null;
+  // Modal wird nur angezeigt wenn es aktiv ist und gültige Daten geladen sind
+  if (!form) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-      <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded shadow-lg w-full max-w-xl">
-        <h2 className="text-xl font-bold mb-4">✏️ Buchung bearbeiten</h2>
-
-        {/* 🧾 Bearbeitungsformular */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* 🏟️ Platzwahl, Platzanteil, Anlass */}
-          <div className="flex gap-4 flex-wrap">
-            <select
+    <Modal open={show} onClose={onClose} title="Buchung bearbeiten" size="md">
+      {/* Bearbeitungsformular */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Platz, Platzanteil, Anlass */}
+        <div className="flex gap-4 flex-wrap">
+          <div className="flex-1 min-w-[140px]">
+            <Select
+              label="Platz"
               value={form.platz}
-              onChange={(e) => handleChange("platz", e.target.value)}
-              className="select-field"
-            >
-              <option value="hauptplatz">Hauptplatz</option>
-              <option value="nebenplatz">Nebenplatz</option>
-            </select>
-
-            <select
-              value={form.platzanteil}
-              onChange={(e) => handleChange("platzanteil", e.target.value)}
-              className="select-field"
-            >
-              <option value="viertel">1/4 Platz</option>
-              <option value="halb">1/2 Platz</option>
-              <option value="ganz">Ganzer Platz</option>
-            </select>
-
-            <select
-              value={form.anlass}
-              onChange={(e) => handleChange("anlass", e.target.value)}
-              className="select-field"
-            >
-              <option value="training">Training</option>
-              <option value="freundschaftsspiel">Freundschaftsspiel</option>
-              <option value="punktspiel">Punktspiel</option>
-              <option value="platzpflege">Platzpflege</option>
-            </select>
+              onChange={(v) => handleChange("platz", v)}
+              options={PLATZ_OPTIONEN}
+            />
           </div>
 
-          {/* 🕓 Start- und Endzeit */}
-          <div className="flex gap-4 flex-wrap">
+          <div className="flex-1 min-w-[140px]">
+            <Select
+              label="Platzanteil"
+              value={form.platzanteil}
+              onChange={(v) => handleChange("platzanteil", v)}
+              options={PLATZANTEIL_OPTIONEN}
+            />
+          </div>
+
+          <div className="flex-1 min-w-[140px]">
+            <Select
+              label="Anlass"
+              value={form.anlass}
+              onChange={(v) => handleChange("anlass", v)}
+              options={ANLASS_OPTIONEN}
+            />
+          </div>
+        </div>
+
+        {/* Start- und Endzeit – native datetime-local Felder (Bearbeitungsformular
+            nutzt String-Werte aus Supabase ISO-Timestamps, nicht react-datepicker) */}
+        <div className="flex gap-4 flex-wrap">
+          <div className="space-y-1.5 flex-1 min-w-[180px]">
+            <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Startzeit
+            </label>
             <input
               type="datetime-local"
               value={form.startzeit.slice(0, 16)}
               onChange={(e) => handleChange("startzeit", e.target.value)}
-              className="border p-2 rounded text-[var(--foreground)]"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />
+          </div>
+          <div className="space-y-1.5 flex-1 min-w-[180px]">
+            <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Endzeit
+            </label>
             <input
               type="datetime-local"
               value={form.endzeit.slice(0, 16)}
               onChange={(e) => handleChange("endzeit", e.target.value)}
-              className="border p-2 rounded text-[var(--foreground)]"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />
           </div>
+        </div>
 
-          {/* 👤 Name & Mannschaft */}
-          <div className="flex gap-4 flex-wrap">
-            <input
-              type="text"
+        {/* Buchende Person und Mannschaft */}
+        <div className="flex gap-4 flex-wrap">
+          <div className="flex-1 min-w-[180px]">
+            <TextField
+              label="Buchende Person"
               value={form.buchende_person}
-              onChange={(e) => handleChange("buchende_person", e.target.value)}
+              onChange={(v) => handleChange("buchende_person", v)}
               placeholder="Name"
-              className="form-field md:w-auto"
             />
-            <input
-              type="text"
+          </div>
+          <div className="flex-1 min-w-[180px]">
+            <TextField
+              label="Mannschaft"
               value={form.mannschaft}
-              onChange={(e) => handleChange("mannschaft", e.target.value)}
+              onChange={(v) => handleChange("mannschaft", v)}
               placeholder="Mannschaft"
-              className="form-field md:w-auto"
             />
           </div>
+        </div>
 
-          {/* 📝 Optional: Bemerkung */}
-          <textarea
-            value={form.bemerkung || ""}
-            onChange={(e) => handleChange("bemerkung", e.target.value)}
-            placeholder="Weitere Infos (optional)"
-            className="form-field md:w-auto"
-          />
+        {/* Optionale Bemerkung */}
+        <Textarea
+          label="Bemerkung"
+          value={form.bemerkung || ""}
+          onChange={(v) => handleChange("bemerkung", v)}
+          placeholder="Weitere Infos (optional)"
+          optional
+        />
 
-          {/* ✅ Aktionen */}
-          <div className="flex justify-between">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
-            >
-              Abbrechen
-            </button>
-            <button
-              type="submit"
-              className="bg-gray-300 hover:bg-gray-400 text-[var(--foreground)] px-4 py-2 rounded"
-            >
-              Speichern
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        {/* Aktionen */}
+        <div className="flex justify-between pt-2">
+          <Button type="button" variant="secondary" onClick={onClose}>
+            Abbrechen
+          </Button>
+          <Button type="submit" variant="primary">
+            Speichern
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }

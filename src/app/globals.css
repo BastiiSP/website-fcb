@@ -93,29 +93,128 @@ body {
   animation: toast-fade-slide 0.4s ease-out;
 }
 
-/* 🗓️ FullCalendar Header */
+/* ============================================================
+   FullCalendar – theme-aware Styling (dual-theme via CSS-Tokens)
+   Ersetzt die früheren hardcodierten Hell-Farben (#111, #1f2937).
+   ============================================================ */
+
+/* Allgemeine Schriftfarbe – folgt dem aktiven Theme */
+.fc {
+  color: rgb(var(--color-text));
+}
+
+/* Kalender-Titel (Monat/Woche/Tag) */
 .fc .fc-toolbar-title {
-  color: #111111;
+  color: rgb(var(--color-text));
   font-weight: 600;
 }
 
-/* 🗓️ Tagesnamen (Mo–So) sichtbar machen */
+/* Tagesnamen-Kopfzeile (Mo–So) */
 .fc-col-header-cell-cushion {
-  color: #1f2937;
+  color: rgb(var(--color-muted));
   font-weight: 600;
   text-transform: uppercase;
 }
 
-/* 🗓️ Allgemeine Schriftfarbe im Kalender */
-.fc {
-  color: #1f2937;
+/* Zeitleiste links: Hintergrund und Schrift folgen dem Theme */
+.fc .fc-timegrid-slot-label {
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-text));
+  font-weight: 600;
 }
 
-/* 🕒 Hintergrund & Schriftfarbe der Zeitleiste links */
-.fc .fc-timegrid-slot-label {
-  background-color: #ffffff;
-  color: #111827;
-  font-weight: 600;
+/* Rasterlinien und Trennstriche des Kalenders */
+.fc-theme-standard td,
+.fc-theme-standard th,
+.fc-theme-standard .fc-scrollgrid {
+  border-color: rgb(var(--color-border));
+}
+
+/* Navigations-Buttons (Vor/Zurück/Heute/Ansichtsauswahl) – immer FCB-Blau */
+.fc .fc-button-primary {
+  background-color: #1d5fad;
+  border-color: #1d5fad;
+}
+.fc .fc-button-primary:hover {
+  background-color: rgba(29, 95, 173, 0.9);
+  border-color: rgba(29, 95, 173, 0.9);
+}
+.fc .fc-button-primary:not(:disabled):active,
+.fc .fc-button-primary:not(:disabled).fc-button-active {
+  background-color: rgba(29, 95, 173, 0.85);
+  border-color: rgba(29, 95, 173, 0.85);
+}
+
+/* Heutiger Tag: dezenter FCB-Blau-Hintergrund */
+.fc .fc-day-today {
+  background-color: rgba(29, 95, 173, 0.08) !important;
+}
+
+/* ============================================================
+   react-datepicker – theme-aware Styling (dual-theme via CSS-Tokens)
+   Überschreibt die eingebetteten hellen Standardfarben der Bibliothek.
+   ============================================================ */
+
+/* Haupt-Popup-Box */
+.react-datepicker {
+  background: rgb(var(--color-surface));
+  color: rgb(var(--color-text));
+  border-color: rgb(var(--color-border));
+  font-family: var(--font-inter), Inter, ui-sans-serif, sans-serif;
+}
+
+/* Monatskopf (Monatsname + Jahr + Navigationspfeile) */
+.react-datepicker__header {
+  background: rgb(var(--color-bg));
+  border-color: rgb(var(--color-border));
+}
+
+/* Textfarben innerhalb des Kalenders */
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker__day,
+.react-datepicker-time__header,
+.react-datepicker__time-name {
+  color: rgb(var(--color-text));
+}
+
+/* Hover-Effekt auf Tagen */
+.react-datepicker__day:hover {
+  background: rgb(var(--color-border));
+}
+
+/* Ausgewählter Tag */
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: #1d5fad;
+  color: #ffffff;
+}
+
+/* Zeit-Panel (rechte Spalte mit Uhrzeiten) */
+.react-datepicker__time-container,
+.react-datepicker__time,
+.react-datepicker__time-box {
+  background: rgb(var(--color-surface));
+  color: rgb(var(--color-text));
+}
+
+/* Uhrzeit-Hover */
+.react-datepicker__time-list-item:hover {
+  background: rgb(var(--color-border));
+}
+
+/* Ausgewählte Uhrzeit */
+.react-datepicker__time-list-item--selected {
+  background: #1d5fad !important;
+  color: #ffffff !important;
+}
+
+/* Navigations-Pfeile sichtbar machen */
+.react-datepicker__navigation-icon::before {
+  border-color: rgb(var(--color-muted));
+}
+.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+  border-color: rgb(var(--color-text));
 }
 
 /* Tippy Tooltip */
