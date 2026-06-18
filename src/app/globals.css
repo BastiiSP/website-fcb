@@ -2,35 +2,43 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 🌗 Helle + Dunkle Farbvarianten definieren */
-:root {
-  --background: #ffffff;
-  --foreground: #111111;
+/* ============================================================
+   Semantische Theme-Tokens (Light/Dark)
+   RGB-Kanäle space-separiert → ermöglicht Tailwind <alpha-value>
+   (z. B. bg-fcb-surface/80). Brand-Akzente (blue/red) sind in
+   beiden Themes konstant und liegen direkt in tailwind.config.
+   ============================================================ */
+.dark {
+  --color-bg:      10 10 10;     /* #0a0a0a */
+  --color-surface: 22 22 22;     /* #161616 */
+  --color-footer:  38 38 38;     /* #262626 */
+  --color-border:  42 42 42;     /* #2a2a2a */
+  --color-text:    255 255 255;  /* #ffffff */
+  --color-muted:   136 136 136;  /* #888888 */
+  --color-nav:     82 82 91;     /* #52525b */
+  color-scheme: dark;
+}
+.light {
+  --color-bg:      255 255 255;  /* weiß */
+  --color-surface: 245 245 245;  /* #f5f5f5 Cards */
+  --color-footer:  229 229 229;  /* #e5e5e5 */
+  --color-border:  212 212 212;  /* #d4d4d4 */
+  --color-text:    17 17 17;     /* #111111 */
+  --color-muted:   90 90 90;     /* #5a5a5a – WCAG-AA-tauglich auf weiß */
+  --color-nav:     228 228 231;  /* #e4e4e7 helle Navbar */
+  color-scheme: light;
 }
 
-/* Deaktiviert automatische Dark-Mode-Umschaltung durch Gerät */
-/* @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #f5f5f5;
-  }
-} */
-
-@media (prefers-color-scheme: dark) {
-  html:not(.dark) {
-    color-scheme: light;
-  }
-}
-
-/* 🌍 Globale Grundstruktur */
+/* Globale Grundstruktur – Body nutzt die semantischen Tokens + Inter */
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: rgb(var(--color-bg));
+  color: rgb(var(--color-text));
+  font-family: var(--font-inter), Inter, ui-sans-serif, sans-serif;
   transition: background 0.3s, color 0.3s;
 }
 
-/* ✅ Formulareinheitlichkeit */
+/* ✅ Formulareinheitlichkeit – referenziert noch var(--foreground)/var(--background)
+   aus der Legacy-Schicht; wird in einem späteren Cleanup-Task migriert */
 .form-field {
   @apply border p-2 rounded text-[var(--foreground)] w-full;
 }
@@ -41,7 +49,8 @@ body {
    in jedem Browser genau EIN Pfeil – das eigene Chevron als background-image
    überschreibt den Plugin-Pfeil, appearance:none entfernt den nativen Pfeil.
    padding-right sorgt dafür, dass langer Optionstext den Pfeil nie überlappt.
-   Breite (w-full o. ä.) wird bewusst pro Select per Utility gesetzt. */
+   Breite (w-full o. ä.) wird bewusst pro Select per Utility gesetzt.
+   Referenziert noch var(--foreground)/var(--background) – Cleanup folgt später. */
 .select-field {
   @apply border p-2 rounded text-[var(--foreground)] bg-[var(--background)];
   -webkit-appearance: none;
@@ -93,18 +102,6 @@ body {
   background-color: #ffffff;
   color: #111827;
   font-weight: 600;
-}
-
-/* Light Mode */
-.light {
-  --background: #ffffff;
-  --foreground: #111111;
-}
-
-/* Dark Mode */
-.dark {
-  --background: #1a1a1a;
-  --foreground: #f5f5f5;
 }
 
 /* Tippy Tooltip */

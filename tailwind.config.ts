@@ -11,16 +11,18 @@ const config: Config = {
         // FCB Design-Tokens – abgestimmt mit Claudian (Obsidian)
         // Basis-Palette (beide Bereiche: FCB + JFG)
         fcb: {
-          bg:          "#0a0a0a", // fast schwarz – Hintergrund, Hero
-          surface:     "#161616", // dunkelgrau – Cards, Panels
-          footer:      "#262626", // etwas heller – Footer-Fläche, hebt sich vom bg ab
-          border:      "#2a2a2a", // Trennlinien, Rahmen
-          text:        "#ffffff", // Primärtext
-          muted:       "#888888", // Datum, Metainfo, Sekundärtext
-          nav:         "#52525b", // Navbar-Hintergrund (zinc-600)
-          // Akzentfarben
-          blue:        "#1d5fad", // FCB-Akzent – Stadtfarbe Burgkunstadt
-          red:         "#cc1f1f", // JFG-Akzent – JFG Kunstadt-Obermain Wappenfarbe
+          // Semantische Tokens – lösen per CSS-Variablen auf (.dark / .light auf <html>).
+          // <alpha-value> ermöglicht Opacity-Modifier wie bg-fcb-surface/80.
+          // RGB-Kanäle space-separiert in globals.css (kein rgb()-Wrapper dort).
+          bg:      "rgb(var(--color-bg) / <alpha-value>)",
+          surface: "rgb(var(--color-surface) / <alpha-value>)",
+          footer:  "rgb(var(--color-footer) / <alpha-value>)",
+          border:  "rgb(var(--color-border) / <alpha-value>)",
+          text:    "rgb(var(--color-text) / <alpha-value>)",
+          muted:   "rgb(var(--color-muted) / <alpha-value>)",
+          nav:     "rgb(var(--color-nav) / <alpha-value>)",
+          blue:    "#1d5fad", // Brand-Akzent – in beiden Themes konstant
+          red:     "#cc1f1f", // Brand-Akzent – in beiden Themes konstant
         },
       },
       fontFamily: {

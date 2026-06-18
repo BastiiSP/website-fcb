@@ -46,11 +46,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className="light">
+    <html lang="de" className="dark">
       <body
         // Oswald & Inter werden als CSS-Variablen verfügbar gemacht und in
         // modernen Komponenten via font-oswald / font-inter (Tailwind) genutzt.
-        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${inter.variable} antialiased bg-[var(--background)] text-[var(--foreground)]`}
+        // bg/color kommen jetzt aus globals.css (body-Regel mit semantischen Tokens).
+        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${inter.variable} antialiased`}
       >
         {/* ConditionalChrome rendert Header/Footer und das Main-Padding. */}
         <ConditionalChrome>{children}</ConditionalChrome>
