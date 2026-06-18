@@ -46,7 +46,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className="dark">
+    <html lang="de" suppressHydrationWarning>
+      <head>
+        {/* FOUC-Schutz: setzt das Theme VOR dem ersten Paint aus localStorage,
+            Fallback dunkel. Inline + blockierend, daher kein Aufblitzen. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');if(t!=='light'&&t!=='dark'){t='dark';}document.documentElement.classList.add(t);}catch(e){document.documentElement.classList.add('dark');}})();`,
+          }}
+        />
+      </head>
       <body
         // Oswald & Inter werden als CSS-Variablen verfügbar gemacht und in
         // modernen Komponenten via font-oswald / font-inter (Tailwind) genutzt.
