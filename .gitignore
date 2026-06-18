@@ -54,3 +54,6 @@ node_modules
 
 # Superpowers-Planungsdokumente – lokale Arbeitsartefakte, gehören nicht ins Repo
 docs/superpowers/
+
+# Playwright-MCP-Artefakte (lokale Screenshots/Logs)
+.playwright-mcp/
