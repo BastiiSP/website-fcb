@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { MapPin } from "lucide-react";
 import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
 import { useConsent } from "@/components/consent/ConsentProvider";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 /**
  * Vereins-Footer (Design-Runde 2, dreispaltig).
@@ -162,11 +163,16 @@ export default function Footer() {
 
       {/* Dezente Kurzbeschreibung des Mitgliederbereichs – erklärt den Zweck des
           Logins (relevant für Googles OAuth-Brand-Verifizierung), ohne den
-          Seiten-Flow zu dominieren. Bewusst sichtbar (NICHT versteckt). */}
-      <div className="border-t border-white/10 px-4 py-4">
-        <p className="mx-auto max-w-6xl font-inter text-xs leading-relaxed text-fcb-muted">
-          Mitglieder können sich anmelden, um auf interne Bereiche zuzugreifen.
-        </p>
+          Seiten-Flow zu dominieren. Bewusst sichtbar (NICHT versteckt).
+          ThemeToggle rechts ausgerichtet – zugänglich im Footer, ohne die
+          Navigation zu überladen. */}
+      <div className="border-t border-fcb-border px-4 py-4">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <p className="font-inter text-xs leading-relaxed text-fcb-muted">
+            Mitglieder können sich anmelden, um auf interne Bereiche zuzugreifen.
+          </p>
+          <ThemeToggle />
+        </div>
       </div>
     </motion.footer>
   );
