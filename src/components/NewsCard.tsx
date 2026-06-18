@@ -46,9 +46,10 @@ export default function NewsCard({ item, index }: NewsCardProps) {
       rel="noopener noreferrer"
       className="block hover:no-underline"
     >
+      {/* Card: fcb-surface als Hintergrund, Bild oben, Textbereich unten */}
       <article
         ref={ref}
-        className={`bg-[var(--background)] text-[var(--foreground)] border border-gray-200 rounded-lg shadow hover:shadow-lg transition-transform duration-300 transform hover:scale-105 overflow-hidden fade-in-up ${
+        className={`bg-fcb-surface text-fcb-text border border-fcb-border rounded-lg shadow hover:shadow-lg transition-transform duration-300 transform hover:scale-105 overflow-hidden fade-in-up ${
           visible ? `fade-in-up-visible fade-delay-${Math.min(index, 5)}` : ""
         }`}
       >
@@ -60,17 +61,18 @@ export default function NewsCard({ item, index }: NewsCardProps) {
             loading="lazy"
           />
         )}
+        {/* Textbereich liegt unter dem Bild auf der Card-Surface – keine over-image whites nötig */}
         <div className="p-4 space-y-2">
-          <span className="text-[10px] uppercase font-semibold text-gray-500">
+          <span className="text-[10px] uppercase font-semibold text-fcb-muted">
             {formatCapitalized(item.kategorie)}
           </span>
           <h3 className="text-sm font-semibold leading-tight line-clamp-2">
             {item.titel}
           </h3>
-          <p className="text-sm text-[var(--foreground)] opacity-80 line-clamp-4">
+          <p className="text-sm text-fcb-muted line-clamp-4">
             {item.teaser}
           </p>
-          <time className="block text-xs text-gray-400">
+          <time className="block text-xs text-fcb-muted">
             📅 {new Date(item.created_at).toLocaleDateString("de-DE")}
           </time>
         </div>

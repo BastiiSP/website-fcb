@@ -55,8 +55,9 @@ export default function TrainerVerzeichnis() {
   }
 
   if (fehler) {
+    // Fehleranzeige: tinted Banner-Stil – funktioniert in beiden Themes
     return (
-      <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50">
+      <p className="text-fcb-red text-sm p-3 border border-fcb-red/40 rounded bg-fcb-red/10">
         {fehler}
       </p>
     );
@@ -78,7 +79,7 @@ export default function TrainerVerzeichnis() {
         {profile.map((p) => (
           <div
             key={p.id}
-            className="border rounded p-4 bg-[var(--background)] text-[var(--foreground)] space-y-1"
+            className="border border-fcb-border rounded p-4 bg-fcb-surface text-fcb-text space-y-1"
           >
             <p className="font-semibold text-base">
               {p.vorname} {p.nachname}

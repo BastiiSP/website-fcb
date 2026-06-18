@@ -71,7 +71,7 @@ export default function TooltipContent({
               e.stopPropagation();
               onEdit();
             }}
-            className="text-xs px-2 py-1 rounded bg-gray-800 text-white hover:bg-gray-700 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+            className="text-xs px-2 py-1 rounded bg-fcb-surface text-fcb-text border border-fcb-border hover:bg-fcb-border"
           >
             ✏️ Bearbeiten
           </button>
@@ -81,7 +81,7 @@ export default function TooltipContent({
               e.stopPropagation();
               onDelete();
             }}
-            className="text-xs bg-red-600 text-white px-4 py-1 rounded hover:bg-red-700"
+            className="text-xs bg-fcb-red text-white px-4 py-1 rounded hover:bg-fcb-red/80"
           >
             🗑️ Löschen
           </button>
