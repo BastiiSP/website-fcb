@@ -24,7 +24,9 @@ export default function PitchAuthShell({ children }: { children: React.ReactNode
       };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-fcb-bg">
+    // Auth-Seiten sind bewusst in beiden Themes dunkel (immersives Marken-Erlebnis,
+    // konsistent mit dem Hero); `.dark` scopt die Palette auf den Auth-Subtree.
+    <div className="dark relative min-h-screen overflow-hidden bg-fcb-bg">
       <PitchAuthBackground />
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-5 py-16">
