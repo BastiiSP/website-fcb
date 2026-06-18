@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 
 type Mannschaftsanfrage = {
   id: string;
@@ -113,16 +115,16 @@ export default function MannschaftsanfragenVerwaltung() {
   return (
     <div className="space-y-6">
       {fehler && (
-        <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50">
+        <p className="font-inter text-sm p-3 border border-fcb-red/40 rounded-lg bg-fcb-red/10 text-fcb-red">
           {fehler}
         </p>
       )}
       {meldung && (
         <p
-          className={`text-sm p-3 border rounded ${
+          className={`font-inter text-sm p-3 border rounded-lg ${
             meldung.ton === "gruen"
-              ? "text-green-700 border-green-300 bg-green-50"
-              : "text-red-600 border-red-300 bg-red-50"
+              ? "text-green-500 border-green-500/40 bg-green-500/10"
+              : "text-fcb-red border-fcb-red/40 bg-fcb-red/10"
           }`}
         >
           {meldung.text}
@@ -130,50 +132,56 @@ export default function MannschaftsanfragenVerwaltung() {
       )}
 
       {laden ? (
-        <p className="text-sm opacity-70">Lade Anfragen …</p>
+        <p className="font-inter text-sm text-fcb-muted">Lade Anfragen …</p>
       ) : anfragen.length === 0 ? (
-        <p className="text-sm italic opacity-70 text-center py-8">
+        <p className="font-inter text-sm italic text-center text-fcb-muted py-8">
           Keine offenen Mannschaftsanfragen vorhanden.
         </p>
       ) : (
         <div className="space-y-3">
-          <h2 className="text-lg font-semibold">
+          <h2 className="font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text">
             Offene Anfragen ({anfragen.length})
           </h2>
           {anfragen.map((a) => (
             <div
               key={a.id}
-              className="border border-blue-400 rounded p-4 bg-blue-50 dark:bg-blue-900/20"
+              className="border border-fcb-border rounded-xl p-4 bg-fcb-surface"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <p className="font-semibold">
-                    {a.vorname} {a.nachname}
-                  </p>
-                  <p className="text-sm opacity-80">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-inter font-semibold text-fcb-text">
+                      {a.vorname} {a.nachname}
+                    </p>
+                    {/* Status-Badge: offen = gelb (alle hier gezeigten Anfragen haben status='offen') */}
+                    <Badge variant="yellow">offen</Badge>
+                  </div>
+                  <p className="font-inter text-sm text-fcb-muted">
                     {a.typ === "hinzufuegen"
                       ? `möchte ${a.mannschaft} hinzufügen`
                       : `möchte ${a.mannschaft} entfernen`}
                   </p>
                   {a.begruendung && (
-                    <p className="text-sm opacity-70 mt-1">
+                    <p className="font-inter text-sm text-fcb-muted/70 mt-1">
                       Begründung: {a.begruendung}
                     </p>
                   )}
                 </div>
                 <div className="flex gap-2 shrink-0">
-                  <button
+                  <Button
+                    variant="primary"
+                    size="sm"
                     onClick={() => genehmigen(a)}
-                    className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition"
                   >
                     Genehmigen
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="danger"
+                    size="sm"
                     onClick={() => ablehnen(a)}
-                    className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
                   >
                     Ablehnen
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

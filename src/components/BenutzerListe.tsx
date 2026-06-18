@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
-import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import Badge from "@/components/ui/Badge";
+import Button from "@/components/ui/Button";
 
 type Nutzer = {
   id: string;
@@ -22,6 +24,16 @@ interface BenutzerListeProps {
 const ROLLEN_OPTIONEN: Record<string, string[]> = {
   vorstand: ["ausstehend", "trainer", "mitglied"],
   admin: ["ausstehend", "trainer", "mitglied", "vorstand", "admin"],
+};
+
+// Rollen-Badge-Mapping: Farbe kommuniziert Status auf einen Blick
+type BadgeVariant = "yellow" | "blue" | "green" | "purple" | "red" | "neutral";
+const ROLLEN_BADGE: Record<string, { label: string; variant: BadgeVariant }> = {
+  ausstehend: { label: "Ausstehend", variant: "yellow" },
+  mitglied:   { label: "Mitglied",   variant: "blue" },
+  trainer:    { label: "Trainer",    variant: "green" },
+  vorstand:   { label: "Vorstand",   variant: "purple" },
+  admin:      { label: "Admin",      variant: "red" },
 };
 
 export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
@@ -107,12 +119,12 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
   return (
     <div className="space-y-8">
       {fehler && (
-        <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50">
+        <p className="font-inter text-sm p-3 border border-fcb-red/40 rounded-lg bg-fcb-red/10 text-fcb-red">
           {fehler}
         </p>
       )}
       {erfolg && (
-        <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50">
+        <p className="font-inter text-sm p-3 border border-green-500/40 rounded-lg bg-green-500/10 text-green-500">
           {erfolg}
         </p>
       )}
@@ -120,27 +132,27 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
       {/* Ausstehende Anfragen */}
       {ausstehende.length > 0 && (
         <section>
-          <h2 className="text-lg font-semibold mb-3">
+          <h2 className="font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text mb-3">
             Ausstehende Anfragen ({ausstehende.length})
           </h2>
           <div className="space-y-3">
             {ausstehende.map((n) => (
               <div
                 key={n.id}
-                className="border border-yellow-400 rounded p-4 bg-yellow-50 dark:bg-yellow-900/20"
+                className="border border-yellow-500/40 rounded-xl p-4 bg-yellow-500/10"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <div>
-                    <p className="font-semibold">
+                    <p className="font-inter font-semibold text-fcb-text">
                       {n.vorname} {n.nachname}
                     </p>
                     {n.telefonnummer && (
-                      <p className="text-sm opacity-80">
+                      <p className="font-inter text-sm text-fcb-muted">
                         Telefon: {n.telefonnummer}
                       </p>
                     )}
                     {n.mannschaft && n.mannschaft.length > 0 && (
-                      <p className="text-sm opacity-80">
+                      <p className="font-inter text-sm text-fcb-muted">
                         Mannschaft(en): {n.mannschaft.join(", ")}
                       </p>
                     )}
@@ -149,11 +161,11 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                       durch Auswahl einer Nicht-ausstehend-Rolle. ROLLEN_OPTIONEN
                       enthält "ausstehend" für beide Rollen, daher immer sichtbar. */}
                   <div className="flex items-center gap-2">
-                    {/* w-32 entspricht der festen Breite im "Aktive Nutzer"-Block */}
+                    {/* w-36 entspricht der festen Breite im "Aktive Nutzer"-Block */}
                     <select
                       value={n.rolle}
                       onChange={(e) => rolleAendern(n.id, e.target.value)}
-                      className="select-field w-32 text-sm"
+                      className="w-36 rounded-lg border border-fcb-border bg-fcb-bg px-2 py-1.5 font-inter text-sm text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40 focus:border-fcb-blue"
                     >
                       {erlaubteRollen.map((r) => (
                         <option key={r} value={r}>
@@ -161,12 +173,13 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                         </option>
                       ))}
                     </select>
-                    <button
+                    <Button
+                      variant="danger"
+                      size="sm"
                       onClick={() => ablehnen(n.id, `${n.vorname} ${n.nachname}`)}
-                      className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
                     >
                       Ablehnen
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -177,41 +190,47 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
 
       {/* Aktive Nutzer */}
       <section>
-        <h2 className="text-lg font-semibold mb-3">
+        <h2 className="font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text mb-3">
           Aktive Nutzer ({aktive.length})
         </h2>
 
+        {/* Suchfeld retokenisiert – kein .form-field mehr */}
         <input
           type="text"
           placeholder="Nutzer suchen …"
           value={suche}
           onChange={(e) => setSuche(e.target.value)}
-          className="form-field mb-4"
+          className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40 focus:border-fcb-blue mb-4"
         />
 
         <div className="space-y-3">
           {gefilterteAktive.map((n) => (
             <div
               key={n.id}
-              className="border rounded p-4 bg-[var(--background)] text-[var(--foreground)]"
+              className="border border-fcb-border rounded-xl p-4 bg-fcb-surface hover:bg-fcb-border/40 transition-colors"
             >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                  <p className="font-semibold">
+                  <p className="font-inter font-semibold text-fcb-text">
                     {n.vorname} {n.nachname}
                   </p>
-                  <p className="text-sm opacity-80">Rolle: {n.rolle}</p>
+                  {/* Rolle als Badge – visuell konsistent mit ROLLEN_BADGE-Mapping */}
+                  <div className="mt-1">
+                    <Badge variant={(ROLLEN_BADGE[n.rolle]?.variant) ?? "neutral"}>
+                      {ROLLEN_BADGE[n.rolle]?.label ?? n.rolle}
+                    </Badge>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-3">
                   <button
                     onClick={() => toggleDetails(n.id)}
-                    className="text-sm underline flex items-center"
+                    className="font-inter text-sm text-fcb-muted hover:text-fcb-text transition-colors flex items-center gap-1"
                   >
                     {expandedUserIds.includes(n.id) ? (
-                      <>Details ausblenden <FiChevronUp className="ml-1" /></>
+                      <>Details ausblenden <ChevronUp className="w-4 h-4" /></>
                     ) : (
-                      <>Weitere Infos <FiChevronDown className="ml-1" /></>
+                      <>Weitere Infos <ChevronDown className="w-4 h-4" /></>
                     )}
                   </button>
 
@@ -221,16 +240,16 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                     darf. Sonst Badge: ein vorstand-User darf z. B. einen admin
                     nicht herabstufen – ohne diesen Guard würde das <select>
                     fälschlich auf die erste Option ("ausstehend") zurückfallen.
-                    Der w-32-Container stellt sicher, dass "Weitere Infos" in
+                    Der w-36-Container stellt sicher, dass "Weitere Infos" in
                     jeder Zeile exakt auf derselben horizontalen Position bleibt,
                     egal ob Dropdown (breiter) oder Badge (schmaler) gezeigt wird.
                   */}
-                  <div className="w-32 flex items-center">
+                  <div className="w-36 flex items-center">
                     {erlaubteRollen.includes(n.rolle) ? (
                       <select
                         value={n.rolle}
                         onChange={(e) => rolleAendern(n.id, e.target.value)}
-                        className="select-field w-full text-sm"
+                        className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-2 py-1.5 font-inter text-sm text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40 focus:border-fcb-blue"
                       >
                         {erlaubteRollen.map((r) => (
                           <option key={r} value={r}>
@@ -239,17 +258,12 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                         ))}
                       </select>
                     ) : (
-                      <span
-                        className={`px-2 py-0.5 rounded text-xs font-medium ${
-                          n.rolle === "admin"
-                            ? "bg-purple-100 text-purple-800"
-                            : n.rolle === "vorstand"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-700"
-                        }`}
-                        title="Diese Rolle kannst du nicht ändern"
-                      >
-                        {n.rolle}
+                      // Nicht-änderbarer Badge für Rollen außerhalb der eigenen Berechtigung
+                      // (z. B. vorstand sieht admin-Badge, kann ihn nicht ändern)
+                      <span title="Diese Rolle kannst du nicht ändern">
+                        <Badge variant={(ROLLEN_BADGE[n.rolle]?.variant) ?? "neutral"}>
+                          {ROLLEN_BADGE[n.rolle]?.label ?? n.rolle}
+                        </Badge>
                       </span>
                     )}
                   </div>
@@ -257,13 +271,13 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
               </div>
 
               {expandedUserIds.includes(n.id) && (
-                <div className="mt-3 text-sm space-y-1 text-gray-600">
+                <div className="mt-3 font-inter text-sm space-y-1 text-fcb-muted">
                   {n.telefonnummer && <p>Telefon: {n.telefonnummer}</p>}
                   {n.mannschaft && n.mannschaft.length > 0 && (
                     <p>Mannschaft(en): {n.mannschaft.join(", ")}</p>
                   )}
                   {!n.telefonnummer && (!n.mannschaft || n.mannschaft.length === 0) && (
-                    <p className="italic text-gray-400">Keine weiteren Informationen vorhanden.</p>
+                    <p className="italic text-fcb-muted/60">Keine weiteren Informationen vorhanden.</p>
                   )}
                 </div>
               )}
@@ -271,7 +285,7 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
           ))}
 
           {gefilterteAktive.length === 0 && (
-            <p className="text-sm italic text-center opacity-70">
+            <p className="font-inter text-sm italic text-center text-fcb-muted py-8">
               Keine Nutzer gefunden.
             </p>
           )}

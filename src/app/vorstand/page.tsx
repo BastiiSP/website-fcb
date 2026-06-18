@@ -5,6 +5,16 @@ import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import BenutzerListe from "@/components/BenutzerListe";
 import MannschaftsanfragenVerwaltung from "@/components/MannschaftsanfragenVerwaltung";
+import PageShell from "@/components/ui/PageShell";
+import PageHeader from "@/components/ui/PageHeader";
+import Tabs from "@/components/ui/Tabs";
+
+// Tab-Typ: Benutzer, Mannschaftsanfragen, Buchungsübersicht
+const TABS = [
+  { id: "benutzer",  label: "Benutzer" },
+  { id: "anfragen",  label: "Mannschaftsanfragen" },
+  { id: "buchungen", label: "Buchungen" },
+];
 
 export default function VorstandPage() {
   const supabase = createClient();
@@ -21,6 +31,7 @@ export default function VorstandPage() {
       const session = await checkSession(supabase);
       const rolle = session?.rolle ?? "";
 
+      // Zugriff nur für Vorstand und Admin – RLS in der DB sichert dies zusätzlich ab
       if (rolle === "vorstand" || rolle === "admin") {
         setZugelassen(true);
         setEigeneRolle(rolle);
@@ -37,62 +48,41 @@ export default function VorstandPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Lade Inhalte …</p>
-      </main>
+      <PageShell maxWidth="2xl">
+        <p className="font-inter text-fcb-muted">Lade Inhalte …</p>
+      </PageShell>
     );
   }
 
   if (!zugelassen) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <PageShell maxWidth="2xl">
         <div className="text-center space-y-4">
-          <p className="text-xl font-semibold">Kein Zugriff</p>
-          <p className="text-sm opacity-75">
+          <p className="font-oswald text-xl font-semibold uppercase tracking-wide text-fcb-text">
+            Kein Zugriff
+          </p>
+          <p className="font-inter text-sm text-fcb-muted">
             Diese Seite ist nur für Vorstandsmitglieder und Admins zugänglich.
           </p>
         </div>
-      </main>
+      </PageShell>
     );
   }
 
   return (
-    <main className="min-h-screen p-4 sm:p-8">
-      <h1 className="text-2xl font-bold mb-6">
-        Vorstandsbereich – Vereinsverwaltung
-      </h1>
+    <PageShell maxWidth="2xl">
+      <PageHeader
+        title="Vorstandsbereich"
+        subtitle="Vereinsverwaltung"
+      />
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-2 sm:space-y-0 mb-6">
-        <button
-          className={`px-4 py-2 rounded border transition w-full sm:w-auto ${
-            activeTab === "benutzer"
-              ? "bg-[var(--foreground)] text-[var(--background)]"
-              : "bg-transparent border-[var(--foreground)] text-[var(--foreground)]"
-          }`}
-          onClick={() => setActiveTab("benutzer")}
-        >
-          Benutzer
-        </button>
-        <button
-          className={`px-4 py-2 rounded border transition w-full sm:w-auto ${
-            activeTab === "anfragen"
-              ? "bg-[var(--foreground)] text-[var(--background)]"
-              : "bg-transparent border-[var(--foreground)] text-[var(--foreground)]"
-          }`}
-          onClick={() => setActiveTab("anfragen")}
-        >
-          Mannschaftsanfragen
-        </button>
-        <button
-          className={`px-4 py-2 rounded border transition w-full sm:w-auto ${
-            activeTab === "buchungen"
-              ? "bg-[var(--foreground)] text-[var(--background)]"
-              : "bg-transparent border-[var(--foreground)] text-[var(--foreground)]"
-          }`}
-          onClick={() => setActiveTab("buchungen")}
-        >
-          Buchungen
-        </button>
+      {/* Tab-Navigation – a11y-konform via Tabs-Primitiv */}
+      <div className="mb-8">
+        <Tabs
+          tabs={TABS}
+          active={activeTab}
+          onChange={(id) => setActiveTab(id as "benutzer" | "anfragen" | "buchungen")}
+        />
       </div>
 
       {activeTab === "benutzer" && (
@@ -109,9 +99,9 @@ export default function VorstandPage() {
 
       {activeTab === "buchungen" && (
         <section>
-          <p className="text-lg mb-2">Buchungsübersicht folgt …</p>
+          <p className="font-inter text-fcb-muted text-lg mb-2">Buchungsübersicht folgt …</p>
         </section>
       )}
-    </main>
+    </PageShell>
   );
 }
