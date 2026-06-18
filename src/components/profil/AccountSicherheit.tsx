@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
-import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { CheckCircle2, XCircle } from "lucide-react";
 import {
   berechnePasswortFeedback,
   berechnePasswortStaerke,
@@ -10,6 +10,9 @@ import {
   passwortStaerkefarbe,
   type PasswortFeedback,
 } from "@/utils/passwortStaerke";
+import TextField from "@/components/ui/TextField";
+import Banner from "@/components/ui/Banner";
+import Button from "@/components/ui/Button";
 
 interface AccountSicherheitProps {
   aktuelleEmail: string;
@@ -150,145 +153,164 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
     <div className="space-y-10">
       {/* E-Mail ändern */}
       <section>
-        <h2 className="text-base font-semibold mb-1">E-Mail-Adresse ändern</h2>
-        <p className="text-sm opacity-60 mb-4">
-          Aktuell: <strong>{aktuelleEmail}</strong>
+        <h2 className="font-oswald text-base font-semibold uppercase tracking-wide text-fcb-text mb-1">
+          E-Mail-Adresse ändern
+        </h2>
+        <p className="font-inter text-sm text-fcb-muted mb-4">
+          Aktuell: <strong className="text-fcb-text">{aktuelleEmail}</strong>
         </p>
 
-        {emailFehler && (
-          <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50 mb-3">
-            {emailFehler}
-          </p>
-        )}
-        {emailErfolg && (
-          <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50 mb-3">
-            {emailErfolg}
-          </p>
-        )}
+        {emailFehler && <div className="mb-3"><Banner variant="error" message={emailFehler} /></div>}
+        {emailErfolg && <div className="mb-3"><Banner variant="success" message={emailErfolg} /></div>}
 
         <form onSubmit={handleEmailAendern} className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium mb-1">Neue E-Mail-Adresse</label>
-            <input
-              type="email"
-              value={neueEmail}
-              onChange={(e) => setNeueEmail(e.target.value)}
-              placeholder="neue@email.de"
-              required
-              className="form-field"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Aktuelles Passwort</label>
-            <input
-              type="password"
-              value={emailPasswort}
-              onChange={(e) => setEmailPasswort(e.target.value)}
-              placeholder="Zur Bestätigung"
-              required
-              className="form-field"
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={emailLaden}
-            className="px-5 py-2 bg-[var(--foreground)] text-[var(--background)] rounded hover:opacity-80 transition disabled:opacity-50"
-          >
+          <TextField
+            label="Neue E-Mail-Adresse"
+            type="email"
+            value={neueEmail}
+            onChange={setNeueEmail}
+            placeholder="neue@email.de"
+            required
+            autoComplete="email"
+          />
+          <TextField
+            label="Aktuelles Passwort"
+            type="password"
+            value={emailPasswort}
+            onChange={setEmailPasswort}
+            placeholder="Zur Bestätigung"
+            required
+            autoComplete="current-password"
+          />
+          <Button type="submit" variant="primary" size="md" disabled={emailLaden}>
             {emailLaden ? "Wird gesendet …" : "Bestätigungsmail senden"}
-          </button>
+          </Button>
         </form>
       </section>
 
       {/* Passwort ändern */}
       <section>
-        <h2 className="text-base font-semibold mb-4">Passwort ändern</h2>
+        <h2 className="font-oswald text-base font-semibold uppercase tracking-wide text-fcb-text mb-4">
+          Passwort ändern
+        </h2>
 
-        {passwortFehler && (
-          <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50 mb-3">
-            {passwortFehler}
-          </p>
-        )}
-        {passwortErfolg && (
-          <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50 mb-3">
-            {passwortErfolg}
-          </p>
-        )}
+        {passwortFehler && <div className="mb-3"><Banner variant="error" message={passwortFehler} /></div>}
+        {passwortErfolg && <div className="mb-3"><Banner variant="success" message={passwortErfolg} /></div>}
 
         <form onSubmit={handlePasswortAendern} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Aktuelles Passwort</label>
+          {/* TextField unterstützt kein dynamisches type-Toggle → raw input mit fcb-Tokens */}
+          <div className="space-y-1.5">
+            <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Aktuelles Passwort
+            </label>
             <input
               type={passwortAnzeigen ? "text" : "password"}
               value={aktuellesPasswort}
               onChange={(e) => setAktuellesPasswort(e.target.value)}
               required
-              className="form-field"
+              autoComplete="current-password"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Neues Passwort</label>
+          <div className="space-y-1.5">
+            <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Neues Passwort
+            </label>
             <input
               type={passwortAnzeigen ? "text" : "password"}
               value={neuesPasswort}
               onChange={(e) => handleNeuesPasswortChange(e.target.value)}
               required
-              className="form-field"
+              autoComplete="new-password"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />
             {/* Passwort-Stärke-Anzeige */}
             {neuesPasswort && (
               <div className="mt-2 space-y-1">
-                <div className="text-sm space-y-0.5">
-                  <div>{passwortFeedback.hasLower ? "✅" : "❌"} Kleinbuchstaben</div>
-                  <div>{passwortFeedback.hasUpper ? "✅" : "❌"} Großbuchstaben</div>
-                  <div>{passwortFeedback.hasNumber ? "✅" : "❌"} Zahl</div>
-                  <div>{passwortFeedback.hasSymbol ? "✅" : "❌"} Sonderzeichen</div>
-                  <div>{passwortFeedback.hasMinLength ? "✅" : "❌"} Mind. 8 Zeichen</div>
+                <div className="font-inter text-sm space-y-0.5 text-fcb-muted">
+                  <div className={passwortFeedback.hasLower ? "text-green-500" : ""}>
+                    {passwortFeedback.hasLower
+                      ? <CheckCircle2 size={14} className="inline mr-1 text-green-500" />
+                      : <XCircle size={14} className="inline mr-1 text-fcb-muted" />
+                    }
+                    Kleinbuchstaben
+                  </div>
+                  <div className={passwortFeedback.hasUpper ? "text-green-500" : ""}>
+                    {passwortFeedback.hasUpper
+                      ? <CheckCircle2 size={14} className="inline mr-1 text-green-500" />
+                      : <XCircle size={14} className="inline mr-1 text-fcb-muted" />
+                    }
+                    Großbuchstaben
+                  </div>
+                  <div className={passwortFeedback.hasNumber ? "text-green-500" : ""}>
+                    {passwortFeedback.hasNumber
+                      ? <CheckCircle2 size={14} className="inline mr-1 text-green-500" />
+                      : <XCircle size={14} className="inline mr-1 text-fcb-muted" />
+                    }
+                    Zahl
+                  </div>
+                  <div className={passwortFeedback.hasSymbol ? "text-green-500" : ""}>
+                    {passwortFeedback.hasSymbol
+                      ? <CheckCircle2 size={14} className="inline mr-1 text-green-500" />
+                      : <XCircle size={14} className="inline mr-1 text-fcb-muted" />
+                    }
+                    Sonderzeichen
+                  </div>
+                  <div className={passwortFeedback.hasMinLength ? "text-green-500" : ""}>
+                    {passwortFeedback.hasMinLength
+                      ? <CheckCircle2 size={14} className="inline mr-1 text-green-500" />
+                      : <XCircle size={14} className="inline mr-1 text-fcb-muted" />
+                    }
+                    Mind. 8 Zeichen
+                  </div>
                 </div>
-                <div className="h-2 w-full rounded bg-gray-300 overflow-hidden">
+                {/* Stärke-Balken – bg-fcb-border statt bg-gray-300 */}
+                <div className="h-2 w-full rounded bg-fcb-border overflow-hidden">
                   <div className={`h-full transition-all duration-300 ${passwortStaerkefarbe(passwortStaerke)}`} />
                 </div>
-                <p className="text-xs">{passwortStaerkeLabel(passwortStaerke)}</p>
+                <p className="font-inter text-xs text-fcb-muted">{passwortStaerkeLabel(passwortStaerke)}</p>
               </div>
             )}
           </div>
 
-          <div className="relative">
-            <label className="block text-sm font-medium mb-1">Neues Passwort bestätigen</label>
+          {/* Passwort-Bestätigung mit Übereinstimmungs-Icon */}
+          <div className="relative space-y-1.5">
+            <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              Neues Passwort bestätigen
+            </label>
             <input
               type={passwortAnzeigen ? "text" : "password"}
               value={passwortBestaetigung}
               onChange={(e) => setPasswortBestaetigung(e.target.value)}
               required
-              className="form-field pr-10"
+              autoComplete="new-password"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 pr-10 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />
             {passwortBestaetigung && (
               <span className="absolute top-8 right-3">
                 {neuesPasswort === passwortBestaetigung ? (
-                  <FaCheckCircle className="text-green-600" />
+                  <CheckCircle2 size={18} className="text-green-500" />
                 ) : (
-                  <FaTimesCircle className="text-red-500" />
+                  <XCircle size={18} className="text-fcb-red" />
                 )}
               </span>
             )}
           </div>
 
-          <label className="flex items-center gap-2 text-sm cursor-pointer">
+          <label className="flex items-center gap-2 font-inter text-sm text-fcb-muted cursor-pointer">
             <input
               type="checkbox"
               checked={passwortAnzeigen}
               onChange={() => setPasswortAnzeigen((prev) => !prev)}
+              className="accent-fcb-blue"
             />
             Passwörter anzeigen
           </label>
 
-          <button
-            type="submit"
-            disabled={passwortLaden}
-            className="px-5 py-2 bg-[var(--foreground)] text-[var(--background)] rounded hover:opacity-80 transition disabled:opacity-50"
-          >
+          <Button type="submit" variant="primary" size="md" disabled={passwortLaden}>
             {passwortLaden ? "Wird geändert …" : "Passwort ändern"}
-          </button>
+          </Button>
         </form>
       </section>
     </div>

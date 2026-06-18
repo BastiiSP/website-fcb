@@ -2,6 +2,10 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
+import TextField from "@/components/ui/TextField";
+import Banner from "@/components/ui/Banner";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
 
 interface PersoenlicheDatenProps {
   userId: string;
@@ -76,12 +80,12 @@ export default function PersoenlicheDaten({
 
   return (
     <div className="space-y-6">
-      {/* Profilbild-Block */}
+      {/* Profilbild-Block – Avatar-Klick öffnet das Upload-Modal */}
       <div className="flex items-center gap-5">
         <button
           type="button"
           onClick={onAvatarClick}
-          className="w-24 h-24 rounded-full overflow-hidden bg-[var(--foreground)] text-[var(--background)] flex items-center justify-center font-bold text-2xl hover:opacity-80 transition flex-shrink-0"
+          className="w-24 h-24 rounded-full overflow-hidden bg-fcb-surface border border-fcb-border text-fcb-text flex items-center justify-center font-oswald font-bold text-2xl hover:border-fcb-blue transition-colors flex-shrink-0"
           title="Profilbild ändern"
         >
           {avatarUrl ? (
@@ -98,114 +102,91 @@ export default function PersoenlicheDaten({
           <button
             type="button"
             onClick={onAvatarClick}
-            className="text-sm underline opacity-70 hover:opacity-100 transition"
+            className="font-inter text-sm text-fcb-blue underline hover:text-fcb-blue/80 transition-colors"
           >
             Bild ändern
           </button>
-          <p className="text-xs opacity-50 mt-0.5">Max. 5 MB (JPG, PNG, WebP)</p>
+          <p className="font-inter text-xs text-fcb-muted mt-0.5">Max. 5 MB (JPG, PNG, WebP)</p>
         </div>
       </div>
 
-      {fehler && (
-        <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50">
-          {fehler}
-        </p>
-      )}
-      {erfolg && (
-        <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50">
-          {erfolg}
-        </p>
-      )}
+      {fehler && <Banner variant="error" message={fehler} />}
+      {erfolg && <Banner variant="success" message={erfolg} />}
 
       <form onSubmit={handleSpeichern} className="space-y-4">
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[140px]">
-            <label className="block text-sm font-medium mb-1">Vorname *</label>
-            <input
-              type="text"
+            <TextField
+              label="Vorname"
               value={vorname}
-              onChange={(e) => setVorname(e.target.value)}
+              onChange={setVorname}
               required
-              className="form-field"
             />
           </div>
           <div className="flex-1 min-w-[140px]">
-            <label className="block text-sm font-medium mb-1">Nachname *</label>
-            <input
-              type="text"
+            <TextField
+              label="Nachname"
               value={nachname}
-              onChange={(e) => setNachname(e.target.value)}
+              onChange={setNachname}
               required
-              className="form-field"
             />
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Telefonnummer</label>
-          <input
-            type="tel"
-            value={telefonnummer}
-            onChange={(e) => setTelefonnummer(e.target.value)}
-            placeholder="z. B. 0171 123456"
-            className="form-field"
-          />
-        </div>
+        <TextField
+          label="Telefonnummer"
+          optional
+          type="tel"
+          value={telefonnummer}
+          onChange={setTelefonnummer}
+          placeholder="z. B. 0171 123456"
+        />
 
-        <div>
-          <label className="block text-sm font-medium mb-1">Geburtsdatum</label>
-          <input
-            type="date"
-            value={geburtsdatum}
-            onChange={(e) => setGeburtsdatum(e.target.value)}
-            className="form-field"
-          />
-        </div>
+        <TextField
+          label="Geburtsdatum"
+          optional
+          type="date"
+          value={geburtsdatum}
+          onChange={setGeburtsdatum}
+        />
 
-        <fieldset className="border rounded p-4 space-y-3">
-          <legend className="text-sm font-medium px-1">Adresse</legend>
-          <div>
-            <label className="block text-sm mb-1">Straße und Hausnummer</label>
-            <input
-              type="text"
-              value={strasse}
-              onChange={(e) => setStrasse(e.target.value)}
-              placeholder="z. B. Musterstraße 1"
-              className="form-field"
-            />
-          </div>
+        {/* Adress-Block als Card gruppiert */}
+        <Card className="space-y-3">
+          <p className="font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+            Adresse
+          </p>
+          <TextField
+            label="Straße und Hausnummer"
+            optional
+            value={strasse}
+            onChange={setStrasse}
+            placeholder="z. B. Musterstraße 1"
+          />
           <div className="flex gap-4">
             <div className="w-28">
-              <label className="block text-sm mb-1">PLZ</label>
-              <input
-                type="text"
+              <TextField
+                label="PLZ"
+                optional
                 value={plz}
-                onChange={(e) => setPlz(e.target.value)}
+                onChange={setPlz}
                 placeholder="96224"
-                maxLength={10}
-                className="form-field"
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm mb-1">Ort</label>
-              <input
-                type="text"
+              <TextField
+                label="Ort"
+                optional
                 value={ort}
-                onChange={(e) => setOrt(e.target.value)}
+                onChange={setOrt}
                 placeholder="Burgkunstadt"
-                className="form-field"
               />
             </div>
           </div>
-        </fieldset>
+        </Card>
 
-        <button
-          type="submit"
-          disabled={speichern}
-          className="px-5 py-2 bg-[var(--foreground)] text-[var(--background)] rounded hover:opacity-80 transition disabled:opacity-50"
-        >
+        <Button type="submit" variant="primary" size="md" disabled={speichern}>
           {speichern ? "Wird gespeichert …" : "Speichern"}
-        </button>
+        </Button>
       </form>
     </div>
   );

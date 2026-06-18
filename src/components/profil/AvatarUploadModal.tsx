@@ -4,8 +4,12 @@ import { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import type { Area, Point } from "react-easy-crop";
 import { createClient } from "@/lib/supabaseClient";
+import Modal from "@/components/ui/Modal";
+import Banner from "@/components/ui/Banner";
+import Button from "@/components/ui/Button";
 
 interface AvatarUploadModalProps {
+  open: boolean;
   userId: string;
   onClose: () => void;
   onErfolg: (neueUrl: string) => void;
@@ -52,6 +56,7 @@ async function cropBildZuBlob(
 }
 
 export default function AvatarUploadModal({
+  open,
   userId,
   onClose,
   onErfolg,
@@ -128,32 +133,27 @@ export default function AvatarUploadModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-      <div className="bg-[var(--background)] text-[var(--foreground)] rounded-lg shadow-xl w-full max-w-md p-6 space-y-4">
-        <h2 className="text-lg font-semibold">Profilbild hochladen</h2>
-
-        {fehler && (
-          <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50">
-            {fehler}
-          </p>
-        )}
+    // Modal-Primitive übernimmt Overlay, Fokus-Falle und Escape-Handling
+    <Modal open={open} onClose={onClose} title="Profilbild hochladen" size="md">
+      <div className="space-y-4">
+        {fehler && <Banner variant="error" message={fehler} />}
 
         {!bildSrc ? (
           <div className="space-y-3">
-            <p className="text-sm opacity-70">
+            <p className="font-inter text-sm text-fcb-muted">
               Wähle ein Bild (JPG, PNG oder WebP, max. 5 MB). Es wird quadratisch zugeschnitten.
             </p>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
               onChange={handleDateiWahl}
-              className="block w-full text-sm"
+              className="block w-full font-inter text-sm text-fcb-text"
             />
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Crop-Bereich */}
-            <div className="relative w-full h-64 bg-gray-800 rounded overflow-hidden">
+            {/* Crop-Bereich – bg-fcb-bg statt bg-gray-800 */}
+            <div className="relative w-full h-64 rounded overflow-hidden bg-fcb-bg">
               <Cropper
                 image={bildSrc}
                 crop={crop}
@@ -167,7 +167,7 @@ export default function AvatarUploadModal({
 
             {/* Zoom-Slider */}
             <div className="flex items-center gap-3">
-              <span className="text-xs opacity-60">-</span>
+              <span className="font-inter text-xs text-fcb-muted">-</span>
               <input
                 type="range"
                 min={1}
@@ -177,13 +177,13 @@ export default function AvatarUploadModal({
                 onChange={(e) => setZoom(Number(e.target.value))}
                 className="flex-1"
               />
-              <span className="text-xs opacity-60">+</span>
+              <span className="font-inter text-xs text-fcb-muted">+</span>
             </div>
 
             <button
               type="button"
               onClick={() => setBildSrc(null)}
-              className="text-xs underline opacity-60 hover:opacity-100"
+              className="font-inter text-xs text-fcb-muted underline hover:text-fcb-text transition-colors"
             >
               Anderes Bild wählen
             </button>
@@ -191,25 +191,21 @@ export default function AvatarUploadModal({
         )}
 
         <div className="flex gap-3 justify-end pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 border rounded hover:opacity-70 transition"
-          >
+          <Button variant="secondary" size="sm" onClick={onClose}>
             Abbrechen
-          </button>
+          </Button>
           {bildSrc && (
-            <button
-              type="button"
+            <Button
+              variant="primary"
+              size="sm"
               onClick={handleSpeichern}
               disabled={laden}
-              className="px-4 py-2 bg-[var(--foreground)] text-[var(--background)] rounded hover:opacity-80 transition disabled:opacity-50"
             >
               {laden ? "Wird hochgeladen …" : "Speichern"}
-            </button>
+            </Button>
           )}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -5,6 +5,8 @@ import { createClient } from "@/lib/supabaseClient";
 import { LIZENZEN } from "@/lib/lizenzen";
 import { MANNSCHAFTEN } from "@/lib/mannschaften";
 import MannschaftsAnfrageModal from "./MannschaftsAnfrageModal";
+import Banner from "@/components/ui/Banner";
+import Button from "@/components/ui/Button";
 
 interface Anfrage {
   id: string;
@@ -139,8 +141,10 @@ export default function MannschaftLizenzen({
     <div className="space-y-8">
       {/* Mannschafts-Sektion (read-only, Änderungen per Anfrage) */}
       <section>
-        <h2 className="text-base font-semibold mb-3">Meine Mannschaft(en)</h2>
-        <p className="text-sm opacity-60 mb-3">
+        <h2 className="font-oswald text-base font-semibold uppercase tracking-wide text-fcb-text mb-3">
+          Meine Mannschaft(en)
+        </h2>
+        <p className="font-inter text-sm text-fcb-muted mb-3">
           Mannschaftszuweisungen werden vom Vorstand verwaltet. Du kannst Anfragen stellen.
         </p>
 
@@ -152,7 +156,7 @@ export default function MannschaftLizenzen({
               .map((a) => (
                 <div
                   key={a.id}
-                  className="flex items-start justify-between gap-3 text-sm p-3 border border-red-400 rounded bg-red-50 dark:bg-red-900/20 text-red-800 dark:text-red-200"
+                  className="flex items-start justify-between gap-3 rounded-lg border border-fcb-red/40 bg-fcb-red/10 px-3 py-2.5 font-inter text-sm text-fcb-text"
                 >
                   <span>
                     Anfrage abgelehnt: <strong>{a.mannschaft}</strong>{" "}
@@ -162,7 +166,7 @@ export default function MannschaftLizenzen({
                   <button
                     type="button"
                     onClick={() => schliesseBanner(a.id)}
-                    className="shrink-0 text-lg leading-none font-bold opacity-60 hover:opacity-100 transition"
+                    className="shrink-0 text-lg leading-none font-bold text-fcb-muted hover:text-fcb-text transition-colors"
                     aria-label="Meldung ausblenden"
                   >
                     ×
@@ -178,7 +182,7 @@ export default function MannschaftLizenzen({
             {offeneAnfragen.map((a) => (
               <div
                 key={a.id}
-                className="flex items-start justify-between gap-3 text-sm p-3 border border-yellow-400 rounded bg-yellow-50 dark:bg-yellow-900/20"
+                className="flex items-start justify-between gap-3 rounded-lg border border-yellow-500/40 bg-yellow-500/10 px-3 py-2.5 font-inter text-sm text-fcb-text"
               >
                 <span>
                   Anfrage ausstehend: <strong>{a.mannschaft}</strong>{" "}
@@ -187,7 +191,7 @@ export default function MannschaftLizenzen({
                 <button
                   type="button"
                   onClick={() => zurueckziehen(a.id)}
-                  className="shrink-0 text-xs underline opacity-70 hover:opacity-100 transition"
+                  className="shrink-0 font-inter text-xs text-fcb-muted underline hover:text-fcb-text transition-colors"
                 >
                   Zurückziehen
                 </button>
@@ -202,14 +206,14 @@ export default function MannschaftLizenzen({
             {mannschaft.map((m) => (
               <li
                 key={m}
-                className="flex items-center justify-between border rounded p-3"
+                className="flex items-center justify-between rounded-lg border border-fcb-border bg-fcb-surface px-3 py-2.5"
               >
-                <span className="text-sm">{m}</span>
+                <span className="font-inter text-sm text-fcb-text">{m}</span>
                 {!hatOffeneAnfrageFuer(m, "entfernen") && (
                   <button
                     type="button"
                     onClick={() => setModal({ typ: "entfernen", mannschaft: m })}
-                    className="text-xs text-red-600 underline hover:text-red-800 transition"
+                    className="font-inter text-xs text-fcb-red underline hover:text-fcb-red/80 transition-colors"
                   >
                     Entfernen anfragen
                   </button>
@@ -218,34 +222,31 @@ export default function MannschaftLizenzen({
             ))}
           </ul>
         ) : (
-          <p className="text-sm italic opacity-60 mb-3">Noch keine Mannschaft zugewiesen.</p>
+          <p className="font-inter text-sm italic text-fcb-muted mb-3">
+            Noch keine Mannschaft zugewiesen.
+          </p>
         )}
 
         {hinzufuegenMoeglich.length > 0 && (
-          <button
+          <Button
+            variant="ghost"
+            size="sm"
             type="button"
             onClick={() => setModal({ typ: "hinzufuegen" })}
-            className="text-sm underline opacity-70 hover:opacity-100 transition"
           >
             + Mannschaft hinzufügen anfragen
-          </button>
+          </Button>
         )}
       </section>
 
       {/* Trainer-Lizenzen */}
       <section>
-        <h2 className="text-base font-semibold mb-3">Trainer-Lizenzen</h2>
+        <h2 className="font-oswald text-base font-semibold uppercase tracking-wide text-fcb-text mb-3">
+          Trainer-Lizenzen
+        </h2>
 
-        {lizenzFehler && (
-          <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50 mb-3">
-            {lizenzFehler}
-          </p>
-        )}
-        {lizenzErfolg && (
-          <p className="text-green-700 text-sm p-3 border border-green-300 rounded bg-green-50 mb-3">
-            {lizenzErfolg}
-          </p>
-        )}
+        {lizenzFehler && <div className="mb-3"><Banner variant="error" message={lizenzFehler} /></div>}
+        {lizenzErfolg && <div className="mb-3"><Banner variant="success" message={lizenzErfolg} /></div>}
 
         <div className="space-y-2 mb-4">
           {LIZENZEN.map((lizenz) => (
@@ -254,34 +255,34 @@ export default function MannschaftLizenzen({
                 type="checkbox"
                 checked={lizenzen.includes(lizenz)}
                 onChange={() => toggleLizenz(lizenz)}
-                className="w-4 h-4"
+                className="w-4 h-4 accent-fcb-blue"
               />
-              <span className="text-sm">{lizenz}</span>
+              <span className="font-inter text-sm text-fcb-text">{lizenz}</span>
             </label>
           ))}
         </div>
 
-        <button
+        <Button
+          variant="primary"
+          size="md"
           type="button"
           onClick={handleLizenzSpeichern}
           disabled={lizenzSpeichern}
-          className="px-5 py-2 bg-[var(--foreground)] text-[var(--background)] rounded hover:opacity-80 transition disabled:opacity-50"
         >
           {lizenzSpeichern ? "Wird gespeichert …" : "Lizenzen speichern"}
-        </button>
+        </Button>
       </section>
 
-      {/* Anfrage-Modal */}
-      {modal && (
-        <MannschaftsAnfrageModal
-          userId={userId}
-          typ={modal.typ}
-          mannschaftVorausgefuellt={modal.mannschaft}
-          bereitsZugewiesen={mannschaft}
-          onClose={() => setModal(null)}
-          onErfolg={handleAnfrageErfolg}
-        />
-      )}
+      {/* Anfrage-Modal – modal-State steuert open-Prop */}
+      <MannschaftsAnfrageModal
+        userId={userId}
+        typ={modal?.typ ?? "hinzufuegen"}
+        mannschaftVorausgefuellt={modal?.mannschaft}
+        bereitsZugewiesen={mannschaft}
+        onClose={() => setModal(null)}
+        onErfolg={handleAnfrageErfolg}
+        open={modal !== null}
+      />
     </div>
   );
 }

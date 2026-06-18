@@ -3,8 +3,15 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import { MANNSCHAFTEN } from "@/lib/mannschaften";
+import Modal from "@/components/ui/Modal";
+import Banner from "@/components/ui/Banner";
+import Select from "@/components/ui/Select";
+import Textarea from "@/components/ui/Textarea";
+import Button from "@/components/ui/Button";
 
 interface MannschaftsAnfrageModalProps {
+  // Sichtbarkeit: Modal-Primitive steuert via headlessui Dialog
+  open: boolean;
   userId: string;
   typ: "hinzufuegen" | "entfernen";
   // Bei 'entfernen' ist die Mannschaft bereits bekannt
@@ -16,6 +23,7 @@ interface MannschaftsAnfrageModalProps {
 }
 
 export default function MannschaftsAnfrageModal({
+  open,
   userId,
   typ,
   mannschaftVorausgefuellt,
@@ -61,70 +69,56 @@ export default function MannschaftsAnfrageModal({
   const typLabel = typ === "hinzufuegen" ? "hinzufügen" : "entfernen";
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-[var(--background)] text-[var(--foreground)] rounded-lg shadow-xl w-full max-w-md p-6 space-y-4">
-        <h2 className="text-lg font-semibold">
-          Mannschaft {typLabel} – Anfrage stellen
-        </h2>
-
-        {fehler && (
-          <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50">
-            {fehler}
-          </p>
-        )}
+    // Modal-Primitive übernimmt Overlay, Fokus-Falle und Escape-Handling
+    <Modal open={open} onClose={onClose} title={`Mannschaft ${typLabel} – Anfrage stellen`} size="md">
+      <div className="space-y-4">
+        {fehler && <Banner variant="error" message={fehler} />}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Mannschaft</label>
-            {typ === "entfernen" || verfuegbareMannschaften.length === 0 ? (
-              <p className="form-field opacity-70 cursor-not-allowed">{mannschaft}</p>
-            ) : (
-              <select
-                value={mannschaft}
-                onChange={(e) => setMannschaft(e.target.value)}
-                required
-                className="select-field w-full"
-              >
-                {verfuegbareMannschaften.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Begründung (optional)
-            </label>
-            <textarea
-              value={begruendung}
-              onChange={(e) => setBegruendung(e.target.value)}
-              placeholder="z. B. Ich trainiere seit dieser Saison bei dieser Mannschaft."
-              rows={3}
-              className="form-field resize-none"
+          {/* Mannschafts-Auswahl: bei 'entfernen' oder Einzeloption nur anzeigen */}
+          {typ === "entfernen" || verfuegbareMannschaften.length === 0 ? (
+            <div className="space-y-1.5">
+              <p className="font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+                Mannschaft
+              </p>
+              <p className="rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-muted">
+                {mannschaft}
+              </p>
+            </div>
+          ) : (
+            <Select
+              label="Mannschaft"
+              value={mannschaft}
+              onChange={setMannschaft}
+              options={verfuegbareMannschaften.map((m) => ({ value: m, label: m }))}
+              required
             />
-          </div>
+          )}
+
+          <Textarea
+            label="Begründung"
+            optional
+            value={begruendung}
+            onChange={setBegruendung}
+            placeholder="z. B. Ich trainiere seit dieser Saison bei dieser Mannschaft."
+            rows={3}
+          />
 
           <div className="flex gap-3 justify-end pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="px-4 py-2 border rounded hover:opacity-70 transition"
-            >
+            <Button variant="secondary" size="sm" type="button" onClick={onClose}>
               Abbrechen
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
               type="submit"
               disabled={laden || !mannschaft}
-              className="px-4 py-2 bg-[var(--foreground)] text-[var(--background)] rounded hover:opacity-80 transition disabled:opacity-50"
             >
               {laden ? "Wird gesendet …" : "Anfrage senden"}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 }

@@ -8,6 +8,12 @@ import PersoenlicheDaten from "@/components/profil/PersoenlicheDaten";
 import MannschaftLizenzen from "@/components/profil/MannschaftLizenzen";
 import AccountSicherheit from "@/components/profil/AccountSicherheit";
 import AvatarUploadModal from "@/components/profil/AvatarUploadModal";
+import PageShell from "@/components/ui/PageShell";
+import PageHeader from "@/components/ui/PageHeader";
+import Badge from "@/components/ui/Badge";
+import Tabs from "@/components/ui/Tabs";
+import Banner from "@/components/ui/Banner";
+import Button from "@/components/ui/Button";
 
 type Tab = "persoenlich" | "mannschaft" | "account";
 
@@ -30,12 +36,12 @@ interface ProfilDaten {
 // Read-only Anzeige der aktuellen Rolle im Profil. Ändert NICHTS am
 // Rollenkonzept (Vergabe bleibt Vorstand/Admin vorbehalten) – reine Information
 // für den Nutzer, v. a. für den Status 'ausstehend'.
-const ROLLEN_ANZEIGE: Record<string, { label: string; klasse: string }> = {
-  ausstehend: { label: "Ausstehend", klasse: "bg-yellow-100 text-yellow-800 border-yellow-300" },
-  mitglied: { label: "Mitglied", klasse: "bg-blue-100 text-blue-800 border-blue-300" },
-  trainer: { label: "Trainer", klasse: "bg-green-100 text-green-800 border-green-300" },
-  vorstand: { label: "Vorstand", klasse: "bg-purple-100 text-purple-800 border-purple-300" },
-  admin: { label: "Admin", klasse: "bg-red-100 text-red-800 border-red-300" },
+const ROLLEN_BADGE: Record<string, { label: string; variant: "yellow" | "blue" | "green" | "purple" | "red" | "neutral" }> = {
+  ausstehend: { label: "Ausstehend", variant: "yellow" },
+  mitglied:   { label: "Mitglied",   variant: "blue" },
+  trainer:    { label: "Trainer",    variant: "green" },
+  vorstand:   { label: "Vorstand",   variant: "purple" },
+  admin:      { label: "Admin",      variant: "red" },
 };
 
 export default function ProfilPage() {
@@ -113,79 +119,68 @@ export default function ProfilPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Lade Profil …</p>
-      </main>
+      <PageShell maxWidth="xl">
+        <p className="font-inter text-fcb-muted">Lade Profil …</p>
+      </PageShell>
     );
   }
 
   if (!profil) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
+      <PageShell maxWidth="xl">
         <div className="text-center space-y-4">
-          <p className="text-xl font-semibold">Nicht eingeloggt</p>
-          <p className="text-sm opacity-75">Bitte melde dich an, um dein Profil zu bearbeiten.</p>
-          <Link
-            href="/login"
-            className="inline-block px-5 py-2 border border-[var(--foreground)] rounded hover:opacity-80 transition"
-          >
-            Zum Login
+          <p className="font-oswald text-xl font-semibold uppercase tracking-wide text-fcb-text">
+            Nicht eingeloggt
+          </p>
+          <p className="font-inter text-sm text-fcb-muted">
+            Bitte melde dich an, um dein Profil zu bearbeiten.
+          </p>
+          <Link href="/login">
+            <Button variant="secondary" size="md">Zum Login</Button>
           </Link>
         </div>
-      </main>
+      </PageShell>
     );
   }
 
-  const tabs: { key: Tab; label: string }[] = [
-    { key: "persoenlich", label: "Persönliche Daten" },
-    { key: "mannschaft", label: "Mannschaft & Lizenzen" },
-    { key: "account", label: "Account & Sicherheit" },
+  // Rollen-Badge: bekannte Rollen → Variant; unbekannte → neutral
+  const rollenInfo = ROLLEN_BADGE[profil.rolle] ?? { label: profil.rolle, variant: "neutral" as const };
+
+  const tabs = [
+    { id: "persoenlich", label: "Persönliche Daten" },
+    { id: "mannschaft",  label: "Mannschaft & Lizenzen" },
+    { id: "account",     label: "Account & Sicherheit" },
   ];
 
   return (
-    <main className="min-h-screen p-4 sm:p-8 max-w-2xl mx-auto">
-      {/* Titel + read-only Rollen-Badge */}
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <h1 className="text-2xl font-bold">Mein Profil</h1>
-        {(() => {
-          const r =
-            ROLLEN_ANZEIGE[profil.rolle] ?? {
-              label: profil.rolle,
-              klasse: "bg-gray-100 text-gray-800 border-gray-300",
-            };
-          return (
-            <span
-              className={`inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium ${r.klasse}`}
-            >
-              Rolle: {r.label}
-            </span>
-          );
-        })()}
-      </div>
+    <PageShell maxWidth="xl">
+      {/* Seitentitel + Rollen-Badge */}
+      <PageHeader
+        title="Profil"
+        actions={
+          <Badge variant={rollenInfo.variant}>
+            Rolle: {rollenInfo.label}
+          </Badge>
+        }
+      />
 
       {/* Hinweis für noch nicht freigeschaltete Konten */}
       {profil.rolle === "ausstehend" && (
-        <p className="mb-8 rounded border border-yellow-300 bg-yellow-50 px-4 py-3 text-sm text-yellow-900">
-          Dein Konto wird geprüft und freigeschaltet. Bei Fragen wende dich an
-          die Vorstandschaft oder den IT-Verantwortlichen.
-        </p>
+        <div className="mb-8">
+          <Banner
+            variant="warning"
+            message="Dein Konto wird geprüft und freigeschaltet. Bei Fragen wende dich an die Vorstandschaft oder den IT-Verantwortlichen."
+          />
+        </div>
       )}
 
       {/* Tab-Navigation */}
-      <div className="flex flex-col sm:flex-row sm:space-x-2 space-y-2 sm:space-y-0 mb-8">
-        {tabs.map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setActiveTab(key)}
-            className={`px-4 py-2 rounded border transition text-sm w-full sm:w-auto ${
-              activeTab === key
-                ? "bg-[var(--foreground)] text-[var(--background)]"
-                : "bg-transparent border-[var(--foreground)] text-[var(--foreground)] hover:opacity-70"
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="mb-8">
+        <Tabs
+          tabs={tabs}
+          active={activeTab}
+          onChange={(id) => setActiveTab(id as Tab)}
+        />
       </div>
 
       {/* Tab-Inhalte */}
@@ -218,14 +213,13 @@ export default function ProfilPage() {
         <AccountSicherheit aktuelleEmail={profil.email} />
       )}
 
-      {/* Avatar-Upload-Modal */}
-      {avatarModalOffen && (
-        <AvatarUploadModal
-          userId={profil.id}
-          onClose={() => setAvatarModalOffen(false)}
-          onErfolg={handleAvatarErfolg}
-        />
-      )}
-    </main>
+      {/* Avatar-Upload-Modal – immer gerendert, Sichtbarkeit via open-Prop gesteuert */}
+      <AvatarUploadModal
+        open={avatarModalOffen}
+        userId={profil.id}
+        onClose={() => setAvatarModalOffen(false)}
+        onErfolg={handleAvatarErfolg}
+      />
+    </PageShell>
   );
 }
