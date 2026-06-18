@@ -107,18 +107,20 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
               </div>
 
               {/* Text-Zone (abgetrennt, über dem Lichtkegel):
-                  Datum → Überschrift → Fließtext mit erhaltenen Absätzen. */}
+                  Datum → Überschrift → Fließtext mit erhaltenen Absätzen.
+                  Liegt auf bg-fcb-surface (Card-Fläche), nicht über dem Bild
+                  → semantische Tokens statt literal white/white/70. */}
               <div className="relative z-10 flex flex-1 flex-col gap-1.5 p-4">
                 <p className="font-inter text-[0.7rem] uppercase tracking-wider text-fcb-blue">
                   {formatPostDate(post.timestamp)}
                 </p>
                 {heading && (
-                  <p className="line-clamp-2 font-inter text-sm font-semibold text-white">
+                  <p className="line-clamp-2 font-inter text-sm font-semibold text-fcb-text">
                     {heading}
                   </p>
                 )}
                 {body && (
-                  <p className="line-clamp-4 whitespace-pre-line font-inter text-sm leading-relaxed text-white/70">
+                  <p className="line-clamp-4 whitespace-pre-line font-inter text-sm leading-relaxed text-fcb-muted">
                     {body}
                   </p>
                 )}
@@ -128,7 +130,10 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
         })}
       </div>
 
-      {/* Pfeil-Navigation (Touch-Target 48×48 px) */}
+      {/* Pfeil-Navigation (Touch-Target 48×48 px).
+          bg-black/50 = dunkler Scrim über den Fotos – bleibt in beiden Themes
+          dunkel (das Bild dahinter ist immer dunkel). Daher text-white,
+          border-white/20 und bg-black/50 bewusst als Literal – kein Token nötig. */}
       <button
         type="button"
         onClick={prev}
