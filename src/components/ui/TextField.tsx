@@ -12,6 +12,8 @@ interface TextFieldProps {
   autoComplete?: string;
   optional?: boolean;
   error?: string;
+  /** Maximale Zeichenanzahl – wird direkt ans input-Element weitergegeben */
+  maxLength?: number;
 }
 
 export default function TextField({
@@ -24,6 +26,7 @@ export default function TextField({
   autoComplete,
   optional,
   error,
+  maxLength,
 }: TextFieldProps) {
   const id = useId();
   return (
@@ -43,6 +46,7 @@ export default function TextField({
         placeholder={placeholder}
         required={required}
         autoComplete={autoComplete}
+        maxLength={maxLength}
         className={`w-full rounded-lg border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:outline-none focus-visible:ring-2 ${
           error
             ? "border-fcb-red focus:border-fcb-red focus-visible:ring-fcb-red/40"

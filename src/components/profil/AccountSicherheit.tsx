@@ -287,8 +287,9 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
               autoComplete="new-password"
               className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 pr-10 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />
+            {/* Icon am Input ausrichten – bottom-2.5 entspricht der vertikalen Mitte des py-2.5-Inputs */}
             {passwortBestaetigung && (
-              <span className="absolute top-8 right-3">
+              <span className="absolute bottom-2.5 right-3">
                 {neuesPasswort === passwortBestaetigung ? (
                   <CheckCircle2 size={18} className="text-green-500" />
                 ) : (

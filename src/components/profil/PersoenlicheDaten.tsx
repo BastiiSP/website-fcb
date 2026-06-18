@@ -170,6 +170,7 @@ export default function PersoenlicheDaten({
                 value={plz}
                 onChange={setPlz}
                 placeholder="96224"
+                maxLength={10}
               />
             </div>
             <div className="flex-1">
