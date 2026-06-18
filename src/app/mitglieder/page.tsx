@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import TrainerVerzeichnis from "@/components/TrainerVerzeichnis";
 import MitgliederVerwaltung from "@/components/MitgliederVerwaltung";
+import PageShell from "@/components/ui/PageShell";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function MitgliederPage() {
   const supabase = createClient();
@@ -36,24 +38,28 @@ export default function MitgliederPage() {
 
   if (laden) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-lg">Lade Inhalte …</p>
-      </main>
+      <PageShell maxWidth="2xl">
+        <p className="text-center font-inter text-fcb-muted mt-8">Lade Inhalte …</p>
+      </PageShell>
     );
   }
 
   // ausstehend und mitglied haben keinen Zugriff – nur trainer/vorstand/admin
   if (rolle === "ausstehend" || rolle === "mitglied") {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-center space-y-4 max-w-md">
-          <p className="text-xl font-semibold">Kein Zugriff</p>
-          <p className="text-sm opacity-75">
-            Dein Konto wurde noch nicht freigegeben. Sobald ein Vorstandsmitglied
-            dein Konto aktiviert hat, kannst du diese Seite aufrufen.
-          </p>
+      <PageShell maxWidth="2xl">
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <div className="text-center space-y-3 max-w-md">
+            <p className="font-oswald text-xl font-semibold uppercase tracking-wide text-fcb-text">
+              Kein Zugriff
+            </p>
+            <p className="font-inter text-sm text-fcb-muted">
+              Dein Konto wurde noch nicht freigegeben. Sobald ein Vorstandsmitglied
+              dein Konto aktiviert hat, kannst du diese Seite aufrufen.
+            </p>
+          </div>
         </div>
-      </main>
+      </PageShell>
     );
   }
 
@@ -62,23 +68,23 @@ export default function MitgliederPage() {
   const istVorstandOderAdmin = rolle === "vorstand" || rolle === "admin";
 
   return (
-    <main className="min-h-screen p-4 sm:p-8">
+    <PageShell maxWidth="2xl">
       {istTrainer && (
         <>
-          <h1 className="text-2xl font-bold mb-2">Trainer-Verzeichnis</h1>
-          <p className="text-sm opacity-60 mb-6">
-            Kontaktdaten aller Trainer, Platzwarte und Vorstandsmitglieder
-          </p>
+          <PageHeader
+            title="Trainer-Verzeichnis"
+            subtitle="Kontaktdaten aller Trainer, Platzwarte und Vorstandsmitglieder"
+          />
           <TrainerVerzeichnis />
         </>
       )}
 
       {istVorstandOderAdmin && (
         <>
-          <h1 className="text-2xl font-bold mb-2">Mitgliederverwaltung</h1>
-          <p className="text-sm opacity-60 mb-6">
-            Vereinsmitglieder verwalten – hinzufügen, bearbeiten, löschen und exportieren
-          </p>
+          <PageHeader
+            title="Mitgliederverwaltung"
+            subtitle="Vereinsmitglieder verwalten – hinzufügen, bearbeiten, löschen und exportieren"
+          />
           {/* userId ist hier garantiert nicht null, da wir oben auf !uid prüfen */}
           <MitgliederVerwaltung eigeneUserId={userId!} />
         </>
@@ -87,9 +93,9 @@ export default function MitgliederPage() {
       {/* Fallback: eingeloggt, aber unbekannte Rolle */}
       {!istTrainer && !istVorstandOderAdmin && (
         <div className="flex items-center justify-center min-h-[50vh]">
-          <p className="text-center opacity-70">Unbekannte Rolle – kein Zugriff.</p>
+          <p className="font-inter text-center text-fcb-muted">Unbekannte Rolle – kein Zugriff.</p>
         </div>
       )}
-    </main>
+    </PageShell>
   );
 }

@@ -2,6 +2,11 @@
 
 import React, { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabaseClient";
+import Modal from "@/components/ui/Modal";
+import Button from "@/components/ui/Button";
+import TextField from "@/components/ui/TextField";
+import Select from "@/components/ui/Select";
+import Textarea from "@/components/ui/Textarea";
 
 // Typdefinition für ein Vereinsmitglied – spiegelt das DB-Schema der mitglieder-Tabelle
 export type Mitglied = {
@@ -45,6 +50,14 @@ const LEERES_FORMULAR: MitgliedFormData = {
   mannschaftText: "",
   notizen: "",
 };
+
+// Status-Optionen für das Select-Primitive
+const STATUS_SELECT_OPTIONEN = [
+  { value: "aktiv", label: "Aktiv" },
+  { value: "passiv", label: "Passiv" },
+  { value: "ehrenamt", label: "Ehrenamt" },
+  { value: "gekündigt", label: "Gekündigt" },
+];
 
 type Props = {
   show: boolean;
@@ -148,168 +161,131 @@ export default function MitgliedBearbeitenModal({
     }
   };
 
-  if (!show) return null;
-
   const istBearbeiten = initialData !== null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-      <div className="bg-[var(--background)] text-[var(--foreground)] p-6 rounded shadow-lg w-full max-w-xl max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">
-          {istBearbeiten ? "✏️ Mitglied bearbeiten" : "➕ Mitglied hinzufügen"}
-        </h2>
+    <Modal
+      open={show}
+      onClose={onClose}
+      title={istBearbeiten ? "Mitglied bearbeiten" : "Mitglied hinzufügen"}
+      size="lg"
+    >
+      {fehler && (
+        <p className="font-inter text-sm text-fcb-red p-3 border border-fcb-red/40 rounded-lg bg-fcb-red/10 mb-4">
+          {fehler}
+        </p>
+      )}
 
-        {fehler && (
-          <p className="text-red-600 text-sm p-3 border border-red-300 rounded bg-red-50 mb-4">
-            {fehler}
-          </p>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Pflichtfelder */}
-          <div className="flex gap-3 flex-wrap">
-            <div className="flex-1 min-w-[140px]">
-              <label className="block text-sm font-medium mb-1">
-                Vorname <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.vorname}
-                onChange={(e) => handleChange("vorname", e.target.value)}
-                className="form-field"
-                required
-              />
-            </div>
-            <div className="flex-1 min-w-[140px]">
-              <label className="block text-sm font-medium mb-1">
-                Nachname <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={form.nachname}
-                onChange={(e) => handleChange("nachname", e.target.value)}
-                className="form-field"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Kontaktdaten */}
-          <div className="flex gap-3 flex-wrap">
-            <div className="flex-1 min-w-[140px]">
-              <label className="block text-sm font-medium mb-1">E-Mail</label>
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => handleChange("email", e.target.value)}
-                className="form-field"
-              />
-            </div>
-            <div className="flex-1 min-w-[140px]">
-              <label className="block text-sm font-medium mb-1">Telefon</label>
-              <input
-                type="text"
-                value={form.telefonnummer}
-                onChange={(e) => handleChange("telefonnummer", e.target.value)}
-                className="form-field"
-              />
-            </div>
-          </div>
-
-          {/* Datumsfelder */}
-          <div className="flex gap-3 flex-wrap">
-            <div className="flex-1 min-w-[140px]">
-              <label className="block text-sm font-medium mb-1">
-                Geburtsdatum
-              </label>
-              <input
-                type="date"
-                value={form.geburtsdatum}
-                onChange={(e) => handleChange("geburtsdatum", e.target.value)}
-                className="form-field"
-              />
-            </div>
-            <div className="flex-1 min-w-[140px]">
-              <label className="block text-sm font-medium mb-1">
-                Eintrittsdatum
-              </label>
-              <input
-                type="date"
-                value={form.eintrittsdatum}
-                onChange={(e) =>
-                  handleChange("eintrittsdatum", e.target.value)
-                }
-                className="form-field"
-              />
-            </div>
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Status</label>
-            <select
-              value={form.status}
-              onChange={(e) =>
-                handleChange(
-                  "status",
-                  e.target.value as MitgliedFormData["status"]
-                )
-              }
-              className="select-field w-full"
-            >
-              <option value="aktiv">Aktiv</option>
-              <option value="passiv">Passiv</option>
-              <option value="ehrenamt">Ehrenamt</option>
-              <option value="gekündigt">Gekündigt</option>
-            </select>
-          </div>
-
-          {/* Mannschaft(en) – kommagetrennte Eingabe für bessere UX */}
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Mannschaft(en){" "}
-              <span className="text-xs opacity-60">(kommagetrennt)</span>
-            </label>
-            <input
-              type="text"
-              value={form.mannschaftText}
-              onChange={(e) => handleChange("mannschaftText", e.target.value)}
-              placeholder="z. B. Herren 1, A-Jugend"
-              className="form-field"
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Pflichtfelder */}
+        <div className="flex gap-3 flex-wrap">
+          <div className="flex-1 min-w-[140px]">
+            <TextField
+              label="Vorname"
+              value={form.vorname}
+              onChange={(v) => handleChange("vorname", v)}
+              required
             />
           </div>
-
-          {/* Notizen */}
-          <div>
-            <label className="block text-sm font-medium mb-1">Notizen</label>
-            <textarea
-              value={form.notizen}
-              onChange={(e) => handleChange("notizen", e.target.value)}
-              placeholder="Interne Hinweise (optional)"
-              rows={3}
-              className="form-field"
+          <div className="flex-1 min-w-[140px]">
+            <TextField
+              label="Nachname"
+              value={form.nachname}
+              onChange={(v) => handleChange("nachname", v)}
+              required
             />
           </div>
+        </div>
 
-          {/* Aktionen */}
-          <div className="flex justify-between pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-neutral-300 hover:bg-neutral-400 text-[var(--foreground)] font-semibold px-4 py-2 rounded"
-            >
-              Abbrechen
-            </button>
-            <button
-              type="submit"
-              disabled={speichert}
-              className="bg-[var(--foreground)] hover:opacity-80 text-[var(--background)] font-semibold px-4 py-2 rounded disabled:opacity-50"
-            >
-              {speichert ? "Wird gespeichert …" : "Speichern"}
-            </button>
+        {/* Kontaktdaten */}
+        <div className="flex gap-3 flex-wrap">
+          <div className="flex-1 min-w-[140px]">
+            <TextField
+              label="E-Mail"
+              type="email"
+              value={form.email}
+              onChange={(v) => handleChange("email", v)}
+              optional
+            />
           </div>
-        </form>
-      </div>
-    </div>
+          <div className="flex-1 min-w-[140px]">
+            <TextField
+              label="Telefon"
+              value={form.telefonnummer}
+              onChange={(v) => handleChange("telefonnummer", v)}
+              optional
+            />
+          </div>
+        </div>
+
+        {/* Datumsfelder */}
+        <div className="flex gap-3 flex-wrap">
+          <div className="flex-1 min-w-[140px]">
+            <TextField
+              label="Geburtsdatum"
+              type="date"
+              value={form.geburtsdatum}
+              onChange={(v) => handleChange("geburtsdatum", v)}
+              optional
+            />
+          </div>
+          <div className="flex-1 min-w-[140px]">
+            <TextField
+              label="Eintrittsdatum"
+              type="date"
+              value={form.eintrittsdatum}
+              onChange={(v) => handleChange("eintrittsdatum", v)}
+              optional
+            />
+          </div>
+        </div>
+
+        {/* Status */}
+        <Select
+          label="Status"
+          value={form.status}
+          onChange={(v) => handleChange("status", v as MitgliedFormData["status"])}
+          options={STATUS_SELECT_OPTIONEN}
+          required
+        />
+
+        {/* Mannschaft(en) – kommagetrennte Eingabe für bessere UX als Freitext */}
+        <TextField
+          label="Mannschaft(en) – kommagetrennt"
+          value={form.mannschaftText}
+          onChange={(v) => handleChange("mannschaftText", v)}
+          placeholder="z. B. Herren 1, A-Jugend"
+          optional
+        />
+
+        {/* Notizen */}
+        <Textarea
+          label="Notizen"
+          value={form.notizen}
+          onChange={(v) => handleChange("notizen", v)}
+          placeholder="Interne Hinweise (optional)"
+          rows={3}
+          optional
+        />
+
+        {/* Aktionen */}
+        <div className="flex justify-between pt-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onClose}
+          >
+            Abbrechen
+          </Button>
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={speichert}
+          >
+            {speichert ? "Wird gespeichert …" : "Speichern"}
+          </Button>
+        </div>
+      </form>
+    </Modal>
   );
 }
