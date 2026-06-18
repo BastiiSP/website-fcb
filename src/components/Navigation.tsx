@@ -70,7 +70,7 @@ export default function Navigation({ onLinkClick }: NavigationProps) {
             className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${
               aktiv
                 ? "text-fcb-blue font-semibold"
-                : "text-white/85 hover:text-fcb-blue"
+                : "text-fcb-text/85 hover:text-fcb-blue"
             }`}
           >
             {label}

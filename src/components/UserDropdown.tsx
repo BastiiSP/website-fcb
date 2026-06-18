@@ -79,10 +79,11 @@ export default function UserDropdown() {
       <div className="flex items-center gap-2">
         <Link
           href="/login"
-          className="rounded-full border border-white/40 bg-transparent px-2.5 py-1 font-inter text-xs font-medium text-white transition-colors hover:border-white/70 hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav md:px-3 md:py-1.5 md:text-sm"
+          className="rounded-full border border-fcb-text/40 bg-transparent px-2.5 py-1 font-inter text-xs font-medium text-fcb-text transition-colors hover:border-fcb-text/70 hover:bg-fcb-text/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav md:px-3 md:py-1.5 md:text-sm"
         >
           Anmelden
         </Link>
+        {/* text-white bewusst: steht auf konstantem fcb-blue, in beiden Themes korrekt */}
         <Link
           href="/registrieren"
           className="flex items-center gap-1.5 rounded-full border border-fcb-blue bg-fcb-blue px-2.5 py-1 font-inter text-xs font-medium text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav md:px-3 md:py-1.5 md:text-sm"

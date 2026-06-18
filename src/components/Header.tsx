@@ -94,7 +94,7 @@ export default function Header() {
             <Link
               key={label}
               href={href}
-              className="font-inter text-sm font-medium text-white/85 transition-colors hover:text-fcb-blue"
+              className="font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-blue"
             >
               {label}
             </Link>
@@ -125,7 +125,7 @@ export default function Header() {
                   key={label}
                   href={href}
                   onClick={() => setMenuOpen(false)}
-                  className="py-1.5 font-inter text-sm font-medium text-white/85 transition-colors hover:text-fcb-blue"
+                  className="py-1.5 font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-blue"
                 >
                   {label}
                 </Link>
