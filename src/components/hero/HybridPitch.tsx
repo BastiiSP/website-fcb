@@ -34,9 +34,15 @@ export default function HybridPitch() {
       style={{ opacity: 0.55, pointerEvents: "none" }}
     >
       <defs>
+        {/*
+         * Vignette-Gradient – theme-aware via CSS-Vars:
+         * Dark: --hero-vignette = 9 9 11 (fast schwarz), alpha 0.85 → Rand wird abgedunkelt.
+         * Light: --hero-vignette = 255 255 255, alpha 0.0 → Gradient vollständig transparent.
+         * SVG stopOpacity akzeptiert CSS Custom Properties gemäß SVG 2 / CSS Painting Level 1.
+         */}
         <radialGradient id="hybridPitchVignette" cx="50%" cy="50%" r="70%">
-          <stop offset="0%" stopColor="#0f1822" stopOpacity="0" />
-          <stop offset="100%" stopColor="#000" stopOpacity="0.5" />
+          <stop offset="0%" stopColor="rgb(var(--hero-vignette))" stopOpacity="0" />
+          <stop offset="100%" stopColor="rgb(var(--hero-vignette))" stopOpacity="var(--hero-vignette-alpha)" />
         </radialGradient>
       </defs>
       <rect width="1600" height="900" fill="url(#hybridPitchVignette)" />

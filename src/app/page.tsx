@@ -27,11 +27,13 @@ export default function HomePage() {
     <main className="min-h-screen bg-fcb-bg text-fcb-text">
 
       {/*
-       * Hero-Section – Marken-Showcase-Band, intentionell in BEIDEN Themes dunkel.
-       * `.dark` scopt die fcb-*-CSS-Variablen auf diesen Subtree, sodass `bg-fcb-bg`
-       * immer das dunkle #0a0a0a malt – auch wenn <html> im Light-Theme ist.
+       * Hero-Section – folgt jetzt dem globalen Theme:
+       * Light = weißer Grund + blaue Linien + dunkler Text.
+       * Dark = dunkler Grund wie bisher.
+       * Das führende `dark` wurde entfernt, damit fcb-*-Tokens das globale
+       * Theme widerspiegeln statt immer auf dunkel zu scopen.
        */}
-      <section className="dark relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-fcb-bg">
+      <section className="relative min-h-[calc(100vh-3.5rem)] overflow-hidden bg-fcb-bg">
 
         {/* Dot-Grid Hintergrund */}
         <HybridCanvas />
@@ -39,13 +41,15 @@ export default function HomePage() {
         {/* Spielfeld-SVG – liegt über dem Canvas, beide absolute inset-0 */}
         <HybridPitch />
 
-        {/* Vignette für Lesbarkeit des Inhalts */}
+        {/* Vignette für Lesbarkeit des Inhalts – theme-aware via CSS-Vars:
+            Dark: --hero-vignette ≈ fast-schwarz, alpha 0.85 → abdunkelnder Rand.
+            Light: alpha 0.0 → Vignette praktisch unsichtbar. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at center, transparent 30%, rgba(9,9,11,0.85) 100%)",
+              "radial-gradient(ellipse at center, transparent 30%, rgb(var(--hero-vignette) / var(--hero-vignette-alpha)) 100%)",
           }}
         />
 
@@ -93,7 +97,7 @@ export default function HomePage() {
            * Rahmen (weißer Stroke auf blauer Schrift). Realisiert über
            * `-webkit-text-stroke` – keine neuen Farben.
            */}
-          <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-white">
+          <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-fcb-text">
             {HEADLINE_LINES.map((line, i) => {
               const isLast = i === HEADLINE_LINES.length - 1;
               // Längste Zeile bestimmt die Container-Breite – ihre Position
@@ -108,8 +112,11 @@ export default function HomePage() {
               // Blau auf Weiß hat geringeren Kontrast als Weiß auf Blau,
               // deshalb braucht F/C mehr Stroke-Breite (4 px) als B (2 px),
               // damit die Rahmen optisch gleich präsent wirken.
+              // Stroke-Farbe für F/C (blaue Umrahmung) bleibt konstant #1d5fad.
+              // Für B (letztes Wort, blauer Text) wechselt der Stroke per CSS-Var:
+              // Dark: rgb(255,255,255) → weißer Rahmen; Light: rgb(17,17,17) → dunkler Rahmen.
               const fcbBorder = {
-                WebkitTextStroke: isLast ? "2px #ffffff" : "4px #1d5fad",
+                WebkitTextStroke: isLast ? "2px rgb(var(--hero-stroke))" : "4px #1d5fad",
               };
 
               const motionProps = {
@@ -160,7 +167,7 @@ export default function HomePage() {
             initial={{ y: 16, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1.1, duration: 0.5 }}
-            className="mt-6 font-inter text-sm uppercase tracking-[0.4em] text-white/70 flex items-center justify-center gap-2"
+            className="mt-6 font-inter text-sm uppercase tracking-[0.4em] text-fcb-muted flex items-center justify-center gap-2"
           >
             <span>Dein Verein für</span>
             <RotatingText
@@ -181,15 +188,15 @@ export default function HomePage() {
             className="mt-10 flex items-center justify-center gap-4 sm:gap-5"
           >
             {/* Linke Zierlinie */}
-            <span aria-hidden className="h-0.5 w-8 bg-white/30 sm:w-12" />
+            <span aria-hidden className="h-0.5 w-8 bg-fcb-text/20 sm:w-12" />
             <span className="font-oswald text-base font-bold uppercase tracking-[0.2em] text-fcb-blue sm:text-xl">
               1911
             </span>
-            <span className="font-oswald text-base font-medium uppercase tracking-[0.2em] text-white/85 sm:text-xl">
+            <span className="font-oswald text-base font-medium uppercase tracking-[0.2em] text-fcb-text/85 sm:text-xl">
               Schuhstädter
             </span>
             {/* Rechte Zierlinie */}
-            <span aria-hidden className="h-0.5 w-8 bg-white/30 sm:w-12" />
+            <span aria-hidden className="h-0.5 w-8 bg-fcb-text/20 sm:w-12" />
           </motion.div>
 
         </div>
