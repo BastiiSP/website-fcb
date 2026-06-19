@@ -280,72 +280,75 @@ export default function KalenderSeite() {
               ))}
             </div>
 
-            {/* FullCalendar – Konfiguration unverändert */}
-            <FullCalendar
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-              initialView="timeGridWeek"
-              locale="de"
-              firstDay={1}
-              headerToolbar={
-                isMobile
-                  ? { left: "prev,next", center: "title", right: "today" }
-                  : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" }
-              }
-              slotMinTime="08:00:00"
-              slotMaxTime="22:30:00"
-              allDaySlot={false}
-              height="auto"
-              editable={true}
-              eventResizableFromStart={true}
-              eventDrop={async (info) => aktualisiereBuchungszeiten(info)}
-              eventResize={async (info) => aktualisiereBuchungszeiten(info)}
-              events={events}
-              eventContent={(arg) => {
-                const props = arg.event.extendedProps as Buchung;
-                const istGeoeffnet = geoeffneterTooltipId === arg.event.id;
+            {/* Surface-Container hebt den Kalender vom Seiten-Hintergrund (bg-fcb-bg) ab */}
+            <div className="rounded-2xl border border-fcb-border bg-fcb-surface p-2 sm:p-4">
+              {/* FullCalendar – Konfiguration unverändert */}
+              <FullCalendar
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                initialView="timeGridWeek"
+                locale="de"
+                firstDay={1}
+                headerToolbar={
+                  isMobile
+                    ? { left: "prev,next", center: "title", right: "today" }
+                    : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" }
+                }
+                slotMinTime="08:00:00"
+                slotMaxTime="22:30:00"
+                allDaySlot={false}
+                height="auto"
+                editable={true}
+                eventResizableFromStart={true}
+                eventDrop={async (info) => aktualisiereBuchungszeiten(info)}
+                eventResize={async (info) => aktualisiereBuchungszeiten(info)}
+                events={events}
+                eventContent={(arg) => {
+                  const props = arg.event.extendedProps as Buchung;
+                  const istGeoeffnet = geoeffneterTooltipId === arg.event.id;
 
-                return (
-                  <Tippy
-                    visible={istGeoeffnet}
-                    onClickOutside={() => setGeoeffneterTooltipId(null)}
-                    content={
-                      <TooltipContent
-                        props={props}
-                        event={arg.event}
-                        userId={userId}
-                        rolle={rolle}
-                        onEdit={() => {
-                          setBearbeiteBuchung(props);
-                          setGeoeffneterTooltipId(null);
-                        }}
-                        onDelete={() => {
-                          setZuLoeschendeId(props.id);
-                          setZuLoeschendeMannschaft(props.mannschaft);
-                          setLoeschenModalOffen(true);
-                          setGeoeffneterTooltipId(null);
-                        }}
-                      />
-                    }
-                    interactive={true}
-                    theme="light-border"
-                    placement="top"
-                    appendTo={document.body}
-                    zIndex={9999}
-                  >
-                    <div
-                      className="whitespace-pre-line px-1 text-sm cursor-pointer transition-all duration-150 transform hover:scale-101 hover:drop-shadow-md hover:brightness-70"
-                      onClick={() =>
-                        setGeoeffneterTooltipId((prev) =>
-                          prev === arg.event.id ? null : arg.event.id
-                        )
+                  return (
+                    <Tippy
+                      visible={istGeoeffnet}
+                      onClickOutside={() => setGeoeffneterTooltipId(null)}
+                      content={
+                        <TooltipContent
+                          props={props}
+                          event={arg.event}
+                          userId={userId}
+                          rolle={rolle}
+                          onEdit={() => {
+                            setBearbeiteBuchung(props);
+                            setGeoeffneterTooltipId(null);
+                          }}
+                          onDelete={() => {
+                            setZuLoeschendeId(props.id);
+                            setZuLoeschendeMannschaft(props.mannschaft);
+                            setLoeschenModalOffen(true);
+                            setGeoeffneterTooltipId(null);
+                          }}
+                        />
                       }
+                      interactive={true}
+                      theme="light-border"
+                      placement="top"
+                      appendTo={document.body}
+                      zIndex={9999}
                     >
-                      {arg.event.title}
-                    </div>
-                  </Tippy>
-                );
-              }}
-            />
+                      <div
+                        className="whitespace-pre-line px-1 text-sm cursor-pointer transition-all duration-150 transform hover:scale-101 hover:drop-shadow-md hover:brightness-70"
+                        onClick={() =>
+                          setGeoeffneterTooltipId((prev) =>
+                            prev === arg.event.id ? null : arg.event.id
+                          )
+                        }
+                      >
+                        {arg.event.title}
+                      </div>
+                    </Tippy>
+                  );
+                }}
+              />
+            </div>
 
             {/* Buchungsformular */}
             <Buchungsformular

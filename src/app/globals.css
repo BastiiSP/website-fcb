@@ -129,8 +129,14 @@ body {
 
 /* Heutiger Tag: dezenter FCB-Blau-Hintergrund */
 .fc .fc-day-today {
-  background-color: rgba(29, 95, 173, 0.08) !important;
+  background-color: rgba(29, 95, 173, 0.10) !important;
 }
+
+/* Kalender hebt sich von der Surface-Karte ab: Zellen = bg, Container = surface */
+.fc-theme-standard .fc-scrollgrid { border-color: rgb(var(--color-border)); }
+.fc .fc-timegrid-slot,
+.fc .fc-daygrid-day { background-color: rgb(var(--color-bg)); }
+.fc .fc-col-header-cell { background-color: rgb(var(--color-surface)); }
 
 /* ============================================================
    react-datepicker – theme-aware Styling (dual-theme via CSS-Tokens)

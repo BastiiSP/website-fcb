@@ -146,6 +146,9 @@ export default function Buchungsformular({
         Neue Buchung
       </h2>
 
+      {/* Surface-Karte hebt das Formular vom Seiten-Hintergrund (bg-fcb-bg) ab –
+          dadurch haben die bg-fcb-bg-Eingabefelder ihren sichtbaren Kontrast. */}
+      <div className="rounded-2xl border border-fcb-border bg-fcb-surface p-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Platzwahl als Segmented Control – Farb-Punkte dienen als Legende
             (gleiche Farben wie die Kalender-Events) */}
@@ -302,6 +305,7 @@ export default function Buchungsformular({
           </p>
         </div>
       </form>
+      </div>
     </>
   );
 }
