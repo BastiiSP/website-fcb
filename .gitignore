@@ -57,3 +57,9 @@ docs/superpowers/
 
 # Playwright-MCP-Artefakte (lokale Screenshots/Logs)
 .playwright-mcp/
+
+# Playwright E2E Artefakte
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
