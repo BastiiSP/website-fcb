@@ -16,6 +16,10 @@
   --color-text:    255 255 255;  /* #ffffff */
   --color-muted:   136 136 136;  /* #888888 */
   --color-nav:     82 82 91;     /* #52525b */
+  /* Hero/Auth: weiße Display-Schrift-Kontur + dunkle Vignette (Dark-Theme) */
+  --hero-stroke: 255 255 255;          /* weiß */
+  --hero-vignette: 9 9 11;             /* fast schwarz (rgb für die Vignette) */
+  --hero-vignette-alpha: 0.85;         /* Deckkraft der Vignette am Rand */
   color-scheme: dark;
 }
 .light {
@@ -26,6 +30,10 @@
   --color-text:    17 17 17;     /* #111111 */
   --color-muted:   90 90 90;     /* #5a5a5a – WCAG-AA-tauglich auf weiß */
   --color-nav:     228 228 231;  /* #e4e4e7 helle Navbar */
+  /* Hero/Auth: dunkle Display-Schrift-Kontur + sehr dezente helle Vignette (Light-Theme) */
+  --hero-stroke: 17 17 17;             /* #111 */
+  --hero-vignette: 255 255 255;        /* weiß */
+  --hero-vignette-alpha: 0.0;          /* im Light keine Abdunklung – Vignette praktisch aus */
   color-scheme: light;
 }
 
