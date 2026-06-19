@@ -79,14 +79,14 @@ export default function UserDropdown() {
       <div className="flex items-center gap-2">
         <Link
           href="/login"
-          className="rounded-full border border-fcb-text/40 bg-transparent px-2.5 py-1 font-inter text-xs font-medium text-fcb-text transition-colors hover:border-fcb-text/70 hover:bg-fcb-text/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav md:px-3 md:py-1.5 md:text-sm"
+          className="rounded-full border border-fcb-text/40 bg-transparent px-2.5 py-1 font-inter text-xs font-medium text-fcb-text transition-colors hover:border-fcb-text/70 hover:bg-fcb-text/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface md:px-3 md:py-1.5 md:text-sm"
         >
           Anmelden
         </Link>
         {/* text-white bewusst: steht auf konstantem fcb-blue, in beiden Themes korrekt */}
         <Link
           href="/registrieren"
-          className="flex items-center gap-1.5 rounded-full border border-fcb-blue bg-fcb-blue px-2.5 py-1 font-inter text-xs font-medium text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav md:px-3 md:py-1.5 md:text-sm"
+          className="flex items-center gap-1.5 rounded-full border border-fcb-blue bg-fcb-blue px-2.5 py-1 font-inter text-xs font-medium text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface md:px-3 md:py-1.5 md:text-sm"
         >
           <UserPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
           <span>Registrieren</span>
@@ -98,7 +98,7 @@ export default function UserDropdown() {
   // Eingeloggt → Avatar-Trigger öffnet das Card-Style-Dropdown.
   return (
     <Menu as="div" className="relative inline-block text-left">
-      <Menu.Button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-bold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-nav">
+      <Menu.Button className="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-fcb-blue font-bold text-white transition-opacity hover:opacity-90 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface">
         {user?.avatar_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img

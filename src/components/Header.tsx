@@ -47,7 +47,7 @@ export default function Header() {
     <motion.header
       animate={{ y: hidden ? "-100%" : 0 }}
       transition={{ duration: 0.25, ease: "easeInOut" }}
-      className="fixed top-0 left-0 right-0 z-50 border-b border-fcb-border bg-fcb-nav/90 backdrop-blur-md"
+      className="fixed top-0 left-0 right-0 z-50 border-b border-fcb-border bg-fcb-surface/90 backdrop-blur-md"
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
 
@@ -117,7 +117,7 @@ export default function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="overflow-hidden border-t border-fcb-border bg-fcb-nav/95 md:hidden"
+            className="overflow-hidden border-t border-fcb-border bg-fcb-surface/95 md:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-3">
               {PUBLIC_LINKS.map(({ label, href }) => (
