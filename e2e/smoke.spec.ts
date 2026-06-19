@@ -112,10 +112,16 @@ test("Theme-Toggle wechselt auf light und bleibt nach Reload", async ({
   // Sicherstellen, dass wir im dunklen Modus starten
   await expect(page.locator("html")).toHaveClass(/dark/);
 
-  // ThemeToggle im Footer anklicken – Button mit Text "Hell" (wechselt zu hell)
-  // Im Dark-Modus zeigt der Button "Hell" an (Ziel ist helles Design)
-  const toggle = page.getByRole("button", { name: /Hell/i });
+  // Der ThemeToggle ist jetzt ein Switch (role="switch").
+  // Im Dark-Modus ist aria-checked="true" (Dunkel ist aktiv/eingeschaltet).
+  const toggle = page.locator('[role="switch"]').first();
+  await expect(toggle).toBeVisible();
+  await expect(toggle).toHaveAttribute("aria-checked", "true");
+
   await toggle.click();
+
+  // Nach dem Klick: aria-checked flippt auf "false" (Dunkel ist deaktiviert = hell aktiv)
+  await expect(toggle).toHaveAttribute("aria-checked", "false");
 
   // html-Element muss jetzt "light" tragen
   await expect(page.locator("html")).toHaveClass(/light/);
@@ -135,27 +141,29 @@ test("Theme-Toggle wechselt auf light und bleibt nach Reload", async ({
 });
 
 // ──────────────────────────────────────────────
-// 4. Auth-Seite ist eine Dark-Island (auch im Light-Modus)
+// 4. Auth-Seite folgt dem Theme (kein Dark-Island mehr)
 // ──────────────────────────────────────────────
-test("Auth-Seite /login ist immer-dunkle Insel (dark island)", async ({
+test("Auth-Seite /login folgt dem globalen Theme (kein Dark-Island)", async ({
   page,
 }) => {
   // Light-Modus erzwingen
   await seedStorage(page, { theme: "light" });
   await page.goto("/login");
 
-  // Das globale html-Element ist "light" (App-weites Theme)
+  // Das globale html-Element ist "light" – und bleibt es auch auf der Auth-Seite
   await expect(page.locator("html")).toHaveClass(/light/);
 
-  // Der Auth-Shell-Wrapper hat die Klasse "dark" – er scoped die Palette auf
-  // den Auth-Subtree und bleibt immer dunkel, unabhängig vom App-Theme.
-  // PitchAuthShell rendert: <div className="dark relative min-h-screen ...">
-  const darkIsland = page.locator("div.dark").first();
-  await expect(darkIsland).toBeVisible();
+  // Es gibt keinen .dark-Wrapper-Subtree mehr – Auth folgt dem globalen Theme
+  const darkWrappers = page.locator(".dark");
+  await expect(darkWrappers).toHaveCount(0);
 
-  // Das Login-Formular ist innerhalb der Dark-Island sichtbar
-  // h1 lautet "Willkommen zurück" (nicht "Anmelden")
+  // Das Login-Formular ist sichtbar
+  // h1 lautet "WILLKOMMEN ZURÜCK" (Oswald, uppercase) – enthält-Text-Prüfung
   await expect(page.locator("h1")).toContainText("Willkommen zurück");
+
+  // Auf der Auth-Seite gibt es einen Theme-Switcher (role="switch")
+  const themeSwitcher = page.locator('[role="switch"]').first();
+  await expect(themeSwitcher).toBeVisible();
 });
 
 // ──────────────────────────────────────────────
