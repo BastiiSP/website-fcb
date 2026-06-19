@@ -32,7 +32,7 @@ export default function PitchAuthBackground() {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at center, transparent 30%, rgba(9,9,11,0.85) 100%)",
+            "radial-gradient(ellipse at center, transparent 30%, rgb(var(--hero-vignette) / var(--hero-vignette-alpha)) 100%)",
         }}
       />
     </div>

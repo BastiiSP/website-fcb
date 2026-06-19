@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import PitchAuthBackground from "./PitchAuthBackground";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 /**
  * Gemeinsame Hülle für alle echten Auth-Seiten im Pitch-Look:
@@ -24,10 +25,15 @@ export default function PitchAuthShell({ children }: { children: React.ReactNode
       };
 
   return (
-    // Auth-Seiten sind bewusst in beiden Themes dunkel (immersives Marken-Erlebnis,
-    // konsistent mit dem Hero); `.dark` scopt die Palette auf den Auth-Subtree.
-    <div className="dark relative min-h-screen overflow-hidden bg-fcb-bg">
+    // Auth-Seiten folgen jetzt dem globalen Theme (hell/dunkel); `.dark` wurde
+    // entfernt, damit bg-fcb-bg und alle fcb-*-Tokens korrekt flippen.
+    <div className="relative min-h-screen overflow-hidden bg-fcb-bg">
       <PitchAuthBackground />
+
+      {/* Theme-Switcher oben rechts – Auth-Seiten haben keinen Footer */}
+      <div className="absolute right-4 top-4 z-20">
+        <ThemeToggle />
+      </div>
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-5 py-16">
         <motion.div
@@ -58,11 +64,11 @@ export default function PitchAuthShell({ children }: { children: React.ReactNode
             </Link>
 
             <div className="mt-4 flex items-center gap-3">
-              <span className="h-0.5 w-12 bg-white/30" aria-hidden="true" />
+              <span className="h-0.5 w-12 bg-fcb-text/20" aria-hidden="true" />
               <span className="font-oswald text-xs uppercase tracking-[0.2em] text-fcb-muted">
                 <span className="text-fcb-blue">1911</span> Schuhstädter
               </span>
-              <span className="h-0.5 w-12 bg-white/30" aria-hidden="true" />
+              <span className="h-0.5 w-12 bg-fcb-text/20" aria-hidden="true" />
             </div>
           </div>
 
