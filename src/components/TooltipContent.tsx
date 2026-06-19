@@ -1,4 +1,5 @@
 import { EventApi } from "@fullcalendar/core";
+import { Pencil, Trash2 } from "lucide-react";
 import type { Buchung } from "@/components/BearbeitenModal";
 
 type Props = {
@@ -71,9 +72,9 @@ export default function TooltipContent({
               e.stopPropagation();
               onEdit();
             }}
-            className="text-xs px-2 py-1 rounded bg-fcb-surface text-fcb-text border border-fcb-border hover:bg-fcb-border"
+            className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-fcb-surface text-fcb-text border border-fcb-border hover:bg-fcb-border"
           >
-            ✏️ Bearbeiten
+            <Pencil size={14} /> Bearbeiten
           </button>
 
           <button
@@ -81,9 +82,9 @@ export default function TooltipContent({
               e.stopPropagation();
               onDelete();
             }}
-            className="text-xs bg-fcb-red text-white px-4 py-1 rounded hover:bg-fcb-red/80"
+            className="inline-flex items-center gap-1 text-xs bg-fcb-red text-white px-4 py-1 rounded hover:bg-fcb-red/80"
           >
-            🗑️ Löschen
+            <Trash2 size={14} /> Löschen
           </button>
         </div>
       )}

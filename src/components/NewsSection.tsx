@@ -14,7 +14,7 @@ export default function NewsSection() {
   return (
     <section className="py-12 px-6 max-w-5xl mx-auto">
       {/* Heading mit Oswald-Font gemäß Design-Spec */}
-      <h2 className="text-2xl font-bold font-oswald mb-8 text-center">📰 Vereins-News</h2>
+      <h2 className="text-2xl font-bold font-oswald mb-8 text-center">Vereins-News</h2>
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {news.map((item, index) => (
           <NewsCard key={item.id.toString()} item={item} index={index} />
