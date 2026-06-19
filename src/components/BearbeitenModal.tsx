@@ -97,13 +97,13 @@ export default function BearbeitenModal({
     }
   };
 
-  // Modal wird nur angezeigt wenn es aktiv ist und gültige Daten geladen sind
-  if (!form) return null;
-
   return (
     <Modal open={show} onClose={onClose} title="Buchung bearbeiten" size="md">
-      {/* Bearbeitungsformular */}
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Formular nur rendern, wenn Daten geladen sind. Das Modal selbst bleibt
+          gemountet (open={show}), damit headlessui die Schließen-Animation
+          abspielen kann – ein vorzeitiges `return null` würde sie überspringen. */}
+      {form ? (
+        <form onSubmit={handleSubmit} className="space-y-4">
         {/* Platz, Platzanteil, Anlass */}
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1 min-w-[140px]">
@@ -199,7 +199,8 @@ export default function BearbeitenModal({
             Speichern
           </Button>
         </div>
-      </form>
+        </form>
+      ) : null}
     </Modal>
   );
 }
