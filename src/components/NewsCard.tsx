@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Calendar } from "lucide-react";
 import { formatCapitalized } from "@/utils/formatCapitalized";
 import { NewsItem } from "@/utils/fetchNews";
 
@@ -72,8 +73,9 @@ export default function NewsCard({ item, index }: NewsCardProps) {
           <p className="text-sm text-fcb-muted line-clamp-4">
             {item.teaser}
           </p>
-          <time className="block text-xs text-fcb-muted">
-            📅 {new Date(item.created_at).toLocaleDateString("de-DE")}
+          <time className="inline-flex items-center gap-1 text-xs text-fcb-muted">
+            <Calendar size={12} />
+            {new Date(item.created_at).toLocaleDateString("de-DE")}
           </time>
         </div>
       </article>
