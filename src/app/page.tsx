@@ -92,32 +92,15 @@ export default function HomePage() {
            * Browser Justify nur zwischen Wörtern verteilen, nicht zwischen
            * Buchstaben innerhalb eines einzelnen Worts.
            *
-           * FCB-Easter-Egg: F & C bekommen einen dezenten FCB-Blau-Rahmen
-           * (blauer Stroke auf weißer Schrift), B bekommt einen weißen
-           * Rahmen (weißer Stroke auf blauer Schrift). Realisiert über
-           * `-webkit-text-stroke` – keine neuen Farben.
+           * FCB-Akzent: Alle drei Wörter in der Theme-Textfarbe (hell/dunkel),
+           * nur der jeweils ERSTE Buchstabe (F, C, B) in Burgkunstadt-Blau.
+           * Keine Umrandung/kein Text-Stroke.
            */}
           <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-fcb-text">
             {HEADLINE_LINES.map((line, i) => {
-              const isLast = i === HEADLINE_LINES.length - 1;
-              // Längste Zeile bestimmt die Container-Breite – ihre Position
-              // im Array ist bekannt, aber wir leiten sie zur Sicherheit aus
-              // der maximalen Länge ab.
+              // Längste Zeile bestimmt die Container-Breite (siehe Justify-Hinweis oben).
               const longestLength = Math.max(...HEADLINE_LINES.map((l) => l.length));
               const isLongest = line.length === longestLength;
-
-              // Dezenter Rahmen statt Glow: F & C bekommen blauen Stroke
-              // (auf weißer Schrift sichtbar), B bekommt weißen Stroke
-              // (auf blauer Schrift sichtbar).
-              // Blau auf Weiß hat geringeren Kontrast als Weiß auf Blau,
-              // deshalb braucht F/C mehr Stroke-Breite (4 px) als B (2 px),
-              // damit die Rahmen optisch gleich präsent wirken.
-              // Stroke-Farbe für F/C (blaue Umrahmung) bleibt konstant #1d5fad.
-              // Für B (letztes Wort, blauer Text) wechselt der Stroke per CSS-Var:
-              // Dark: rgb(255,255,255) → weißer Rahmen; Light: rgb(17,17,17) → dunkler Rahmen.
-              const fcbBorder = {
-                WebkitTextStroke: isLast ? "2px rgb(var(--hero-stroke))" : "4px #1d5fad",
-              };
 
               const motionProps = {
                 initial: { y: 40, opacity: 0 },
@@ -126,10 +109,6 @@ export default function HomePage() {
                   delay: 0.3 + i * 0.18,
                   duration: 0.55,
                   ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-                },
-                style: {
-                  // Letzte Zeile FCB-Blau – verleiht der Stadt das Gewicht
-                  color: isLast ? "#1d5fad" : undefined,
                 },
               };
 
@@ -140,7 +119,8 @@ export default function HomePage() {
                     {...motionProps}
                     className="block text-[clamp(2.25rem,5vw,5rem)]"
                   >
-                    <span style={fcbBorder}>{line[0]}</span>
+                    {/* Anfangsbuchstabe in FCB-Blau, Rest erbt die Theme-Textfarbe */}
+                    <span className="text-fcb-blue">{line[0]}</span>
                     {line.slice(1)}
                   </motion.span>
                 );
@@ -153,7 +133,7 @@ export default function HomePage() {
                   className="flex justify-between text-[clamp(2.25rem,5vw,5rem)]"
                 >
                   {Array.from(line).map((char, idx) => (
-                    <span key={idx} style={idx === 0 ? fcbBorder : undefined}>
+                    <span key={idx} className={idx === 0 ? "text-fcb-blue" : undefined}>
                       {char}
                     </span>
                   ))}
