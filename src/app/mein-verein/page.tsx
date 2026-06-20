@@ -2,10 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// lucide-react: MessageCircle als WhatsApp-Stellvertreter (kein Brand-Icon verfügbar),
-// ExternalLink für allgemeine Links
-import { MessageCircle, ExternalLink } from "lucide-react";
-import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
+// lucide-react: ExternalLink für allgemeine Links (kein Brand-Glyph nötig)
+import { ExternalLink } from "lucide-react";
+import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import { VEREINSLINKS, type VereinsLink, type VereinsLinkIcon } from "@/lib/vereinslinks";
@@ -20,8 +19,8 @@ import Banner from "@/components/ui/Banner";
 function VereinsLinkIconComponent({ icon }: { icon: VereinsLinkIcon }) {
   switch (icon) {
     case "whatsapp":
-      // Grün für eindeutige WhatsApp-Erkennbarkeit, kein react-icons mehr
-      return <MessageCircle className="w-8 h-8 text-green-500" aria-hidden="true" />;
+      // Offizielles WhatsApp-Glyph (mit Hörer) in WhatsApp-Grün
+      return <WhatsAppIcon className="w-8 h-8 text-green-500" aria-hidden="true" />;
     case "instagram":
       return <InstagramIcon className="w-8 h-8 text-pink-500" aria-hidden="true" />;
     case "facebook":
