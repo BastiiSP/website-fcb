@@ -6,7 +6,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { type Buchung } from "@/components/BearbeitenModal";
 import Button from "@/components/ui/Button";
-import { PLATZ_FARBEN } from "@/utils/getEventColor";
+import { getEventColor } from "@/utils/getEventColor";
 
 // Supabase-Client auf Modul-Ebene → stabile Referenz, kein useCallback-Dep-Churn
 // (gleiches Muster wie kalender/page.tsx)
@@ -68,7 +68,7 @@ function PlatzZelle({ platz }: { platz: string }) {
     <span className="inline-flex items-center gap-2">
       <span
         className="inline-block h-2.5 w-2.5 rounded-full shrink-0"
-        style={{ backgroundColor: PLATZ_FARBEN[platz] ?? "#999" }}
+        style={{ backgroundColor: getEventColor(platz) }}
       />
       {platz.charAt(0).toUpperCase() + platz.slice(1)}
     </span>
@@ -146,10 +146,12 @@ export default function BuchungenVerwaltung() {
 
       {/* FILTERLEISTE – wird in Task 2 ergänzt */}
 
-      {/* Ergebniszähler */}
-      <p className="font-inter text-sm text-fcb-muted">
-        {gesamt} Buchung{gesamt !== 1 ? "en" : ""} im gewählten Zeitraum
-      </p>
+      {/* Ergebniszähler – erst nach dem Laden zeigen, sonst flackert "0 Buchungen" auf */}
+      {!laden && (
+        <p className="font-inter text-sm text-fcb-muted">
+          {gesamt} Buchung{gesamt !== 1 ? "en" : ""} im gewählten Zeitraum
+        </p>
+      )}
 
       {laden ? (
         <p className="font-inter text-center text-fcb-muted mt-6">Lade Buchungen …</p>
@@ -206,28 +208,30 @@ export default function BuchungenVerwaltung() {
             </table>
           </div>
 
-          {/* Pagination */}
-          <div className="flex items-center justify-between gap-4">
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={seite <= 0}
-              onClick={() => setSeite((s) => Math.max(0, s - 1))}
-            >
-              Zurück
-            </Button>
-            <span className="font-inter text-sm text-fcb-muted">
-              Seite {seite + 1} von {letzteSeite + 1}
-            </span>
-            <Button
-              variant="secondary"
-              size="sm"
-              disabled={seite >= letzteSeite}
-              onClick={() => setSeite((s) => Math.min(letzteSeite, s + 1))}
-            >
-              Weiter
-            </Button>
-          </div>
+          {/* Pagination – nur zeigen, wenn es mehr als eine Seite gibt */}
+          {letzteSeite > 0 && (
+            <div className="flex items-center justify-between gap-4">
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={seite <= 0}
+                onClick={() => setSeite((s) => Math.max(0, s - 1))}
+              >
+                Zurück
+              </Button>
+              <span className="font-inter text-sm text-fcb-muted">
+                Seite {seite + 1} von {letzteSeite + 1}
+              </span>
+              <Button
+                variant="secondary"
+                size="sm"
+                disabled={seite >= letzteSeite}
+                onClick={() => setSeite((s) => Math.min(letzteSeite, s + 1))}
+              >
+                Weiter
+              </Button>
+            </div>
+          )}
         </>
       )}
     </div>
