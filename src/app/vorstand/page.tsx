@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import BenutzerListe from "@/components/BenutzerListe";
 import MannschaftsanfragenVerwaltung from "@/components/MannschaftsanfragenVerwaltung";
+import BuchungenVerwaltung from "@/components/BuchungenVerwaltung";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Tabs from "@/components/ui/Tabs";
@@ -99,7 +100,7 @@ export default function VorstandPage() {
 
       {activeTab === "buchungen" && (
         <section>
-          <p className="font-inter text-fcb-muted text-lg mb-2">Buchungsübersicht folgt …</p>
+          <BuchungenVerwaltung />
         </section>
       )}
     </PageShell>
