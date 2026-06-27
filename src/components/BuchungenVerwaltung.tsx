@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import { type Buchung } from "@/components/BearbeitenModal";
 import Button from "@/components/ui/Button";
+import Select from "@/components/ui/Select";
 import { getEventColor } from "@/utils/getEventColor";
 
 // Supabase-Client auf Modul-Ebene → stabile Referenz, kein useCallback-Dep-Churn
@@ -28,6 +29,18 @@ const PLATZANTEIL_LABEL: Record<string, string> = {
   halb: "1/2 Platz",
   ganz: "Ganzer Platz",
 };
+
+// Platz-Filter-Optionen (leere Option = alle Plätze)
+const PLATZ_FILTER_OPTIONEN = [
+  { value: "", label: "Alle Plätze" },
+  { value: "hauptplatz", label: "Hauptplatz" },
+  { value: "nebenplatz", label: "Nebenplatz" },
+];
+
+// Einheitliche Styles für die nativen <input type="date">-Felder (fcb-Tokens,
+// gleiches Muster wie die datetime-local-Felder in BearbeitenModal).
+const DATUM_INPUT_KLASSEN =
+  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40";
 
 // YYYY-MM-DD aus LOKALEN Datumsfeldern bauen – nicht über toISOString(),
 // das würde in UTC umrechnen und je nach Zeitzone den Tag verschieben.
@@ -83,12 +96,8 @@ export default function BuchungenVerwaltung() {
 
   // Filter-Zustand – sinnvoller Standard: aktueller Monat, alle Plätze.
   // Verhindert, dass beim Öffnen sofort hunderte Einträge geladen werden.
-  // Setter werden ab Task 2 (Filterleiste) genutzt – noch nicht wegoptimieren.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [platzFilter, setPlatzFilter] = useState("");
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [vonDatum, setVonDatum] = useState(ersterTagDesMonats());
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [bisDatum, setBisDatum] = useState(letzterTagDesMonats());
 
   // Pagination – 0-basierter Seitenindex
@@ -135,6 +144,14 @@ export default function BuchungenVerwaltung() {
   // Index der letzten Seite (0-basiert)
   const letzteSeite = Math.max(0, Math.ceil(gesamt / PRO_SEITE) - 1);
 
+  // Setzt Filter auf den Standard zurück (aktueller Monat, alle Plätze, Seite 1)
+  const zuruecksetzen = () => {
+    setPlatzFilter("");
+    setVonDatum(ersterTagDesMonats());
+    setBisDatum(letzterTagDesMonats());
+    setSeite(0);
+  };
+
   return (
     <div className="space-y-6">
       {/* Ladefehler */}
@@ -144,7 +161,55 @@ export default function BuchungenVerwaltung() {
         </p>
       )}
 
-      {/* FILTERLEISTE – wird in Task 2 ergänzt */}
+      {/* Filterleiste – mobile gestapelt, ab sm nebeneinander */}
+      <div className="flex flex-col sm:flex-row gap-3 flex-wrap items-end">
+        <div className="sm:w-52">
+          <Select
+            label="Platz"
+            value={platzFilter}
+            // Jede Filteränderung zurück auf Seite 1 → kein leerer Seitenindex
+            onChange={(v) => {
+              setPlatzFilter(v);
+              setSeite(0);
+            }}
+            options={PLATZ_FILTER_OPTIONEN}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+            Von
+          </label>
+          <input
+            type="date"
+            value={vonDatum}
+            onChange={(e) => {
+              setVonDatum(e.target.value);
+              setSeite(0);
+            }}
+            className={DATUM_INPUT_KLASSEN}
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+            Bis
+          </label>
+          <input
+            type="date"
+            value={bisDatum}
+            onChange={(e) => {
+              setBisDatum(e.target.value);
+              setSeite(0);
+            }}
+            className={DATUM_INPUT_KLASSEN}
+          />
+        </div>
+
+        <Button variant="secondary" onClick={zuruecksetzen}>
+          Zurücksetzen
+        </Button>
+      </div>
 
       {/* Ergebniszähler – erst nach dem Laden zeigen, sonst flackert "0 Buchungen" auf */}
       {!laden && (
