@@ -4,7 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import { type Buchung } from "@/components/BearbeitenModal";
+import BearbeitenModal, { type Buchung } from "@/components/BearbeitenModal";
+import LoeschenModal from "@/components/LoeschenModal";
+import ToastMessage from "@/components/ToastMessage";
+import { Pencil, Trash2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Select from "@/components/ui/Select";
 import { getEventColor } from "@/utils/getEventColor";
@@ -88,6 +91,30 @@ function PlatzZelle({ platz }: { platz: string }) {
   );
 }
 
+// Bearbeiten/Löschen-Icon-Buttons – in Tabelle und Card identisch, daher ausgelagert (DRY)
+function AktionsButtons({ onEdit, onDelete }: { onEdit: () => void; onDelete: () => void }) {
+  return (
+    <div className="flex justify-end gap-2">
+      <button
+        onClick={onEdit}
+        className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+        title="Bearbeiten"
+        aria-label="Buchung bearbeiten"
+      >
+        <Pencil size={16} />
+      </button>
+      <button
+        onClick={onDelete}
+        className="p-1.5 rounded text-fcb-muted hover:text-fcb-red hover:bg-fcb-red/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-red"
+        title="Löschen"
+        aria-label="Buchung löschen"
+      >
+        <Trash2 size={16} />
+      </button>
+    </div>
+  );
+}
+
 export default function BuchungenVerwaltung() {
   const [buchungen, setBuchungen] = useState<Buchung[]>([]);
   const [gesamt, setGesamt] = useState(0);
@@ -102,6 +129,14 @@ export default function BuchungenVerwaltung() {
 
   // Pagination – 0-basierter Seitenindex
   const [seite, setSeite] = useState(0);
+
+  // Modal-Zustände: jeweils die betroffene Buchung oder null
+  const [bearbeiteBuchung, setBearbeiteBuchung] = useState<Buchung | null>(null);
+  const [loeschBuchung, setLoeschBuchung] = useState<Buchung | null>(null);
+
+  // Toast-Meldungen für Aktions-Feedback (Erfolg / Fehler)
+  const [erfolg, setErfolg] = useState("");
+  const [aktionsFehler, setAktionsFehler] = useState("");
 
   // Lädt eine Seite Buchungen server-seitig. count:"exact" liefert die
   // Gesamtanzahl passender Zeilen trotz .range() → Basis für die Pagination.
@@ -150,6 +185,24 @@ export default function BuchungenVerwaltung() {
     setVonDatum(ersterTagDesMonats());
     setBisDatum(letzterTagDesMonats());
     setSeite(0);
+  };
+
+  // Löschen bestätigen → DB-Delete → Toast + Liste neu laden (kein Seitenreload)
+  const loeschenBestaetigen = async () => {
+    if (!loeschBuchung) return;
+
+    const { error } = await supabase
+      .from("buchungen")
+      .delete()
+      .eq("id", loeschBuchung.id);
+
+    if (error) {
+      setAktionsFehler("Löschen fehlgeschlagen: " + error.message);
+    } else {
+      setErfolg("Buchung erfolgreich gelöscht.");
+      ladeBuchungen();
+    }
+    setLoeschBuchung(null);
   };
 
   return (
@@ -255,7 +308,7 @@ export default function BuchungenVerwaltung() {
                   <p className="font-inter text-xs italic text-fcb-muted">{b.bemerkung}</p>
                 )}
 
-                {/* AKTIONEN MOBILE – Buttons werden in Task 4 ergänzt */}
+                <AktionsButtons onEdit={() => setBearbeiteBuchung(b)} onDelete={() => setLoeschBuchung(b)} />
               </div>
             ))}
           </div>
@@ -297,7 +350,7 @@ export default function BuchungenVerwaltung() {
                       {b.buchende_person}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      {/* AKTIONEN DESKTOP – Buttons werden in Task 4 ergänzt */}
+                      <AktionsButtons onEdit={() => setBearbeiteBuchung(b)} onDelete={() => setLoeschBuchung(b)} />
                     </td>
                   </tr>
                 ))}
@@ -330,6 +383,38 @@ export default function BuchungenVerwaltung() {
             </div>
           )}
         </>
+      )}
+
+      {/* Bearbeiten-Modal: vollständiges Buchungsformular, wiederverwendet aus dem Kalender */}
+      <BearbeitenModal
+        show={bearbeiteBuchung !== null}
+        onClose={() => setBearbeiteBuchung(null)}
+        supabase={supabase}
+        initialData={bearbeiteBuchung}
+        onSave={() => {
+          setErfolg("Buchung erfolgreich aktualisiert.");
+          ladeBuchungen();
+        }}
+      />
+
+      {/* Löschen-Bestätigung: expliziter Schritt vor dem Entfernen */}
+      <LoeschenModal
+        show={loeschBuchung !== null}
+        onClose={() => setLoeschBuchung(null)}
+        onConfirm={loeschenBestaetigen}
+        mannschaft={loeschBuchung?.mannschaft}
+      />
+
+      {/* Aktions-Feedback */}
+      {erfolg && (
+        <ToastMessage message={erfolg} type="success" onClose={() => setErfolg("")} />
+      )}
+      {aktionsFehler && (
+        <ToastMessage
+          message={aktionsFehler}
+          type="error"
+          onClose={() => setAktionsFehler("")}
+        />
       )}
     </div>
   );
