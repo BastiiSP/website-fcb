@@ -7,13 +7,12 @@ name: Supabase Keep-Alive Website-FCB
 # Buchungen und alle DB-Funktionen für alle Nutzer lahm.
 #
 # MECHANISMUS
-# Alle 3 Tage wird ein read-only-SELECT gegen die Tabelle `profiles` über die
-# PostgREST-API abgesetzt. Das ist eine harmlose, nicht-schreibende Anfrage,
-# die Postgres erreicht und damit als Aktivität zählt. Es werden KEINE Daten
-# verändert und KEINE bestehenden Funktionen berührt.
+# Alle 3 Tage schreibt der Workflow einen Eintrag in die `keepalive`-Tabelle
+# via PostgREST (anon-Key). Schreiboperationen werden von Supabase zuverlässig
+# als echte Datenbankaktivität erkannt – im Gegensatz zu GET-Leseanfragen.
 #
 # ──────────────────────────────────────────────────────────────────────────
-# EINMALIGE EINRICHTUNG (nach dem Merge)
+# EINMALIGE EINRICHTUNG
 # GitHub-Repo -> Settings -> Secrets and variables -> Actions
 #   -> New repository secret
 # Folgende ZWEI Secrets anlegen (Werte stehen lokal in .env.local):
@@ -42,23 +41,35 @@ jobs:
   keepalive:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase (read-only)
+      - name: Write-Ping an Supabase keepalive-Tabelle
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-        # Der Schritt endet IMMER mit Exit-Code 0: Schlägt der Ping fehl
-        # (Netzwerk, falsches Secret, Supabase-Wartung), wird das nur geloggt –
-        # es gibt KEINE Fehler-Mail und KEINEN roten Lauf. Ein einzelner
-        # verpasster Keep-Alive-Ping ist unkritisch; der nächste folgt in 3 Tagen.
         run: |
+          # Secrets prüfen – fehlen sie, sofort abbrechen und GitHub-Mail auslösen
+          if [ -z "${SUPABASE_URL}" ] || [ -z "${SUPABASE_ANON_KEY}" ]; then
+            echo "FEHLER: SUPABASE_URL oder SUPABASE_ANON_KEY nicht gesetzt."
+            exit 1
+          fi
+
+          # POST-Insert in die keepalive-Tabelle; anon-Policy erlaubt das Einfügen.
+          # Rückgabe 201 = Erfolg (PostgREST-Standard für INSERT).
           status=$(curl -s -o /dev/null -w "%{http_code}" \
-            "${SUPABASE_URL}/rest/v1/profiles?select=id&limit=1" \
+            -X POST \
+            "${SUPABASE_URL}/rest/v1/keepalive" \
             -H "apikey: ${SUPABASE_ANON_KEY}" \
             -H "Authorization: Bearer ${SUPABASE_ANON_KEY}" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: return=minimal" \
+            -d '{}' \
             --max-time 30 || echo "000")
+
           echo "Supabase keep-alive HTTP-Status: ${status}"
-          if [ "${status}" = "200" ]; then
-            echo "Keep-Alive erfolgreich – Projekt aktiv gehalten."
+
+          if [ "${status}" = "201" ]; then
+            echo "Keep-Alive-Schreibvorgang erfolgreich – Projekt aktiv gehalten."
+            exit 0
           else
-            echo "Keep-Alive-Ping nicht erfolgreich (Status ${status}). Wird ignoriert."
+            echo "FEHLER: Keep-Alive-Schreibvorgang fehlgeschlagen (Status ${status})."
+            exit 1
           fi
