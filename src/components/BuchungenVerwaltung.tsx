@@ -215,7 +215,11 @@ export default function BuchungenVerwaltung() {
       )}
 
       {/* Filterleiste – mobile gestapelt, ab sm nebeneinander */}
-      <div className="flex flex-col sm:flex-row gap-3 flex-wrap items-end">
+      <div
+        role="group"
+        aria-label="Buchungen filtern"
+        className="flex flex-col sm:flex-row gap-3 flex-wrap items-end"
+      >
         <div className="sm:w-52">
           <Select
             label="Platz"
@@ -230,10 +234,11 @@ export default function BuchungenVerwaltung() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+          <label htmlFor="buchung-von" className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
             Von
           </label>
           <input
+            id="buchung-von"
             type="date"
             value={vonDatum}
             onChange={(e) => {
@@ -245,10 +250,11 @@ export default function BuchungenVerwaltung() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+          <label htmlFor="buchung-bis" className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
             Bis
           </label>
           <input
+            id="buchung-bis"
             type="date"
             value={bisDatum}
             onChange={(e) => {
@@ -308,7 +314,9 @@ export default function BuchungenVerwaltung() {
                   <p className="font-inter text-xs italic text-fcb-muted">{b.bemerkung}</p>
                 )}
 
-                <AktionsButtons onEdit={() => setBearbeiteBuchung(b)} onDelete={() => setLoeschBuchung(b)} />
+                <div className="pt-1">
+                  <AktionsButtons onEdit={() => setBearbeiteBuchung(b)} onDelete={() => setLoeschBuchung(b)} />
+                </div>
               </div>
             ))}
           </div>
