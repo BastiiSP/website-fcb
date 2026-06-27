@@ -226,7 +226,39 @@ export default function BuchungenVerwaltung() {
         </p>
       ) : (
         <>
-          {/* MOBILE CARDS – wird in Task 3 ergänzt */}
+          {/* Mobile: Card-Layout (unter md). Alle relevanten Infos auf einen Blick. */}
+          <div className="md:hidden space-y-3">
+            {buchungen.map((b) => (
+              <div
+                key={b.id}
+                className="rounded-2xl border border-fcb-border bg-fcb-surface p-4 space-y-2"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <span className="font-oswald text-base font-semibold uppercase tracking-wide text-fcb-text">
+                    {b.mannschaft}
+                  </span>
+                  <span className="font-inter text-sm text-fcb-muted shrink-0">
+                    <PlatzZelle platz={b.platz} />
+                  </span>
+                </div>
+
+                <p className="font-inter text-sm text-fcb-text">
+                  {zeitspanne(b.startzeit, b.endzeit)}
+                </p>
+
+                <p className="font-inter text-xs text-fcb-muted">
+                  {ANLASS_LABEL[b.anlass] ?? b.anlass} ·{" "}
+                  {PLATZANTEIL_LABEL[b.platzanteil] ?? b.platzanteil} · {b.buchende_person}
+                </p>
+
+                {b.bemerkung && (
+                  <p className="font-inter text-xs italic text-fcb-muted">{b.bemerkung}</p>
+                )}
+
+                {/* AKTIONEN MOBILE – Buttons werden in Task 4 ergänzt */}
+              </div>
+            ))}
+          </div>
 
           {/* Desktop-Tabelle (ab md) */}
           <div className="hidden md:block overflow-x-auto rounded-2xl border border-fcb-border bg-fcb-surface">
