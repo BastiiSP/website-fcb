@@ -20,10 +20,10 @@ import Navigation from "@/components/Navigation";
  *   Rechts – UserDropdown + Hamburger (Mobile)
  */
 const PUBLIC_LINKS = [
-  { label: "Verein", href: "#" },
-  { label: "Mannschaften", href: "#" },
-  { label: "News", href: "#" },
-  { label: "Kontakt", href: "#" },
+  { label: "Verein", href: "/verein" },
+  { label: "Mannschaften", href: "/mannschaften" },
+  { label: "News", href: "/news" },
+  { label: "Kontakt", href: "/kontakt" },
 ];
 
 export default function Header() {

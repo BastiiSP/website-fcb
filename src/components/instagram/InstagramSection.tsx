@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ImageOff } from "lucide-react";
 import type { InstaPost } from "@/lib/beholdFeed";
 import InstagramCarousel from "./InstagramCarousel";
+import ButtonLink from "@/components/ui/ButtonLink";
 
 /**
  * „Vereins-News"-Sektion der Startseite: das finale Instagram-Carousel.
@@ -56,7 +57,15 @@ export default function InstagramSection() {
           </p>
         </div>
       ) : (
-        <InstagramCarousel posts={posts} />
+        <>
+          <InstagramCarousel posts={posts} />
+          {/* Brücke zur ausführlichen News-Seite (Volltext + alle Bilder) */}
+          <div className="mt-10 text-center">
+            <ButtonLink href="/news" variant="secondary" size="md">
+              Alle News ansehen
+            </ButtonLink>
+          </div>
+        </>
       )}
     </section>
   );
