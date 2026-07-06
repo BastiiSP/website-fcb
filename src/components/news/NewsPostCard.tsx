@@ -5,6 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Calendar, ChevronLeft, ChevronRight } from "lucide-react";
 import Card from "@/components/ui/Card";
+import { spotlightMove, SpotlightOverlays } from "@/components/instagram/Spotlight";
 import { InstagramIcon } from "@/components/icons/BrandIcons";
 import {
   formatPostDate,
@@ -48,8 +49,12 @@ export default function NewsPostCard({ post }: NewsPostCardProps) {
       whileInView={{ y: 0, opacity: 1 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
+      // Spotlight-Glow wie beim Homepage-Carousel: --mx/--my werden hier
+      // gesetzt und vererben sich auf die .spotlight-card (identische Box).
+      onMouseMove={spotlightMove}
     >
-      <Card padding="none" className="overflow-hidden">
+      <Card padding="none" className="spotlight-card overflow-hidden">
+        <SpotlightOverlays />
         {/* Bildbereich – quadratisch wie auf Instagram, Bilder werden mittig beschnitten */}
         {bilder && (
           <div className="relative aspect-square w-full overflow-hidden bg-fcb-bg">

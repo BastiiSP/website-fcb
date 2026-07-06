@@ -8,7 +8,7 @@ import { TEAMS, TRAEGER_INFO, type Traeger } from "@/lib/teams";
 export const metadata: Metadata = {
   title: "Mannschaften – 1. FC 1911 Burgkunstadt",
   description:
-    "Alle Mannschaften des 1. FC 1911 Burgkunstadt: von den Bambini über die JFG-Jugend bis zur Ersten – plus AH, Damen und Mädchen.",
+    "Alle Mannschaften des 1. FC 1911 Burgkunstadt: von den Bambini über die leistungsorientierte JFG-Jugend bis zur Ersten – plus AH.",
 };
 
 // Öffentliche Mannschaftsübersicht – kein Auth-Check, Server Component.
@@ -46,14 +46,14 @@ export default function MannschaftenPage() {
       <p className="max-w-2xl font-inter text-base leading-relaxed text-fcb-text/80">
         Beim FCB kann jeder kicken: die Kleinsten fangen bei den Bambini an, die
         Herren spielen sonntags um Punkte, und die AH trifft sich, wenn die Knochen
-        es noch hergeben. Die älteren Jugendjahrgänge spielen gemeinsam mit unseren
-        Nachbarvereinen in der JFG Kunstadt-Obermain – so hat bei uns jeder Jahrgang
-        eine Mannschaft.
+        es noch hergeben. Für die älteren Jugendjahrgänge haben wir mit den
+        Nachbarvereinen die JFG Kunstadt-Obermain gegründet – unser
+        Leistungsprojekt für den Nachwuchs.
       </p>
 
       <TraegerHeading
         traeger="fcb"
-        sub="Herren, AH, Damen, Mädchen und die jüngsten Jahrgänge – direkt beim FCB."
+        sub="Herren, AH und die jüngsten Jahrgänge – direkt beim FCB."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {fcbTeams.map((team) => (
@@ -63,13 +63,16 @@ export default function MannschaftenPage() {
 
       <TraegerHeading
         traeger="jfg"
-        sub="Die A- bis D-Junioren spielen in der Jugendfördergemeinschaft mit den Nachbarvereinen."
+        sub="A- bis D-Junioren: leistungsorientierte Jugendarbeit in der Jugendfördergemeinschaft."
       />
       <p className="mb-5 max-w-2xl font-inter text-sm leading-relaxed text-fcb-text/70">
-        Warum eine JFG? Ein Verein allein bekommt nicht in jedem Jahrgang eine
-        komplette Mannschaft zusammen. Deshalb stellen wir die älteren
-        Jugendteams gemeinsam mit den Vereinen aus der Nachbarschaft – und kein
-        Jahrgang bleibt ohne Fußball.
+        Warum eine JFG? Weil wir aus unseren Talenten das Maximum herausholen
+        wollen. In der JFG Kunstadt-Obermain bündeln wir mit den Nachbarvereinen
+        die Jahrgänge und teilen die Teams leistungsgerecht ein – so wird jeder
+        Nachwuchskicker genau da gefördert, wo er steht. Das Konzept geht auf:
+        Unsere JFG-Teams messen sich regelmäßig mit den
+        Nachwuchsleistungszentren der Region – und lassen sie teilweise hinter
+        sich.
       </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {jfgTeams.map((team) => (

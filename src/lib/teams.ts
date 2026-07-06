@@ -1,8 +1,8 @@
 // Strukturierte Team-Daten + Akzent-Helfer für die Mannschaftsdarstellung
 // (Design-Spec „Mannschaftsdarstellung").
 //
-// Träger-Regel: FCB-Teams (Herren, AH, E-/F-/G-Jugend, Damen/Mädchen) laufen
-// mit fcb-blue, die JFG-Leistungsjugend (A-/B-/C-/D-Junioren) mit fcb-red.
+// Träger-Regel: FCB-Teams (Herren, AH, E-/F-/G-Jugend) laufen mit fcb-blue,
+// die JFG-Leistungsjugend (A-/B-/C-/D-Junioren) mit fcb-red.
 // Die konkreten Teamdaten-Einträge werden separat gepflegt – diese Datei
 // enthält nur Typen, Träger-Metadaten und die Klassen-Helfer.
 
@@ -110,20 +110,6 @@ export const TEAMS: Team[] = [
       "Kein Punktspielbetrieb mehr, dafür Freundschaftsspiele und die dritte Halbzeit.",
   },
   {
-    id: "damen",
-    name: "Damen",
-    altersklasse: "Frauen",
-    traeger: "fcb",
-    beschreibung: "Unsere Frauenmannschaft – Neuzugänge sind jederzeit willkommen.",
-  },
-  {
-    id: "maedchen",
-    name: "Mädchen",
-    altersklasse: "Juniorinnen",
-    traeger: "fcb",
-    beschreibung: "Fußball für Mädchen – einfach zum Schnuppertraining vorbeikommen.",
-  },
-  {
     id: "e-junioren",
     name: "E-Junioren",
     kurzname: "U11",
@@ -178,6 +164,6 @@ export const TEAMS: Team[] = [
     kurzname: "U13",
     altersklasse: "U13",
     traeger: "jfg",
-    beschreibung: "Erste Saison in der JFG – Fußball mit Freunden aus der Nachbarschaft.",
+    beschreibung: "Der Einstieg in die JFG – hier beginnt die leistungsgerechte Förderung.",
   },
 ];

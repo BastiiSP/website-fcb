@@ -308,7 +308,7 @@ Nur **Lucide** (`lucide-react`); Brand-/Social-Icons ausschließlich über `src/
 - **A11y**: dekorative Icons `aria-hidden`; bedeutungstragende Icons mit deutschem `aria-label` (IconBadge: `label`-Prop → `role="img"`).
 
 ### Mannschaftsdarstellung
-- **Träger bestimmt den Akzent**: FCB-Teams (Herren, AH, E-/F-/G-Jugend, Damen/Mädchen) → `fcb-blue`; JFG-Jugendteams (A-/B-/C-/D-Junioren) → `fcb-red`. Klassen-Sets liefert `getTeamAccent(traeger)` aus `src/lib/teams.ts` – nie manuell zusammenbauen.
+- **Träger bestimmt den Akzent**: FCB-Teams (Herren, AH, E-/F-/G-Jugend) → `fcb-blue`; JFG-Jugendteams (A-/B-/C-/D-Junioren) → `fcb-red`. Klassen-Sets liefert `getTeamAccent(traeger)` aus `src/lib/teams.ts` – nie manuell zusammenbauen.
 - **Team-Daten**: `interface Team` in `src/lib/teams.ts` (`id`, `name`, `kurzname?`, `altersklasse?`, `liga?`, `traeger: "fcb" | "jfg"`, `beschreibung?`, `trainer?: string[]`).
 - **Team-Card** (`src/components/ui/TeamCard.tsx`): interaktive Card mit Akzentkante links in Trägerfarbe. Aufbau von oben nach unten:
   1. Kopfzeile: `IconBadge` (Users-Icon, Trägerakzent) links, Träger-Badge (`FCB`/`JFG`, Pill mit Tint) rechts

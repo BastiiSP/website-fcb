@@ -40,7 +40,7 @@ const FAKTEN = [
   {
     icon: Handshake,
     wert: "JFG",
-    text: "ältere Jugend gemeinsam mit den Nachbarvereinen",
+    text: "leistungsorientierte Jugendförderung mit den Nachbarvereinen",
   },
 ];
 
