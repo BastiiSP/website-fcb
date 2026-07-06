@@ -22,11 +22,10 @@ export interface TabellenEintrag {
   siege: number;
   unentschieden: number;
   niederlagen: number;
-  /** Erzielte Tore. */
-  tore: number;
-  /** Gegentore. */
-  gegentore: number;
-  /** Tordifferenz (tore - gegentore). */
+  /**
+   * Tordifferenz. Die BFV-Widget-API liefert nur `goalsDiff` –
+   * getrennte Tore/Gegentore gibt es dort nicht (live verifiziert).
+   */
   tordifferenz: number;
   punkte: number;
   /** true bei der eigenen Mannschaft – die Zeile wird im UI hervorgehoben. */

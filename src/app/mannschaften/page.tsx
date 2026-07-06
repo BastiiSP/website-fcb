@@ -3,6 +3,7 @@ import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import TeamCard from "@/components/ui/TeamCard";
 import ButtonLink from "@/components/ui/ButtonLink";
+import SpielbetriebSection from "@/components/spielbetrieb/SpielbetriebSection";
 import { TEAMS, TRAEGER_INFO, type Traeger } from "@/lib/teams";
 
 export const metadata: Metadata = {
@@ -78,6 +79,10 @@ export default function MannschaftenPage() {
           <TeamCard key={team.id} team={team} />
         ))}
       </div>
+
+      {/* Tabelle & Spiele: erscheint nur für Teams mit konfigurierten
+          BFV-Daten (aktuell die beiden Herren) – rendert sonst gar nicht. */}
+      <SpielbetriebSection />
 
       {/* Abschluss-CTA – bewusst nur ein primary auf der Seite */}
       <div className="mt-14 rounded-2xl border border-fcb-border bg-fcb-surface p-6 text-center sm:p-8">
