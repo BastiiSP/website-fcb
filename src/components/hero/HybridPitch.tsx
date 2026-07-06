@@ -20,14 +20,19 @@ import { motion } from "framer-motion";
  * pointer-events: none, damit der Canvas-Layer Maus-Events empfangen kann.
  */
 export default function HybridPitch() {
+  // Gestaffeltes Einblenden statt pathLength-Zeichnen-Animation: pathLength
+  // animiert über stroke-dasharray, und das kollidiert browserabhängig mit
+  // vector-effect: non-scaling-stroke (Dash-Muster wird gegen die echte
+  // statt der normierten Pfadlänge gerechnet) – die Linien blieben dann
+  // dauerhaft gestrichelt/zerhackt. Ein reiner Opacity-Fade ist in allen
+  // Browsern stabil.
   const lineVariants = {
-    hidden: { pathLength: 0, opacity: 0 },
+    hidden: { opacity: 0 },
     visible: (i: number) => ({
-      pathLength: 1,
       opacity: 1,
       transition: {
         delay: 0.2 + i * 0.08,
-        duration: 1.2,
+        duration: 0.9,
         ease: [0.65, 0, 0.35, 1] as [number, number, number, number],
       },
     }),
