@@ -104,28 +104,38 @@ export default function HybridPitch() {
         variants={lineVariants} initial="hidden" animate="visible" custom={6}
       />
 
-      {/* Eckkreise */}
+      {/*
+       * Eckkreise: Viertelkreise mit Mittelpunkt exakt in der jeweiligen
+       * Feldecke (Radius 15), die sich nach INNEN ins Feld wölben – wie beim
+       * echten Platz. Die alten Pfade hatten falsche Endpunkte/Sweep-Flags
+       * und wölbten sich über die Feldgrenze hinaus (sichtbare "Beulen").
+       * strokeLinecap round, damit die Bogenenden sauber auf den Linien enden.
+       */}
+      {/* oben links */}
       <motion.path
-        d="M 60 80 A 20 20 0 0 1 80 60"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3"
+        d="M 60 75 A 15 15 0 0 0 75 60"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
+      {/* oben rechts */}
       <motion.path
-        d="M 1540 60 A 20 20 0 0 1 1540 80"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3"
+        d="M 1525 60 A 15 15 0 0 0 1540 75"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
+      {/* unten links */}
       <motion.path
-        d="M 80 840 A 20 20 0 0 1 60 820"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3"
+        d="M 75 840 A 15 15 0 0 0 60 825"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
+      {/* unten rechts */}
       <motion.path
-        d="M 1520 840 A 20 20 0 0 1 1540 820"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3"
+        d="M 1540 825 A 15 15 0 0 0 1525 840"
+        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
