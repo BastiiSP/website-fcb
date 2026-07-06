@@ -80,8 +80,8 @@ export default function MannschaftenPage() {
         ))}
       </div>
 
-      {/* Tabelle & Spiele: erscheint nur für Teams mit konfigurierten
-          BFV-Daten (aktuell die beiden Herren) – rendert sonst gar nicht. */}
+      {/* Tabelle & Spiele: Auswahl Verein → Mannschaft; Teams ohne BFV-Daten
+          (aktuell die Jugend) zeigen einen Hinweis statt einer Daten-Card. */}
       <SpielbetriebSection />
 
       {/* Abschluss-CTA – bewusst nur ein primary auf der Seite */}

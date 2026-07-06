@@ -1,0 +1,137 @@
+"use client";
+
+import { useState } from "react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Banner from "@/components/ui/Banner";
+import SpielbetriebCard from "@/components/spielbetrieb/SpielbetriebCard";
+import {
+  getTeamAccent,
+  TRAEGER_INFO,
+  type Team,
+  type Traeger,
+} from "@/lib/teams";
+import type { SpielbetriebDaten } from "@/lib/bfvTypes";
+
+// Zweistufige Auswahl für den Spielbetrieb: erst Verein (FCB/JFG), dann
+// Mannschaft – erst danach erscheint die Daten-Card. So bleibt die Seite
+// übersichtlich, wenn künftig auch Jugend-Teams BFV-Daten bekommen.
+// Mannschaften ohne Daten zeigen einen dezenten Info-Banner statt einer Card.
+
+/** Ein Team samt seiner (evtl. fehlenden) BFV-Daten – kommt aus der Server-Sektion. */
+export interface SpielbetriebEintrag {
+  team: Team;
+  daten: SpielbetriebDaten | null;
+}
+
+interface SpielbetriebExplorerProps {
+  eintraege: SpielbetriebEintrag[];
+}
+
+export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorerProps) {
+  const reduceMotion = useReducedMotion();
+
+  /** Erstes Team eines Trägers – Default nach Vereinswechsel. */
+  const erstesTeam = (traeger: Traeger): string =>
+    eintraege.find((e) => e.team.traeger === traeger)?.team.id ?? "";
+
+  const [traeger, setTraeger] = useState<Traeger>("fcb");
+  const [teamId, setTeamId] = useState<string>(() => erstesTeam("fcb"));
+
+  const teamsDesTraegers = eintraege.filter((e) => e.team.traeger === traeger);
+  const auswahl = eintraege.find((e) => e.team.id === teamId);
+  const accent = getTeamAccent(traeger);
+
+  // Vereinswechsel wählt automatisch die erste Mannschaft des Trägers,
+  // damit nie eine Mannschaft des anderen Vereins "aktiv" hängen bleibt.
+  const wechsleTraeger = (neu: Traeger) => {
+    if (neu === traeger) return;
+    setTraeger(neu);
+    setTeamId(erstesTeam(neu));
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Stufe 1: Verein wählen – zwei gleichwertige Flächen, mobile untereinander */}
+      <div role="group" aria-label="Verein wählen" className="grid gap-3 sm:grid-cols-2">
+        {(Object.keys(TRAEGER_INFO) as Traeger[]).map((t) => {
+          const info = TRAEGER_INFO[t];
+          const aktiv = t === traeger;
+          const a = getTeamAccent(t);
+          return (
+            <button
+              key={t}
+              type="button"
+              aria-pressed={aktiv}
+              onClick={() => wechsleTraeger(t)}
+              // Aktiv = Tint-Fläche + Akzent-Border (Badge-Muster), inaktiv =
+              // neutrale Surface mit Hover zum Akzent – analog Card-Affordanz.
+              // Volle Klassen-Literale (Tailwind-Scanner) – kein String-Bau.
+              className={`rounded-lg border p-4 text-left transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue ${
+                aktiv
+                  ? `${a.border} ${a.bgSoft}`
+                  : t === "fcb"
+                    ? "border-fcb-border bg-fcb-surface hover:border-fcb-blue/40"
+                    : "border-fcb-border bg-fcb-surface hover:border-fcb-red/40"
+              }`}
+            >
+              <span className={`font-inter text-xs font-medium uppercase tracking-wide ${aktiv ? a.text : "text-fcb-muted"}`}>
+                {info.label}
+              </span>
+              <span className="mt-0.5 block font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text">
+                {info.name}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Stufe 2: Mannschaft des gewählten Vereins – Pill-Leiste, umbruchfähig */}
+      <div role="group" aria-label="Mannschaft wählen" className="flex flex-wrap gap-2">
+        {teamsDesTraegers.map(({ team }) => {
+          const aktiv = team.id === teamId;
+          return (
+            <button
+              key={team.id}
+              type="button"
+              aria-pressed={aktiv}
+              onClick={() => setTeamId(team.id)}
+              // Volle Klassen-Literale (Tailwind-Scanner) – kein String-Bau.
+              className={`rounded-full border px-3.5 py-1.5 font-inter text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue ${
+                aktiv
+                  ? `${accent.badge} font-medium`
+                  : traeger === "fcb"
+                    ? "border-fcb-border text-fcb-muted hover:border-fcb-blue/40 hover:text-fcb-text"
+                    : "border-fcb-border text-fcb-muted hover:border-fcb-red/40 hover:text-fcb-text"
+              }`}
+            >
+              {team.name}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Stufe 3: Daten der gewählten Mannschaft – sanfter Wechsel zwischen Teams */}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={teamId}
+          initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+        >
+          {auswahl &&
+            (auswahl.daten ? (
+              <SpielbetriebCard team={auswahl.team} daten={auswahl.daten} />
+            ) : (
+              // Kein kaputter/leerer Bereich: Teams ohne BFV-Daten (aktuell die
+              // Jugend) bekommen einen dezenten Hinweis statt einer Daten-Card.
+              <Banner
+                variant="info"
+                message={`Für die ${auswahl.team.name} liegen beim BFV noch keine Spieldaten vor. Sobald der Spielplan online ist, erscheinen Tabelle und Termine hier automatisch.`}
+              />
+            ))}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}

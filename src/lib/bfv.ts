@@ -194,6 +194,24 @@ function bfvAnstossZuIso(
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
 }
 
+/**
+ * Konsistente deutsche Spielart-Labels je BFV-competitionType.
+ * Die API kennt aktuell genau diese vier Typen; kommt ein neuer dazu,
+ * fällt das Mapping auf den Rohwert zurück statt zu brechen.
+ */
+const SPIELART_LABELS: Record<BfvCompetitionType, string> = {
+  Meisterschaften: "Ligaspiel",
+  Pokale: "Pokalspiel",
+  Freundschaftsspiele: "Freundschaftsspiel",
+  Turniere: "Turnierspiel",
+};
+
+function spielartLabel(match: BfvMatchData): string {
+  // Runtime-Schutz: competitionType ist als Union typisiert, aber der BFV
+  // könnte unangekündigt neue Typen liefern – dann Rohwert anzeigen.
+  return SPIELART_LABELS[match.competitionType] ?? match.competitionType;
+}
+
 function wettbewerbsName(match: BfvMatchData): string {
   return match.competitionType === "Freundschaftsspiele"
     ? "Freundschaftsspiel"
@@ -225,6 +243,7 @@ function mapSpiel(match: BfvMatchData): Spiel | null {
 
   return {
     anstoss,
+    spielart: spielartLabel(match),
     wettbewerb: wettbewerbsName(match),
     heim: match.homeTeamName,
     gast: match.guestTeamName,

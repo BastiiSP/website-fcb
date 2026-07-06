@@ -36,6 +36,12 @@ export interface TabellenEintrag {
 export interface Spiel {
   /** Anstoß als ISO-8601-Zeitstempel (mit Zeitzone). */
   anstoss: string;
+  /**
+   * Spielart als konsistentes deutsches Label ("Ligaspiel", "Pokalspiel",
+   * "Freundschaftsspiel", "Turnierspiel") – abgeleitet aus dem
+   * BFV-competitionType, siehe Mapping in src/lib/bfv.ts.
+   */
+  spielart: string;
   /** Wettbewerbs-/Staffelname, z. B. "Kreisliga 2 Coburg/Kronach/Lichtenfels". */
   wettbewerb?: string;
   heim: string;

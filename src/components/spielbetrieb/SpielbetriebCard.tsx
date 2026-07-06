@@ -76,9 +76,17 @@ function formatStand(iso: string): string {
 /** Eine Zeile der Spielliste – gespielte Partien zeigen das Ergebnis fett. */
 function SpielZeile({ spiel }: { spiel: Spiel }) {
   return (
-    <li className="border-t border-fcb-border py-2.5 first:border-t-0 first:pt-0 last:pb-0">
-      <p className="font-inter text-xs text-fcb-muted">
-        {spiel.ergebnis ? formatDatum(spiel.anstoss) : formatAnstoss(spiel.anstoss)}
+    // Der Wettbewerbsname (z. B. "Lotto Bayern Kreispokal - Sechzehntelfinale")
+    // steckt als Tooltip an der Zeile – sichtbar bleibt die kompakte Spielart.
+    <li
+      className="border-t border-fcb-border py-2.5 first:border-t-0 first:pt-0 last:pb-0"
+      title={spiel.wettbewerb}
+    >
+      <p className="flex items-baseline justify-between gap-3 font-inter text-xs text-fcb-muted">
+        <span>
+          {spiel.ergebnis ? formatDatum(spiel.anstoss) : formatAnstoss(spiel.anstoss)}
+        </span>
+        <span className="shrink-0 uppercase tracking-wide">{spiel.spielart}</span>
       </p>
       <p className="mt-0.5 flex items-baseline justify-between gap-3 font-inter text-sm text-fcb-text">
         <span className="min-w-0">
