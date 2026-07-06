@@ -13,6 +13,13 @@
 
 const REVALIDATE_SECONDS = 60 * 60; // 1 Stunde
 
+/** Ein einzelnes Bild eines Posts inkl. Maßen (für next/image). */
+export interface InstaImage {
+  url: string;
+  width?: number;
+  height?: number;
+}
+
 /** Aufbereiteter Instagram-Post – das ist die gemeinsame Struktur für alle Varianten. */
 export interface InstaPost {
   id: string;
@@ -20,6 +27,12 @@ export interface InstaPost {
   permalink: string;
   /** Stabile Bild-URL (behold.pictures), nicht die ablaufende Instagram-CDN-URL. */
   imageUrl: string;
+  /**
+   * ALLE Bilder des Posts: bei CAROUSEL_ALBUM die children in Post-Reihenfolge,
+   * sonst einelementig das Hauptbild. Additiv ergänzt für die News-Seite –
+   * Bestandsnutzer (Homepage-Carousel) verwenden weiterhin imageUrl.
+   */
+  images: InstaImage[];
   /** Vollständige Caption – Kürzung auf 2–3 Zeilen passiert per CSS (line-clamp). */
   caption: string;
   /** ISO-Zeitstempel des Posts. */
@@ -35,6 +48,22 @@ interface BeholdSize {
   height: number;
 }
 
+/** Größen-Set eines Bildes im Behold-Feed. */
+interface BeholdSizes {
+  small?: BeholdSize;
+  medium?: BeholdSize;
+  large?: BeholdSize;
+  full?: BeholdSize;
+}
+
+/** Einzelbild eines CAROUSEL_ALBUM (children-Eintrag). */
+interface BeholdChild {
+  id?: string;
+  mediaUrl?: string;
+  mediaType?: string;
+  sizes?: BeholdSizes;
+}
+
 /** Rohform eines Posts aus dem Behold-JSON – nur die genutzten Felder. */
 interface BeholdRawPost {
   id: string;
@@ -44,12 +73,25 @@ interface BeholdRawPost {
   timestamp: string;
   caption?: string;
   prunedCaption?: string;
-  sizes?: {
-    small?: BeholdSize;
-    medium?: BeholdSize;
-    large?: BeholdSize;
-    full?: BeholdSize;
-  };
+  sizes?: BeholdSizes;
+  /** Nur bei CAROUSEL_ALBUM: alle Bilder des Posts in Reihenfolge. */
+  children?: BeholdChild[];
+}
+
+/**
+ * Wählt die stabile behold.pictures-URL eines Bildes (large → medium → full);
+ * die rohe cdninstagram-mediaUrl nur als letzter Ausweg, da sie abläuft.
+ * large (1000 px) reicht für die Card-Darstellung und spart Bandbreite.
+ */
+function pickImage(
+  sizes: BeholdSizes | undefined,
+  fallbackUrl: string | undefined,
+): InstaImage | null {
+  const size = sizes?.large ?? sizes?.medium ?? sizes?.full;
+  if (size) {
+    return { url: size.mediaUrl, width: size.width, height: size.height };
+  }
+  return fallbackUrl ? { url: fallbackUrl } : null;
 }
 
 interface BeholdFeed {
@@ -86,20 +128,30 @@ export async function getInstagramPosts(limit = 6): Promise<InstaPost[]> {
     const data: BeholdFeed = await res.json();
     const posts = data.posts ?? [];
 
-    return posts.slice(0, limit).map((post) => ({
-      id: post.id,
-      permalink: post.permalink,
-      // Stabile, von Behold gehostete Bild-URL bevorzugen (large → medium → full),
-      // erst als letzter Ausweg die ablaufende Instagram-CDN-URL.
-      imageUrl:
-        post.sizes?.large?.mediaUrl ??
-        post.sizes?.medium?.mediaUrl ??
-        post.sizes?.full?.mediaUrl ??
-        post.mediaUrl,
-      caption: post.caption ?? post.prunedCaption ?? "",
-      timestamp: post.timestamp,
-      mediaType: post.mediaType,
-    }));
+    return posts.slice(0, limit).map((post) => {
+      const mainImage = pickImage(post.sizes, post.mediaUrl);
+
+      // CAROUSEL_ALBUM: alle children mappen (je eigenes sizes-Set);
+      // sonst einelementiges Array mit dem Hauptbild.
+      const childImages = (post.children ?? [])
+        .map((child) => pickImage(child.sizes, child.mediaUrl))
+        .filter((img): img is InstaImage => img !== null);
+
+      const images =
+        childImages.length > 0 ? childImages : mainImage ? [mainImage] : [];
+
+      return {
+        id: post.id,
+        permalink: post.permalink,
+        // Stabile, von Behold gehostete Bild-URL bevorzugen (large → medium → full),
+        // erst als letzter Ausweg die ablaufende Instagram-CDN-URL.
+        imageUrl: mainImage?.url ?? post.mediaUrl,
+        images,
+        caption: post.caption ?? post.prunedCaption ?? "",
+        timestamp: post.timestamp,
+        mediaType: post.mediaType,
+      };
+    });
   } catch (err) {
     console.error("[beholdFeed] Unerwarteter Fehler beim Feed-Abruf:", err);
     return [];

@@ -16,6 +16,12 @@ interface CardProps {
   interactive?: boolean;
   /** Akzentkante links (4 px) in Trägerfarbe – FCB = blue, JFG = red. */
   accent?: Accent;
+  /**
+   * Innenabstand: "md" = p-6 (Standard), "none" für randlose Inhalte
+   * (z. B. Bild bündig bis zur Kante) – ein p-0 über className würde
+   * gegen das eingebaute p-6 in der Stylesheet-Reihenfolge verlieren.
+   */
+  padding?: "md" | "none";
 }
 
 // Vollständige Klassen-Literale statt String-Bau ("border-l-fcb-" + accent),
@@ -38,12 +44,14 @@ export default function Card({
   children,
   interactive = false,
   accent,
+  padding = "md",
 }: CardProps) {
   const accentCls = accent ? ACCENT_EDGE[accent] : "";
   const interactiveCls = interactive ? INTERACTIVE[accent ?? "blue"] : "";
+  const paddingCls = padding === "none" ? "" : "p-6";
   return (
     <div
-      className={`rounded-2xl border border-fcb-border bg-fcb-surface p-6 ${accentCls} ${interactiveCls} ${className}`}
+      className={`rounded-2xl border border-fcb-border bg-fcb-surface ${paddingCls} ${accentCls} ${interactiveCls} ${className}`}
     >
       {children}
     </div>
