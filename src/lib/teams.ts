@@ -76,23 +76,108 @@ export function getTeamAccent(traeger: Traeger): TeamAccent {
 }
 
 // ---------------------------------------------------------------------------
-// Muster für die späteren Teamdaten-Einträge (werden separat gepflegt):
-//
-// export const TEAMS: Team[] = [
-//   {
-//     id: "herren-1",
-//     name: "1. Mannschaft",
-//     altersklasse: "Herren",
-//     liga: "Kreisliga",
-//     traeger: "fcb",
-//     trainer: ["Max Mustermann"],
-//   },
-//   {
-//     id: "c-junioren",
-//     name: "C-Junioren",
-//     kurzname: "U15",
-//     altersklasse: "U15",
-//     traeger: "jfg",
-//   },
-// ];
+// Konkrete Mannschaften – Namen konsistent zu src/lib/mannschaften.ts.
+// Trainer-Namen bewusst weggelassen, bis der Verein sie freigibt.
+// Liga-Angaben (Kreisliga/Kreisklasse) bitte pro Saison prüfen.
 // ---------------------------------------------------------------------------
+
+export const TEAMS: Team[] = [
+  // --- 1. FC 1911 Burgkunstadt ---
+  {
+    id: "herren-1",
+    name: "1. Mannschaft",
+    altersklasse: "Herren",
+    liga: "Kreisliga",
+    traeger: "fcb",
+    beschreibung:
+      "Unser Aushängeschild – sonntags am Alten Postweg oder auswärts im Landkreis unterwegs.",
+  },
+  {
+    id: "herren-2",
+    name: "2. Mannschaft",
+    altersklasse: "Herren",
+    liga: "Kreisklasse",
+    traeger: "fcb",
+    beschreibung:
+      "Hier spielt jeder, der Bock auf Fußball hat – vom Routinier bis zum Neuzugang.",
+  },
+  {
+    id: "ah",
+    name: "AH (Alte Herren)",
+    altersklasse: "Alte Herren",
+    traeger: "fcb",
+    beschreibung:
+      "Kein Punktspielbetrieb mehr, dafür Freundschaftsspiele und die dritte Halbzeit.",
+  },
+  {
+    id: "damen",
+    name: "Damen",
+    altersklasse: "Frauen",
+    traeger: "fcb",
+    beschreibung: "Unsere Frauenmannschaft – Neuzugänge sind jederzeit willkommen.",
+  },
+  {
+    id: "maedchen",
+    name: "Mädchen",
+    altersklasse: "Juniorinnen",
+    traeger: "fcb",
+    beschreibung: "Fußball für Mädchen – einfach zum Schnuppertraining vorbeikommen.",
+  },
+  {
+    id: "e-junioren",
+    name: "E-Junioren",
+    kurzname: "U11",
+    altersklasse: "U11",
+    traeger: "fcb",
+    beschreibung: "Erste Punktspiele, viel Bewegung – hier zählt der Spaß am Ball.",
+  },
+  {
+    id: "f-junioren",
+    name: "F-Junioren",
+    kurzname: "U9",
+    altersklasse: "U9",
+    traeger: "fcb",
+    beschreibung: "Spielerisches Kennenlernen von Ball und Mannschaft.",
+  },
+  {
+    id: "g-junioren",
+    name: "G-Junioren / Bambini",
+    kurzname: "U7",
+    altersklasse: "U7",
+    traeger: "fcb",
+    beschreibung: "Unsere Kleinsten – Toben, Kicken und erste Schritte im Verein.",
+  },
+  // --- JFG Kunstadt-Obermain (ältere Jugend gemeinsam mit Nachbarvereinen) ---
+  {
+    id: "a-junioren",
+    name: "A-Junioren",
+    kurzname: "U19",
+    altersklasse: "U19",
+    traeger: "jfg",
+    beschreibung: "Der letzte Schritt vor den Herren – gemeinsam in der JFG.",
+  },
+  {
+    id: "b-junioren",
+    name: "B-Junioren",
+    kurzname: "U17",
+    altersklasse: "U17",
+    traeger: "jfg",
+    beschreibung: "Spielbetrieb in der JFG – je nach Jahrgang auch mit zwei Teams.",
+  },
+  {
+    id: "c-junioren",
+    name: "C-Junioren",
+    kurzname: "U15",
+    altersklasse: "U15",
+    traeger: "jfg",
+    beschreibung: "Übergang aufs Großfeld – Technik und Taktik werden ernster.",
+  },
+  {
+    id: "d-junioren",
+    name: "D-Junioren",
+    kurzname: "U13",
+    altersklasse: "U13",
+    traeger: "jfg",
+    beschreibung: "Erste Saison in der JFG – Fußball mit Freunden aus der Nachbarschaft.",
+  },
+];

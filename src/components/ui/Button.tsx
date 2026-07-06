@@ -27,6 +27,19 @@ const SIZES: Record<Size, string> = {
   lg: "px-5 py-3 text-base",
 };
 
+/**
+ * Baut den kompletten Klassenstring einer Button-Optik zusammen.
+ * Exportiert, damit ButtonLink (Next-Link in Button-Optik) exakt dieselben
+ * Styles nutzt – Varianten/Größen werden nur hier gepflegt.
+ */
+export function buttonClasses(
+  variant: Variant = "primary",
+  size: Size = "md",
+  className = "",
+): string {
+  return `${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`;
+}
+
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   { variant = "primary", size = "md", className = "", type = "button", ...rest },
   ref,
@@ -35,7 +48,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
     <button
       ref={ref}
       type={type}
-      className={`${BASE} ${VARIANTS[variant]} ${SIZES[size]} ${className}`}
+      className={buttonClasses(variant, size, className)}
       {...rest}
     />
   );
