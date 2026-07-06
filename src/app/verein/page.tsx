@@ -25,12 +25,12 @@ const FAKTEN = [
   {
     icon: CalendarDays,
     wert: "1911",
-    text: "gegründet – seit über 110 Jahren wird bei uns gekickt",
+    text: "gegründet, seit über 110 Jahren wird bei uns gekickt",
   },
   {
     icon: Users,
     wert: "≈ 450",
-    text: "Mitglieder – vom Bambini bis zum Ehrenmitglied",
+    text: "Mitglieder, vom Bambini bis zum Ehrenmitglied",
   },
   {
     icon: MapPin,
@@ -58,7 +58,7 @@ export default function VereinPage() {
     <PageShell maxWidth="xl">
       <PageHeader
         title="Der Verein"
-        subtitle="1. FC 1911 Burgkunstadt e. V. – die Schuhstädter."
+        subtitle="1. FC 1911 Burgkunstadt e. V., die Schuhstädter."
       />
 
       <SectionHeading>Wer wir sind</SectionHeading>
@@ -66,12 +66,12 @@ export default function VereinPage() {
         <p>
           Wir sind der Fußballverein in Burgkunstadt. Rund 450 Mitglieder, zwei
           Plätze am Alten Postweg und an guten Sonntagen eine Bratwurst in der
-          Hand – das ist der FCB. Bei uns spielen die Kleinsten bei den Bambini,
-          die Herren um Punkte und die Alten Herren um die Ehre.
+          Hand. Das ist der FCB. Bei uns fangen die Kleinsten bei den Bambini
+          an, und die Herren spielen sonntags um Punkte.
         </p>
         <p>
           Große Töne spucken wir nicht. Wir wollen, dass in Burgkunstadt jeder
-          Fußball spielen kann, der Lust darauf hat – egal ob mit sechs oder
+          Fußball spielen kann, der Lust darauf hat. Egal ob mit sechs oder
           sechzig, ob im Tor oder am Grill. Wer einmal da war, kommt meistens
           wieder.
         </p>
@@ -81,7 +81,7 @@ export default function VereinPage() {
       <div className="max-w-2xl space-y-4 font-inter text-base leading-relaxed text-fcb-text/80">
         <p>
           Gegründet 1911, als Burgkunstadt noch überall als Schuhstadt bekannt
-          war – daher tragen wir den Namen „Schuhstädter“ bis heute mit Stolz.
+          war. Daher tragen wir den Namen „Schuhstädter“ bis heute mit Stolz.
           Seitdem gehört der FCB fest zur Stadt: Generationen von
           Burgkunstadtern haben hier ihre ersten Tore geschossen.
         </p>
@@ -89,7 +89,7 @@ export default function VereinPage() {
           Über hundert Jahre Vereinsgeschichte heißt auch: Auf- und Abstiege,
           Platzbau in Eigenleistung und unzählige Ehrenamtliche, ohne die hier
           gar nichts laufen würde. Die ausführliche Chronik arbeiten wir nach
-          und nach auf – wer alte Fotos oder Geschichten hat, darf sich gerne
+          und nach auf. Wer alte Fotos oder Geschichten hat, darf sich gerne
           melden.
         </p>
       </div>
@@ -115,7 +115,7 @@ export default function VereinPage() {
         <p className="mt-1 font-inter text-sm text-fcb-muted">1. Vorsitzender</p>
         <p className="mt-4 font-inter text-sm leading-relaxed text-fcb-text/80">
           Den kompletten Vorstand stellen wir hier nach und nach vor. Bis dahin
-          gilt: Bei Fragen einfach melden – wir leiten dich an die richtige
+          gilt: Bei Fragen einfach melden, wir leiten dich an die richtige
           Person weiter.
         </p>
         <div className="mt-5">
@@ -131,7 +131,7 @@ export default function VereinPage() {
           Lust mitzumachen?
         </h2>
         <p className="mx-auto mt-2 max-w-xl font-inter text-sm leading-relaxed text-fcb-text/80">
-          Ob als Spieler, Trainer oder helfende Hand am Sportheim – beim FCB
+          Ob als Spieler, Trainer oder helfende Hand am Sportheim: Beim FCB
           gibt es immer was zu tun. Schau bei einer Mannschaft vorbei oder
           schreib uns.
         </p>

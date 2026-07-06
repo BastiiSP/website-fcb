@@ -6,7 +6,11 @@
 
 type Accent = "blue" | "red";
 
-interface CardProps {
+// Erbt Standard-Div-Props (Events etc.), damit z. B. der Spotlight-Effekt
+// seinen onMouseMove direkt auf der Card registrieren kann – CSS-Variablen
+// auf einem Eltern-Element würden von den .spotlight-card-Defaults
+// überschrieben.
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
   children: React.ReactNode;
   /**
@@ -45,6 +49,7 @@ export default function Card({
   interactive = false,
   accent,
   padding = "md",
+  ...rest
 }: CardProps) {
   const accentCls = accent ? ACCENT_EDGE[accent] : "";
   const interactiveCls = interactive ? INTERACTIVE[accent ?? "blue"] : "";
@@ -52,6 +57,7 @@ export default function Card({
   return (
     <div
       className={`rounded-2xl border border-fcb-border bg-fcb-surface ${paddingCls} ${accentCls} ${interactiveCls} ${className}`}
+      {...rest}
     >
       {children}
     </div>

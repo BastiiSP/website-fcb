@@ -1,7 +1,7 @@
 // Strukturierte Team-Daten + Akzent-Helfer für die Mannschaftsdarstellung
 // (Design-Spec „Mannschaftsdarstellung").
 //
-// Träger-Regel: FCB-Teams (Herren, AH, E-/F-/G-Jugend) laufen mit fcb-blue,
+// Träger-Regel: FCB-Teams (Herren, E-/F-/G-Jugend) laufen mit fcb-blue,
 // die JFG-Leistungsjugend (A-/B-/C-/D-Junioren) mit fcb-red.
 // Die konkreten Teamdaten-Einträge werden separat gepflegt – diese Datei
 // enthält nur Typen, Träger-Metadaten und die Klassen-Helfer.
@@ -90,7 +90,7 @@ export const TEAMS: Team[] = [
     liga: "Kreisliga",
     traeger: "fcb",
     beschreibung:
-      "Unser Aushängeschild – sonntags am Alten Postweg oder auswärts im Landkreis unterwegs.",
+      "Unser Aushängeschild. Sonntags am Alten Postweg oder auswärts im Landkreis unterwegs.",
   },
   {
     id: "herren-2",
@@ -99,15 +99,7 @@ export const TEAMS: Team[] = [
     liga: "Kreisklasse",
     traeger: "fcb",
     beschreibung:
-      "Hier spielt jeder, der Bock auf Fußball hat – vom Routinier bis zum Neuzugang.",
-  },
-  {
-    id: "ah",
-    name: "AH (Alte Herren)",
-    altersklasse: "Alte Herren",
-    traeger: "fcb",
-    beschreibung:
-      "Kein Punktspielbetrieb mehr, dafür Freundschaftsspiele und die dritte Halbzeit.",
+      "Hier spielt jeder, der Bock auf Fußball hat, vom Routinier bis zum Neuzugang.",
   },
   {
     id: "e-junioren",
@@ -115,7 +107,7 @@ export const TEAMS: Team[] = [
     kurzname: "U11",
     altersklasse: "U11",
     traeger: "fcb",
-    beschreibung: "Erste Punktspiele, viel Bewegung – hier zählt der Spaß am Ball.",
+    beschreibung: "Erste Punktspiele und viel Bewegung. Hier zählt der Spaß am Ball.",
   },
   {
     id: "f-junioren",
@@ -131,7 +123,7 @@ export const TEAMS: Team[] = [
     kurzname: "U7",
     altersklasse: "U7",
     traeger: "fcb",
-    beschreibung: "Unsere Kleinsten – Toben, Kicken und erste Schritte im Verein.",
+    beschreibung: "Unsere Kleinsten: Toben, Kicken und erste Schritte im Verein.",
   },
   // --- JFG Kunstadt-Obermain (ältere Jugend gemeinsam mit Nachbarvereinen) ---
   {
@@ -140,7 +132,7 @@ export const TEAMS: Team[] = [
     kurzname: "U19",
     altersklasse: "U19",
     traeger: "jfg",
-    beschreibung: "Der letzte Schritt vor den Herren – gemeinsam in der JFG.",
+    beschreibung: "Der letzte Schritt vor den Herren, gemeinsam in der JFG.",
   },
   {
     id: "b-junioren",
@@ -148,7 +140,7 @@ export const TEAMS: Team[] = [
     kurzname: "U17",
     altersklasse: "U17",
     traeger: "jfg",
-    beschreibung: "Spielbetrieb in der JFG – je nach Jahrgang auch mit zwei Teams.",
+    beschreibung: "Spielbetrieb in der JFG, je nach Jahrgang auch mit zwei Teams.",
   },
   {
     id: "c-junioren",
@@ -156,7 +148,7 @@ export const TEAMS: Team[] = [
     kurzname: "U15",
     altersklasse: "U15",
     traeger: "jfg",
-    beschreibung: "Übergang aufs Großfeld – Technik und Taktik werden ernster.",
+    beschreibung: "Übergang aufs Großfeld. Technik und Taktik werden ernster.",
   },
   {
     id: "d-junioren",
@@ -164,6 +156,6 @@ export const TEAMS: Team[] = [
     kurzname: "U13",
     altersklasse: "U13",
     traeger: "jfg",
-    beschreibung: "Der Einstieg in die JFG – hier beginnt die leistungsgerechte Förderung.",
+    beschreibung: "Der Einstieg in die JFG. Hier beginnt die leistungsgerechte Förderung.",
   },
 ];

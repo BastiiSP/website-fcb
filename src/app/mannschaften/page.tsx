@@ -8,7 +8,7 @@ import { TEAMS, TRAEGER_INFO, type Traeger } from "@/lib/teams";
 export const metadata: Metadata = {
   title: "Mannschaften – 1. FC 1911 Burgkunstadt",
   description:
-    "Alle Mannschaften des 1. FC 1911 Burgkunstadt: von den Bambini über die leistungsorientierte JFG-Jugend bis zur Ersten – plus AH.",
+    "Alle Mannschaften des 1. FC 1911 Burgkunstadt: von den Bambini über die leistungsorientierte JFG-Jugend bis zur Ersten.",
 };
 
 // Öffentliche Mannschaftsübersicht – kein Auth-Check, Server Component.
@@ -40,20 +40,19 @@ export default function MannschaftenPage() {
     <PageShell maxWidth="2xl">
       <PageHeader
         title="Unsere Mannschaften"
-        subtitle="Von den Bambini bis zu den Alten Herren – hier spielt ganz Burgkunstadt."
+        subtitle="Von den Bambini bis zur Ersten: Hier spielt ganz Burgkunstadt."
       />
 
       <p className="max-w-2xl font-inter text-base leading-relaxed text-fcb-text/80">
-        Beim FCB kann jeder kicken: die Kleinsten fangen bei den Bambini an, die
-        Herren spielen sonntags um Punkte, und die AH trifft sich, wenn die Knochen
-        es noch hergeben. Für die älteren Jugendjahrgänge haben wir mit den
-        Nachbarvereinen die JFG Kunstadt-Obermain gegründet – unser
-        Leistungsprojekt für den Nachwuchs.
+        Beim FCB kann jeder kicken: die Kleinsten fangen bei den Bambini an und
+        die Herren spielen sonntags um Punkte. Für die älteren Jugendjahrgänge
+        haben wir mit den Nachbarvereinen die JFG Kunstadt-Obermain gegründet,
+        unser Leistungsprojekt für den Nachwuchs.
       </p>
 
       <TraegerHeading
         traeger="fcb"
-        sub="Herren, AH und die jüngsten Jahrgänge – direkt beim FCB."
+        sub="Die Herren und die jüngsten Jahrgänge, direkt beim FCB."
       />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {fcbTeams.map((team) => (
@@ -68,10 +67,10 @@ export default function MannschaftenPage() {
       <p className="mb-5 max-w-2xl font-inter text-sm leading-relaxed text-fcb-text/70">
         Warum eine JFG? Weil wir aus unseren Talenten das Maximum herausholen
         wollen. In der JFG Kunstadt-Obermain bündeln wir mit den Nachbarvereinen
-        die Jahrgänge und teilen die Teams leistungsgerecht ein – so wird jeder
+        die Jahrgänge und teilen die Teams leistungsgerecht ein. So wird jeder
         Nachwuchskicker genau da gefördert, wo er steht. Das Konzept geht auf:
         Unsere JFG-Teams messen sich regelmäßig mit den
-        Nachwuchsleistungszentren der Region – und lassen sie teilweise hinter
+        Nachwuchsleistungszentren der Region und lassen sie teilweise hinter
         sich.
       </p>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -86,7 +85,7 @@ export default function MannschaftenPage() {
           Du willst mitspielen?
         </h2>
         <p className="mx-auto mt-2 max-w-xl font-inter text-sm leading-relaxed text-fcb-text/80">
-          Komm einfach zum Training vorbei oder meld dich kurz – wir sagen dir,
+          Komm einfach zum Training vorbei oder meld dich kurz. Wir sagen dir,
           wann deine Altersklasse auf dem Platz steht.
         </p>
         <div className="mt-5 flex flex-col items-center justify-center gap-3 sm:flex-row">

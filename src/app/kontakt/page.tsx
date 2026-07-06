@@ -76,7 +76,7 @@ export default function KontaktPage() {
     <PageShell maxWidth="xl">
       <PageHeader
         title="Kontakt"
-        subtitle="Meld dich einfach – irgendwer vom FCB hat immer das Handy dabei."
+        subtitle="Meld dich einfach, irgendwer vom FCB hat immer das Handy dabei."
       />
 
       {/* Direkte Kanäle */}
@@ -160,7 +160,7 @@ export default function KontaktPage() {
 
       <p className="mt-12 max-w-2xl font-inter text-sm leading-relaxed text-fcb-text/70">
         Du willst zum Probetraining? Schreib am besten vorher kurz, wann deine
-        Altersklasse trainiert – oder komm einfach am Alten Postweg vorbei,
+        Altersklasse trainiert. Oder komm einfach am Alten Postweg vorbei,
         wenn der Platz voll ist.
       </p>
     </PageShell>

@@ -9,7 +9,7 @@ import { VEREINSLINKS } from "@/lib/vereinslinks";
 export const metadata: Metadata = {
   title: "News – 1. FC 1911 Burgkunstadt",
   description:
-    "Neuigkeiten vom 1. FC 1911 Burgkunstadt – Spielberichte, Termine und Bilder, direkt aus unserem Instagram-Kanal.",
+    "Neuigkeiten vom 1. FC 1911 Burgkunstadt: Spielberichte, Termine und Bilder direkt aus unserem Instagram-Kanal.",
 };
 
 // News-Seite = prominente Instagram-Ansicht. Bewusst KEIN eigenes CMS:
@@ -24,7 +24,7 @@ export default async function NewsPage() {
     <PageShell maxWidth="lg">
       <PageHeader
         title="News"
-        subtitle="Was beim FCB los ist – Beiträge aus unserem Instagram-Kanal, automatisch aktuell."
+        subtitle="Was beim FCB los ist: unsere Instagram-Beiträge, automatisch aktuell."
       />
 
       {posts.length === 0 ? (
@@ -32,7 +32,7 @@ export default async function NewsPage() {
         <div className="rounded-2xl border border-fcb-border bg-fcb-surface p-8 text-center">
           <p className="font-inter text-base text-fcb-text/80">
             Gerade können wir hier keine Beiträge laden. Schau am besten direkt
-            auf unserem Instagram-Kanal vorbei – da ist immer was los.
+            auf unserem Instagram-Kanal vorbei, da ist immer was los.
           </p>
           {instagramLink && (
             <div className="mt-5 flex justify-center">

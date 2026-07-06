@@ -49,11 +49,15 @@ export default function NewsPostCard({ post }: NewsPostCardProps) {
       whileInView={{ y: 0, opacity: 1 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      // Spotlight-Glow wie beim Homepage-Carousel: --mx/--my werden hier
-      // gesetzt und vererben sich auf die .spotlight-card (identische Box).
-      onMouseMove={spotlightMove}
     >
-      <Card padding="none" className="spotlight-card overflow-hidden">
+      {/* Spotlight-Glow wie beim Homepage-Carousel. Der onMouseMove muss auf
+          der .spotlight-card selbst liegen: deren --mx/--my-Defaults würden
+          auf einem Eltern-Element gesetzte Werte überschreiben. */}
+      <Card
+        padding="none"
+        className="spotlight-card overflow-hidden"
+        onMouseMove={spotlightMove}
+      >
         <SpotlightOverlays />
         {/* Bildbereich – quadratisch wie auf Instagram, Bilder werden mittig beschnitten */}
         {bilder && (
