@@ -258,6 +258,67 @@ Tokens sind in `tailwind.config.ts` unter `fcb.*` definiert:
 - **Accessibility**: Kontrast WCAG AA einhalten, Fokus-States immer sichtbar
 - **Keine magic hex-values** im Code – immer `fcb.*`-Tokens verwenden
 
+### Cards & Flächen
+Basis-Primitive: `src/components/ui/Card.tsx` (rückwärtskompatibel erweitert um `interactive` + `accent`).
+
+| Eigenschaft | Wert | Verwendung |
+|---|---|---|
+| Radius groß | `rounded-2xl` (16 px) | Cards, Panels, Modals |
+| Radius klein | `rounded-lg` (8 px) | Banner, Buttons, Inputs, kleine Flächen |
+| Border | `border border-fcb-border` (1 px) | jede Card – Flächen heben sich per Border ab, nicht per Schatten |
+| Fläche | `bg-fcb-surface` | Standard-Card-Hintergrund |
+| Padding | `p-6` | Standard; kompakte Flächen `p-4` |
+| Akzentkante | Card-Prop `accent` (blue/red) → `border-l-4` in Trägerfarbe | Bereichs-/Trägerzuordnung: FCB = blue, JFG = red |
+| Hover | Card-Prop `interactive` → Border färbt sich zum Akzent (`transition-colors`, 200 ms) | nur klickbare/verlinkte Cards; statische Cards ohne Hover |
+
+- **Card vs. Banner**: Card = strukturierender Inhalts-Container (Gruppen, Listen-Items, Teaser). Banner (`ui/Banner.tsx`) = Statusmeldung mit Icon (error/info/success/warning) – nie als Layout-Container zweckentfremden.
+- **Akzentflächen/Tints** immer als Token mit Opacity-Modifier: `bg-<akzent>/10` + `border-<akzent>/40` (Badge-/Banner-Muster) – nie voll gesättigte Flächen für dezente Hervorhebung.
+- **Kein Scale/Lift** beim Card-Hover – die Border-Farbe ist die Affordanz.
+
+### Buttons
+Primitive: `src/components/ui/Button.tsx` – Basis: `rounded-lg font-oswald font-semibold uppercase tracking-wide`, sichtbarer Fokus-Ring (`focus-visible:ring-2` in `fcb-blue`).
+
+| Variante | Optik | Wann |
+|---|---|---|
+| `primary` | `bg-fcb-blue text-white`, Hover `/90` | Hauptaktion – max. eine pro View/Formular |
+| `secondary` | `border-fcb-border bg-fcb-surface`, Hover-Border blau | gleichwertige/neutrale Nebenaktionen |
+| `ghost` | nur Text, Hover `text-fcb-blue` | tertiäre/Inline-Aktionen, Abbrechen |
+| `danger` | `bg-fcb-red text-white`, Hover `/90` | destruktive Aktionen (Löschen) – immer mit Bestätigungs-Modal |
+
+| Größe | Padding/Text | Wann |
+|---|---|---|
+| `sm` | `px-3 py-1.5 text-xs` | Tabellen-/Listen-Aktionen |
+| `md` | `px-4 py-2.5 text-sm` | Standard (Formulare, Modals) |
+| `lg` | `px-5 py-3 text-base` | Hero-/Seiten-CTAs |
+
+- **Icon im Button**: Lucide, `size={16}` bei sm/md, `size={20}` bei lg, immer `aria-hidden` (der Button-Text trägt die Bedeutung); Abstand kommt aus dem `gap-2` der Button-Basis.
+- **Icon-only-Buttons** brauchen zwingend ein deutsches `aria-label`.
+
+### Icons
+Nur **Lucide** (`lucide-react`); Brand-/Social-Icons ausschließlich über `src/components/icons/BrandIcons.tsx`.
+
+| Größe | Einsatz |
+|---|---|
+| `16` | inline im Text, Buttons sm/md, Meta-Zeilen, Banner |
+| `20` | Standard: Navigation, Buttons lg, Listen-Icons |
+| `24` | Feature-Icons, Empty-States, Icon-Badge lg |
+
+- **strokeWidth**: Standard `2`; nur große dekorative Icons (≥ 28 px) dürfen `1.5` für leichtere Optik.
+- **Icon-Badge-Muster** (`src/components/ui/IconBadge.tsx`): Lucide-Icon in dezentem Container – Tint `bg-<akzent>/10` + `border-<akzent>/40`, Akzent `neutral`/`blue`/`red`, Größen `sm` (32 px Box / 16er-Icon, `rounded-lg`), `md` (40/20, `rounded-xl`), `lg` (48/24, `rounded-xl`). Für Feature-Aufzählungen, Card-Köpfe, Team-Cards.
+- **A11y**: dekorative Icons `aria-hidden`; bedeutungstragende Icons mit deutschem `aria-label` (IconBadge: `label`-Prop → `role="img"`).
+
+### Mannschaftsdarstellung
+- **Träger bestimmt den Akzent**: FCB-Teams (Herren, AH, E-/F-/G-Jugend, Damen/Mädchen) → `fcb-blue`; JFG-Jugendteams (A-/B-/C-/D-Junioren) → `fcb-red`. Klassen-Sets liefert `getTeamAccent(traeger)` aus `src/lib/teams.ts` – nie manuell zusammenbauen.
+- **Team-Daten**: `interface Team` in `src/lib/teams.ts` (`id`, `name`, `kurzname?`, `altersklasse?`, `liga?`, `traeger: "fcb" | "jfg"`, `beschreibung?`, `trainer?: string[]`).
+- **Team-Card** (`src/components/ui/TeamCard.tsx`): interaktive Card mit Akzentkante links in Trägerfarbe. Aufbau von oben nach unten:
+  1. Kopfzeile: `IconBadge` (Users-Icon, Trägerakzent) links, Träger-Badge (`FCB`/`JFG`, Pill mit Tint) rechts
+  2. Teamname `font-oswald` uppercase + Altersklasse/Liga in `text-fcb-muted`
+  3. optionale Beschreibung
+  4. Trainer-Slot unter Trennlinie (`border-t border-fcb-border`) – aus `team.trainer` oder frei per `trainerSlot`-Prop
+- **Träger-Badge** immer mit vollem Vereinsnamen für Screenreader (`TRAEGER_INFO` liefert Label + Namen).
+- **Mobile-first**: volle Breite; ab `sm` im Grid (`grid gap-4 sm:grid-cols-2 lg:grid-cols-3`).
+- **Einblendung**: dezente Framer-Motion-Einblendung (`whileInView`, y 16→0, einmalig, 0,4 s) – identisch zum Homepage-Muster; respektiert `prefers-reduced-motion`.
+
 ## Arbeitsweise: Plan-Modus
 
 Handover-Prompts von Claudian sind grundsätzlich für den Plan-Modus formuliert: Sie
