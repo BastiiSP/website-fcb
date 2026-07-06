@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { buttonClasses } from "@/components/ui/Button";
+import { buttonClasses } from "@/components/ui/buttonStyles";
 
 // Next-Link in Button-Optik (Design-Spec „Buttons"): für Seiten-CTAs, die
 // navigieren statt eine Aktion auszulösen. Nutzt exakt die Klassen von Button,
