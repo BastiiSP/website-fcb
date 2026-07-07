@@ -105,7 +105,7 @@ export default function SportheimAnfrageFormular({
     if (konflikt) {
       setFehler(
         konflikt.istHeimspieltag
-          ? "An diesem Tag findet ein Heimspiel statt – das Sportheim ist für den Spielbetrieb reserviert."
+          ? "Rund um das Heimspiel ist das Sportheim für den Spielbetrieb reserviert (bis 4 Stunden nach Anstoß). Bitte wähle eine Zeit davor oder danach."
           : "Der gewünschte Zeitraum ist bereits belegt. Bitte wähle einen freien Termin."
       );
       return;

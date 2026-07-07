@@ -35,7 +35,7 @@ function eventFarbe(art: SportheimEventArt): string {
 /** Legende über dem Kalender – gleiche Farbquelle wie die Event-Chips. */
 const LEGENDE: { art: SportheimEventArt; label: string }[] = [
   { art: "belegt", label: "Belegt / gesperrt" },
-  { art: "heimspiel", label: "Heimspieltag" },
+  { art: "heimspiel", label: "Heimspiel" },
 ];
 
 interface Props {
@@ -99,9 +99,8 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
         // Abendveranstaltungen: Zeitraster bis Mitternacht statt 22:30 wie beim Platz
         slotMinTime="08:00:00"
         slotMaxTime="24:00:00"
-        // Heimspieltage sind ganztägige Events → All-Day-Zeile wird gebraucht
-        allDaySlot={true}
-        allDayText="Ganztägig"
+        // Alle Events (auch Heimspiele) sind Zeitfenster → keine All-Day-Zeile
+        allDaySlot={false}
         height="auto"
         editable={false}
         nowIndicator={true}

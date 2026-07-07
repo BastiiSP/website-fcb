@@ -33,7 +33,7 @@ export const SPORTHEIM_PREISE: PreisPosition[] = [
 export const SPORTHEIM_NUTZUNGSVORGABEN: string[] = [
   "Die Anfrage ist unverbindlich – die Vergabe erfolgt erst nach Bestätigung durch den Vorstand.",
   "Die Räumlichkeiten sind besenrein zu übergeben.",
-  "An Heimspieltagen der Herrenmannschaften ist das Sportheim für den Spielbetrieb reserviert.",
+  "Rund um Heimspiele der Herrenmannschaften ist das Sportheim für den Spielbetrieb reserviert (bis vier Stunden nach Anstoß).",
   "Details zu Kaution, Getränkeabnahme und Schlüsselübergabe werden bei der Bestätigung geklärt.",
 ];
 
