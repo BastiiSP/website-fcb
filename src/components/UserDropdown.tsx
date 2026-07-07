@@ -4,14 +4,58 @@ import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import Link from "next/link";
 import { Menu } from "@headlessui/react";
-import { LogOut, User, UserPlus } from "lucide-react";
+import {
+  CalendarDays,
+  ClipboardList,
+  Home,
+  LogOut,
+  Shield,
+  User,
+  UserPlus,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 
 interface UserData {
   email: string;
   vorname: string | null;
   nachname: string | null;
   avatar_url: string | null;
+  rolle: string | null;
 }
+
+interface RollenLink {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+// Rollenbasierte Links leben im Account-Menü statt in der Hauptnav – die Hauptnav
+// zeigt nur noch öffentliche Seiten. "Platzbuchung" hieß früher "Kalender" (umbenannt,
+// weil eindeutiger). "Profil" braucht keinen Eintrag hier: "Profil bearbeiten" steht
+// fest im unteren Menü-Abschnitt.
+const TRAINER_LINKS: RollenLink[] = [
+  { href: "/kalender", label: "Platzbuchung", icon: CalendarDays },
+  { href: "/meine-buchungen", label: "Meine Buchungen", icon: ClipboardList },
+  { href: "/mitglieder", label: "Mitglieder", icon: Users },
+  { href: "/mein-verein", label: "Mein Verein", icon: Home },
+];
+
+const VORSTAND_LINKS: RollenLink[] = [
+  { href: "/kalender", label: "Platzbuchung", icon: CalendarDays },
+  { href: "/meine-buchungen", label: "Meine Buchungen", icon: ClipboardList },
+  { href: "/mitglieder", label: "Mitglieder", icon: Users },
+  { href: "/vorstand", label: "Vorstand", icon: Shield },
+  { href: "/mein-verein", label: "Mein Verein", icon: Home },
+];
+
+const ROLLEN_LINKS: Record<string, RollenLink[]> = {
+  ausstehend: [],
+  mitglied: [{ href: "/mein-verein", label: "Mein Verein", icon: Home }],
+  trainer: TRAINER_LINKS,
+  vorstand: VORSTAND_LINKS,
+  admin: VORSTAND_LINKS,
+};
 
 export default function UserDropdown() {
   const supabase = createClient();
@@ -38,6 +82,7 @@ export default function UserDropdown() {
           vorname: profile?.vorname ?? "",
           nachname: profile?.nachname ?? "",
           avatar_url: profile?.avatar_url ?? null,
+          rolle: profile?.rolle ?? null,
         });
         setIsLoggedIn(true);
       }
@@ -136,6 +181,27 @@ export default function UserDropdown() {
             </p>
           </div>
         </div>
+
+        {/* Rollenbasierte Bereiche – kamen früher aus der Hauptnav (Navigation.tsx) */}
+        {(ROLLEN_LINKS[user?.rolle ?? ""] ?? []).length > 0 && (
+          <div className="border-t border-fcb-border p-1">
+            {(ROLLEN_LINKS[user?.rolle ?? ""] ?? []).map(({ href, label, icon: Icon }) => (
+              <Menu.Item key={href}>
+                {({ active }) => (
+                  <Link
+                    href={href}
+                    className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
+                      active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4 text-fcb-muted" aria-hidden />
+                    {label}
+                  </Link>
+                )}
+              </Menu.Item>
+            ))}
+          </div>
+        )}
 
         {/* Aktionen */}
         <div className="border-t border-fcb-border p-1">
