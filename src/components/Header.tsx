@@ -6,6 +6,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import UserDropdown from "@/components/UserDropdown";
+import VereinsSwitcher from "@/components/VereinsSwitcher";
 
 /**
  * Globaler Header – Smart-Sticky, fcb-Design-Tokens, beide Wappen, öffentliche Nav-Links.
@@ -86,6 +87,9 @@ export default function Header() {
               FCB
             </span>
           </Link>
+
+          {/* Vereins-Switcher: Vorbereitung für den späteren FCB ↔ JFG-Wechsel (nur UI) */}
+          <VereinsSwitcher />
         </div>
 
         {/* Desktop Nav: nur öffentliche Links – rollenbasierte Bereiche liegen im Account-Menü */}
