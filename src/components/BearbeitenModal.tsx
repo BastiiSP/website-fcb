@@ -7,6 +7,7 @@ import Select from "@/components/ui/Select";
 import TextField from "@/components/ui/TextField";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
+import Banner from "@/components/ui/Banner";
 
 export type Buchung = {
   id: string;
@@ -58,9 +59,13 @@ export default function BearbeitenModal({
   // Lokaler Zustand für das Formular, wird erst gesetzt wenn initialData vorhanden
   const [form, setForm] = useState<Buchung | null>(initialData || null);
 
+  // Fehlermeldung im Modal (z. B. Belegungskonflikt) – ersetzt das frühere alert()
+  const [fehler, setFehler] = useState("");
+
   // Wenn sich die übergebenen Props ändern, Formular aktualisieren
   useEffect(() => {
     setForm(initialData || null);
+    setFehler("");
   }, [initialData]);
 
   // Formularfeldänderungen übernehmen
@@ -69,10 +74,57 @@ export default function BearbeitenModal({
     setForm((prev) => ({ ...prev!, [field]: value }));
   };
 
-  // Speichern der bearbeiteten Daten in Supabase – Logik unverändert
+  // Speichern der bearbeiteten Daten in Supabase – vorher Belegungsprüfung,
+  // damit das Bearbeiten die Kollisionslogik des Buchungsformulars nicht umgeht.
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form) return;
+
+    const startISO = new Date(form.startzeit).toISOString();
+    const endISO = new Date(form.endzeit).toISOString();
+
+    if (new Date(endISO) <= new Date(startISO)) {
+      setFehler("Die Endzeit muss nach der Startzeit liegen.");
+      return;
+    }
+
+    // Belegungsprüfung – gleiches Muster wie Buchungsformular/Kalender,
+    // die eigene Buchung wird dabei ausgeschlossen.
+    const { data: existing, error: fetchError } = await supabase
+      .from("buchungen")
+      .select("startzeit, endzeit, platzanteil")
+      .eq("platz", form.platz)
+      .neq("id", form.id)
+      .gte("endzeit", startISO)
+      .lte("startzeit", endISO);
+
+    if (fetchError) {
+      setFehler("Fehler bei der Überprüfung der Platzbelegung.");
+      return;
+    }
+
+    const anteilWerte: Record<string, number> = {
+      viertel: 0.25,
+      halb: 0.5,
+      ganz: 1,
+    };
+
+    let belegung = 0;
+    for (const buchung of existing || []) {
+      const startB = new Date(buchung.startzeit).getTime();
+      const endB = new Date(buchung.endzeit).getTime();
+      const startN = new Date(startISO).getTime();
+      const endN = new Date(endISO).getTime();
+
+      if (startN < endB && endN > startB) {
+        belegung += anteilWerte[buchung.platzanteil] || 0;
+      }
+    }
+
+    if (belegung + (anteilWerte[form.platzanteil] || 0) > 1) {
+      setFehler("Der Platz ist zu diesem Zeitpunkt bereits belegt.");
+      return;
+    }
 
     const { error } = await supabase
       .from("buchungen")
@@ -80,8 +132,8 @@ export default function BearbeitenModal({
         platz: form.platz,
         platzanteil: form.platzanteil,
         anlass: form.anlass,
-        startzeit: new Date(form.startzeit).toISOString(),
-        endzeit: new Date(form.endzeit).toISOString(),
+        startzeit: startISO,
+        endzeit: endISO,
         buchende_person: form.buchende_person,
         mannschaft: form.mannschaft,
         bemerkung: form.bemerkung,
@@ -89,11 +141,12 @@ export default function BearbeitenModal({
       .eq("id", form.id);
 
     if (!error) {
+      setFehler("");
       onSave();
       onClose();
     } else {
       console.error("Fehler beim Speichern:", error);
-      alert("Fehler beim Speichern!");
+      setFehler("Fehler beim Speichern. Bitte versuche es erneut.");
     }
   };
 
@@ -104,6 +157,9 @@ export default function BearbeitenModal({
           abspielen kann – ein vorzeitiges `return null` würde sie überspringen. */}
       {form ? (
         <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Fehlermeldung (z. B. Belegungskonflikt) direkt im Modal */}
+        {fehler && <Banner variant="error" message={fehler} />}
+
         {/* Platz, Platzanteil, Anlass */}
         <div className="flex gap-4 flex-wrap">
           <div className="flex-1 min-w-[140px]">

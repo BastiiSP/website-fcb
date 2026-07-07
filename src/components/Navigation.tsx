@@ -15,12 +15,14 @@ const NAV_LINKS: Record<string, { href: string; label: string }[]> = {
   ],
   trainer: [
     { href: "/kalender", label: "Kalender" },
+    { href: "/meine-buchungen", label: "Meine Buchungen" },
     { href: "/mitglieder", label: "Mitglieder" },
     { href: "/mein-verein", label: "Mein Verein" },
     { href: "/profil", label: "Profil" },
   ],
   vorstand: [
     { href: "/kalender", label: "Kalender" },
+    { href: "/meine-buchungen", label: "Meine Buchungen" },
     { href: "/mitglieder", label: "Mitglieder" },
     { href: "/vorstand", label: "Vorstand" },
     { href: "/mein-verein", label: "Mein Verein" },
@@ -28,6 +30,7 @@ const NAV_LINKS: Record<string, { href: string; label: string }[]> = {
   ],
   admin: [
     { href: "/kalender", label: "Kalender" },
+    { href: "/meine-buchungen", label: "Meine Buchungen" },
     { href: "/mitglieder", label: "Mitglieder" },
     { href: "/vorstand", label: "Vorstand" },
     { href: "/mein-verein", label: "Mein Verein" },

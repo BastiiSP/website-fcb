@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
@@ -9,7 +9,8 @@ import { EventInput } from "@fullcalendar/core";
 import { createClient } from "@/lib/supabaseClient";
 import Tippy from "@tippyjs/react";
 import "tippy.js/dist/tippy.css";
-import "tippy.js/themes/light-border.css";
+import { format } from "date-fns";
+import { de } from "date-fns/locale";
 
 import Link from "next/link";
 import ToastMessage from "@/components/ToastMessage";
@@ -17,6 +18,10 @@ import Buchungsformular from "@/components/Buchungsformular";
 import LoeschenModal from "@/components/LoeschenModal";
 import BearbeitenModal, { type Buchung } from "@/components/BearbeitenModal";
 import TooltipContent from "@/components/TooltipContent";
+import KalenderToolbar, {
+  type KalenderAnsicht,
+} from "@/components/kalender/KalenderToolbar";
+import EventChip from "@/components/kalender/EventChip";
 import { fetchEvents } from "@/utils/fetchEvents";
 import { PLATZ_FARBEN } from "@/utils/getEventColor";
 import PageShell from "@/components/ui/PageShell";
@@ -34,11 +39,8 @@ export default function KalenderSeite() {
   // ✅ UI States: Meldungen, Modal, Tooltip
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
-  const [loeschenModalOffen, setLoeschenModalOffen] = useState(false);
-  const [zuLoeschendeId, setZuLoeschendeId] = useState<string | null>(null);
-  const [zuLoeschendeMannschaft, setZuLoeschendeMannschaft] = useState<
-    string | null
-  >(null);
+  // Komplette Buchung statt nur ID vorhalten → Rechte-Check vor dem Löschen möglich
+  const [zuLoeschendeBuchung, setZuLoeschendeBuchung] = useState<Buchung | null>(null);
   const [bearbeiteBuchung, setBearbeiteBuchung] = useState<Buchung | null>(
     null
   );
@@ -49,15 +51,11 @@ export default function KalenderSeite() {
   // Redirect-State
   const [redirectMessage, setRedirectMessage] = useState<string | null>(null);
 
-  // Mobile-Erkennung für responsiven Kalender-Header
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const pruefeBreite = () => setIsMobile(window.innerWidth < 768);
-    pruefeBreite();
-    window.addEventListener("resize", pruefeBreite);
-    return () => window.removeEventListener("resize", pruefeBreite);
-  }, []);
+  // Eigene Toolbar (Outlook-Muster) statt der FullCalendar-headerToolbar:
+  // Ref steuert die Kalender-API, Titel/Ansicht kommen aus datesSet zurück.
+  const kalenderRef = useRef<FullCalendar | null>(null);
+  const [kalenderTitel, setKalenderTitel] = useState("");
+  const [ansicht, setAnsicht] = useState<KalenderAnsicht>("timeGridWeek");
 
   // Session prüfen und Rolle laden
   useEffect(() => {
@@ -107,24 +105,37 @@ export default function KalenderSeite() {
 
   // 🗑️ Termin löschen
   const handleLoeschen = async () => {
-    if (!zuLoeschendeId) return;
+    if (!zuLoeschendeBuchung) return;
+
+    // Rechte-Check wie beim Bearbeiten – RLS würde das Löschen ohnehin blocken,
+    // aber so gibt es eine verständliche Meldung statt eines stillen Fehlschlags.
+    const darfLoeschen =
+      rolle === "vorstand" ||
+      rolle === "admin" ||
+      zuLoeschendeBuchung.user_id === userId;
+    if (!darfLoeschen) {
+      setErrorMessage("Du darfst diese Buchung nicht löschen.");
+      setZuLoeschendeBuchung(null);
+      return;
+    }
 
     const { error } = await supabase
       .from("buchungen")
       .delete()
-      .eq("id", zuLoeschendeId);
+      .eq("id", zuLoeschendeBuchung.id);
 
     if (error) {
-      setErrorMessage("❌ Löschen fehlgeschlagen.");
+      setErrorMessage("Löschen fehlgeschlagen.");
     } else {
-      setSuccessMessage("✅ Buchung erfolgreich gelöscht.");
+      setSuccessMessage("Buchung erfolgreich gelöscht.");
       fetchEvents(supabase, setEvents);
     }
 
-    setLoeschenModalOffen(false);
-    setZuLoeschendeId(null);
-    setZuLoeschendeMannschaft(null);
+    setZuLoeschendeBuchung(null);
   };
+
+  // Toolbar-Aktionen delegieren an die FullCalendar-API
+  const kalenderApi = () => kalenderRef.current?.getApi();
 
   /**
    * Gemeinsame Logik für eventDrop und eventResize:
@@ -155,7 +166,7 @@ export default function KalenderSeite() {
       rolle === "vorstand" || rolle === "admin" || buchung.user_id === userId;
     if (!darfAnpassen) {
       info.revert();
-      setErrorMessage("❌ Du darfst diese Buchung nicht bearbeiten.");
+      setErrorMessage("Du darfst diese Buchung nicht bearbeiten.");
       return;
     }
 
@@ -170,7 +181,7 @@ export default function KalenderSeite() {
 
     if (error) {
       console.error("Fehler beim Abrufen:", error);
-      setErrorMessage("❌ Fehler bei der Überprüfung der Platzbelegung.");
+      setErrorMessage("Fehler bei der Überprüfung der Platzbelegung.");
       info.revert();
       return;
     }
@@ -196,7 +207,7 @@ export default function KalenderSeite() {
     const aktuellerWert = anteilsWerte[buchung.platzanteil] || 0;
 
     if (belegung + aktuellerWert > 1) {
-      setErrorMessage("❌ Der Platz ist zu diesem Zeitpunkt vollständig belegt.");
+      setErrorMessage("Der Platz ist zu diesem Zeitpunkt vollständig belegt.");
       info.revert();
       return;
     }
@@ -208,12 +219,12 @@ export default function KalenderSeite() {
       .eq("id", buchung.id);
 
     if (updateError) {
-      setErrorMessage("❌ Fehler beim Speichern der neuen Zeiten.");
+      setErrorMessage("Fehler beim Speichern der neuen Zeiten.");
       info.revert();
       return;
     }
 
-    setSuccessMessage("✅ Buchung erfolgreich angepasst.");
+    setSuccessMessage("Buchung erfolgreich angepasst.");
     await fetchEvents(supabase, setEvents);
   };
 
@@ -281,27 +292,70 @@ export default function KalenderSeite() {
             </div>
 
             {/* Surface-Container hebt den Kalender vom Seiten-Hintergrund (bg-fcb-bg) ab */}
-            <div className="rounded-2xl border border-fcb-border bg-fcb-surface p-2 sm:p-4">
-              {/* FullCalendar – Konfiguration unverändert */}
+            <div className="rounded-2xl border border-fcb-border bg-fcb-surface p-3 sm:p-5">
+              {/* Eigene Toolbar im Outlook-Stil – steuert FullCalendar über die API */}
+              <KalenderToolbar
+                titel={kalenderTitel}
+                ansicht={ansicht}
+                onHeute={() => kalenderApi()?.today()}
+                onZurueck={() => kalenderApi()?.prev()}
+                onWeiter={() => kalenderApi()?.next()}
+                onAnsichtWechsel={(neueAnsicht) =>
+                  kalenderApi()?.changeView(neueAnsicht)
+                }
+              />
+
               <FullCalendar
+                ref={kalenderRef}
                 plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
                 initialView="timeGridWeek"
                 locale="de"
                 firstDay={1}
-                headerToolbar={
-                  isMobile
-                    ? { left: "prev,next", center: "title", right: "today" }
-                    : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" }
-                }
+                // Kopfzeile komplett deaktiviert – ersetzt durch KalenderToolbar
+                headerToolbar={false}
+                // Titel + aktive Ansicht in den React-State spiegeln
+                datesSet={(arg) => {
+                  setKalenderTitel(arg.view.title);
+                  setAnsicht(arg.view.type as KalenderAnsicht);
+                }}
                 slotMinTime="08:00:00"
                 slotMaxTime="22:30:00"
                 allDaySlot={false}
                 height="auto"
+                // Rote "Jetzt"-Linie wie in Outlook/Teams
+                nowIndicator={true}
                 editable={true}
                 eventResizableFromStart={true}
                 eventDrop={async (info) => aktualisiereBuchungszeiten(info)}
                 eventResize={async (info) => aktualisiereBuchungszeiten(info)}
                 events={events}
+                // Spaltenkopf im Outlook-Stil: Wochentag klein, Tageszahl groß,
+                // heutiger Tag als gefüllter blauer Kreis
+                dayHeaderContent={(arg) => {
+                  if (arg.view.type === "dayGridMonth") {
+                    return (
+                      <span className="font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+                        {format(arg.date, "EEEEEE", { locale: de })}
+                      </span>
+                    );
+                  }
+                  return (
+                    <div className="flex flex-col items-center gap-0.5 py-1">
+                      <span className="font-inter text-[11px] font-medium uppercase tracking-wider text-fcb-muted">
+                        {format(arg.date, "EEEEEE", { locale: de })}
+                      </span>
+                      <span
+                        className={`flex h-7 w-7 items-center justify-center rounded-full font-inter text-sm font-semibold ${
+                          arg.isToday
+                            ? "bg-fcb-blue text-white"
+                            : "text-fcb-text"
+                        }`}
+                      >
+                        {format(arg.date, "d")}
+                      </span>
+                    </div>
+                  );
+                }}
                 eventContent={(arg) => {
                   const props = arg.event.extendedProps as Buchung;
                   const istGeoeffnet = geoeffneterTooltipId === arg.event.id;
@@ -321,28 +375,33 @@ export default function KalenderSeite() {
                             setGeoeffneterTooltipId(null);
                           }}
                           onDelete={() => {
-                            setZuLoeschendeId(props.id);
-                            setZuLoeschendeMannschaft(props.mannschaft);
-                            setLoeschenModalOffen(true);
+                            setZuLoeschendeBuchung(props);
                             setGeoeffneterTooltipId(null);
                           }}
                         />
                       }
                       interactive={true}
-                      theme="light-border"
+                      // theme "custom" ist in globals.css theme-aware definiert
+                      // (hell/dunkel) – ersetzt das starre light-border-Theme
+                      theme="custom"
                       placement="top"
                       appendTo={document.body}
                       zIndex={9999}
                     >
                       <div
-                        className="whitespace-pre-line px-1 text-sm cursor-pointer transition-all duration-150 transform hover:scale-101 hover:drop-shadow-md hover:brightness-70"
+                        className="h-full w-full"
                         onClick={() =>
                           setGeoeffneterTooltipId((prev) =>
                             prev === arg.event.id ? null : arg.event.id
                           )
                         }
                       >
-                        {arg.event.title}
+                        <EventChip
+                          buchung={props}
+                          start={arg.event.start}
+                          end={arg.event.end}
+                          kompakt={arg.view.type === "dayGridMonth"}
+                        />
                       </div>
                     </Tippy>
                   );
@@ -364,10 +423,10 @@ export default function KalenderSeite() {
 
       {/* Lösch-Bestätigung */}
       <LoeschenModal
-        show={loeschenModalOffen}
-        onClose={() => setLoeschenModalOffen(false)}
+        show={zuLoeschendeBuchung !== null}
+        onClose={() => setZuLoeschendeBuchung(null)}
         onConfirm={handleLoeschen}
-        mannschaft={zuLoeschendeMannschaft || ""}
+        mannschaft={zuLoeschendeBuchung?.mannschaft || ""}
       />
 
       {/* Bearbeiten-Modal */}

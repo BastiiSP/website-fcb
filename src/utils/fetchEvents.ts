@@ -1,4 +1,3 @@
-import { getEventColor } from "./getEventColor";
 import { SupabaseClient } from "@supabase/supabase-js";
 import type { EventInput } from "@fullcalendar/core";
 import type { Buchung } from "@/components/BearbeitenModal";
@@ -12,10 +11,14 @@ export async function fetchEvents(supabase: SupabaseClient, setEvents: (events: 
   }
 
   const formatted = data.map((buchung: Buchung) => ({
-    title: `⚽ ${buchung.anlass === "freundschaftsspiel" ? "Freundschaftsspiel" : capitalize(buchung.anlass)}\n👥 ${buchung.mannschaft}`,
+    // Klartext-Titel als Fallback (a11y) – die sichtbare Darstellung übernimmt
+    // EventChip via eventContent, inkl. Platz-Farbe als Tint + Akzentkante.
+    title: `${capitalize(buchung.anlass)} – ${buchung.mannschaft}`,
     start: buchung.startzeit,
     end: buchung.endzeit,
-    backgroundColor: getEventColor(buchung.platz),
+    // FullCalendar-eigene Flächen/Rahmen neutralisieren, der Chip stylt sich selbst
+    backgroundColor: "transparent",
+    borderColor: "transparent",
     extendedProps: buchung,
     id: buchung.id,
   }));
