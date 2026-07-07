@@ -139,6 +139,11 @@ body {
   border: none;
   box-shadow: none;
 }
+/* Schmale Fuge zwischen gleichzeitigen Events (Side-by-Side via
+   slotEventOverlap=false), damit sich die Chips nicht berühren */
+.fc .fc-timegrid-event {
+  margin-right: 2px;
+}
 .fc .fc-event .fc-event-main {
   padding: 0;
   color: inherit;

@@ -62,6 +62,20 @@ const ANLASS_OPTIONEN = [
   { value: "platzpflege", label: "Platzpflege" },
 ];
 
+// Zeitwert → Wert für <input type="datetime-local"> in LOKALER Zeit.
+// Wichtig: Supabase liefert timestamptz als UTC-ISO-String – das frühere
+// .slice(0, 16) zeigte dadurch die UTC-Uhrzeit an, während bearbeitete Felder
+// als lokale Zeit interpretiert wurden. Diese gemischten Zeitbasen führten zu
+// falschen "Endzeit vor Startzeit"-Fehlern. new Date() normalisiert beide
+// Formen (UTC-ISO und lokalen Input-String) auf denselben Zeitpunkt.
+function zuLokalemInputWert(zeitwert: string): string {
+  const d = new Date(zeitwert);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
+    d.getHours()
+  )}:${pad(d.getMinutes())}`;
+}
+
 export default function BearbeitenModal({
   show,
   onClose,
@@ -320,7 +334,7 @@ export default function BearbeitenModal({
             </label>
             <input
               type="datetime-local"
-              value={form.startzeit.slice(0, 16)}
+              value={zuLokalemInputWert(form.startzeit)}
               onChange={(e) => handleChange("startzeit", e.target.value)}
               className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />
@@ -331,7 +345,7 @@ export default function BearbeitenModal({
             </label>
             <input
               type="datetime-local"
-              value={form.endzeit.slice(0, 16)}
+              value={zuLokalemInputWert(form.endzeit)}
               onChange={(e) => handleChange("endzeit", e.target.value)}
               className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
             />

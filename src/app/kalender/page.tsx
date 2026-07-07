@@ -351,6 +351,9 @@ export default function KalenderSeite() {
                 slotMaxTime="22:30:00"
                 allDaySlot={false}
                 height="auto"
+                // Gleichzeitige Buchungen (z. B. zwei halbe Plätze) sauber
+                // nebeneinander statt überlappend rendern
+                slotEventOverlap={false}
                 // Rote "Jetzt"-Linie wie in Outlook/Teams
                 nowIndicator={true}
                 editable={true}
