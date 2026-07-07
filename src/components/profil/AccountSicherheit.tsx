@@ -265,7 +265,7 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
                     Mind. 8 Zeichen
                   </div>
                 </div>
-                {/* Stärke-Balken – bg-fcb-border statt bg-gray-300 */}
+                {/* Stärke-Balken */}
                 <div className="h-2 w-full rounded bg-fcb-border overflow-hidden">
                   <div className={`h-full transition-all duration-300 ${passwortStaerkefarbe(passwortStaerke)}`} />
                 </div>

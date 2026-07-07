@@ -169,6 +169,9 @@ src/
 │   ├── news/NewsPostCard.tsx      ← Instagram-Post-Card der News-Seite
 │   ├── instagram/                 ← InstagramSection / InstagramCarousel (Homepage)
 │   ├── consent/                   ← DSGVO: ConsentProvider, CookieBanner, ConsentGate
+│   │                                (ConsentGate bewusst ohne Konsumenten: Instagram läuft über
+│   │                                den next/image-Proxy, BFV server-side – beides first-party;
+│   │                                erst bei echten Client-Einbettungen nutzen)
 │   ├── rechtstexte/RechtstextLayout.tsx
 │   ├── hero/                      ← Homepage-Hero (HybridPitch, HybridCanvas, RotatingText)
 │   ├── auth/                      ← Auth-UI (Pitch-Look: Shell, Background, Felder, Google-Button)
@@ -267,10 +270,9 @@ Die vollständige Designdokumentation liegt in der Obsidian-Projektdatei `02 Pro
 
 > **Status:** Die Design-Migration ist abgeschlossen (Design-System + Dual-Theme live seit
 > 2026-06-19). **Alle Routen** laufen auf den semantischen `fcb.*`-Tokens und unterstützen
-> Hell- und Dunkel-Theme (Default: dunkel, Umschalter im Footer). Kanonische Vorbilder:
-> `Header.tsx` und die Primitive in `src/components/ui/`. Einzige bekannte Rest-Altlast:
-> vereinzelte `gray-*`-Klassen in `profil/AvatarUploadModal.tsx` und
-> `profil/AccountSicherheit.tsx` – nur auf Beauftragung bereinigen.
+> Hell- und Dunkel-Theme (Default: dunkel, Umschalter im Footer); auch Hero und Auth-Seiten
+> folgen dem Theme (bewusste Entscheidung, keine always-dark-Inseln). Kanonische Vorbilder:
+> `Header.tsx` und die Primitive in `src/components/ui/`.
 > **Neue Komponenten müssen in beiden Themes funktionieren** – Tokens statt fester Farben,
 > beim manuellen Test einmal umschalten.
 
@@ -290,11 +292,11 @@ Brand-Akzente `blue`/`red` sind feste Hex-Werte, in beiden Themes konstant.
 |---|---|---|---|---|
 | Hintergrund | `bg-fcb-bg` | `#0a0a0a` | `#ffffff` | Seiten-BG, Hero, Sections |
 | Surface | `bg-fcb-surface` | `#161616` | `#f5f5f5` | Cards, Panels, Modals |
-| Footer | `bg-fcb-footer` | `#262626` | `#e5e5e5` | Footer-Fläche |
+| Footer | `bg-fcb-footer` | `#262626` | `#e5e5e5` | Reserve – aktuell ungenutzt (Footer nutzt `fcb-surface`) |
 | Border | `border-fcb-border` | `#2a2a2a` | `#d4d4d4` | Trennlinien, Rahmen |
 | Text | `text-fcb-text` | `#ffffff` | `#111111` | Primärtext |
 | Muted | `text-fcb-muted` | `#888888` | `#5a5a5a` | Datum, Metainfo |
-| Navbar | `bg-fcb-nav` | `#52525b` | `#e4e4e7` | Navbar-Hintergrund |
+| Navbar | `bg-fcb-nav` | `#52525b` | `#e4e4e7` | Reserve – aktuell ungenutzt (Header nutzt `fcb-surface`) |
 | FCB-Blau | `text-fcb-blue` / `bg-fcb-blue` | `#1d5fad` | (konstant) | FCB-Akzent: Links, aktive States, CTAs |
 | JFG-Rot | `text-fcb-red` / `bg-fcb-red` | `#cc1f1f` | (konstant) | JFG-Bereich-Akzent |
 

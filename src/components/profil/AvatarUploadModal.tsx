@@ -152,7 +152,7 @@ export default function AvatarUploadModal({
           </div>
         ) : (
           <div className="space-y-4">
-            {/* Crop-Bereich – bg-fcb-bg statt bg-gray-800 */}
+            {/* Crop-Bereich */}
             <div className="relative w-full h-64 rounded overflow-hidden bg-fcb-bg">
               <Cropper
                 image={bildSrc}

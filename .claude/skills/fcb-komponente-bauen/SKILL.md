@@ -16,15 +16,15 @@ Das Design-System ist vollständig umgesetzt. Alle `fcb.*`-Klassen (außer `blue
 über CSS-Variablen aus `globals.css` auf und tragen je Theme (`.dark`/`.light` auf `<html>`,
 Default dunkel, Umschalter im Footer) andere Werte. **Jede Komponente muss in beiden Themes
 funktionieren** – deshalb ausschließlich Tokens, nie feste Farben, und beim Testen einmal
-umschalten. Rest-Altlast (`gray-*`) gibt es nur noch in `profil/AvatarUploadModal.tsx` und
-`profil/AccountSicherheit.tsx` – nicht als Vorbild nehmen, nur auf Beauftragung bereinigen.
+umschalten. Auch Hero und Auth-Seiten folgen dem Theme (bewusste Entscheidung – keine
+always-dark-Inseln wieder einführen). Es gibt keine `gray-*`-Altlasten mehr im Projekt.
 
 ## Verifizierte Bausteine (NICHT raten)
 
 | Baustein | Korrekter Wert |
 |---|---|
 | Tailwind-Version | **3.4.1** – KEIN v4. Keine `@theme`-Directive, kein `tailwind.config` in CSS. Klassen wie gewohnt in `tailwind.config.ts`. |
-| Farb-Tokens | `bg-fcb-bg` `bg-fcb-surface` `bg-fcb-footer` `border-fcb-border` `text-fcb-text` `text-fcb-muted` `bg-fcb-nav` `text-fcb-blue` `text-fcb-red`. Semantisch: lösen per CSS-Variablen aus `globals.css` auf (Dual-Theme), Opacity-Modifier wie `bg-fcb-surface/80` funktionieren. **Keine magic hex, kein `gray-*`.** |
+| Farb-Tokens | `bg-fcb-bg` `bg-fcb-surface` `border-fcb-border` `text-fcb-text` `text-fcb-muted` `text-fcb-blue` `text-fcb-red`. Semantisch: lösen per CSS-Variablen aus `globals.css` auf (Dual-Theme), Opacity-Modifier wie `bg-fcb-surface/80` funktionieren. **Keine magic hex, kein `gray-*`.** (`fcb-nav`/`fcb-footer` existieren als Reserve, sind aber ungenutzt – Header und Footer nutzen `fcb-surface`.) |
 | UI-Primitive | **Erst `src/components/ui/` prüfen, bevor selbst gebaut wird:** `Button`, `ButtonLink` (+ `buttonStyles` für Server-Kontexte), `Card`, `Banner`, `Badge`, `IconBadge`, `TeamCard`, `Modal`, `PageShell`, `PageHeader`, `Tabs`, `Select`, `TextField`, `Textarea`, `ThemeToggle`. Varianten/Größen stehen in der Design-Spec in CLAUDE.md. |
 | Theme-Zugriff | `hooks/useTheme.ts` (lesen/umschalten) + `lib/theme.ts` (`applyTheme`, `DEFAULT_THEME: dark`). Nie direkt `document.documentElement.classList` manipulieren. |
 | Headline-Font | `font-oswald` (CSS-Var-gebunden, lädt zuverlässig). `font-display` existiert auch, ist aber NICHT an next/font gebunden → für neue Komponenten `font-oswald` nehmen. |
@@ -44,7 +44,7 @@ Diese Komponente zeigt das vollständige moderne Muster – beim Bauen daran ori
 - Smart-Sticky-Nav: `useScroll` + `useMotionValueEvent`, versteckt ab `scrollY > 80` & `delta > 5`
 - `<motion.header animate={{ y: hidden ? "-100%" : 0 }} transition={{ duration: 0.25 }}>`
 - `AnimatePresence` für Mobile-Menü (`initial`/`animate`/`exit`)
-- Durchgängig fcb-Tokens: `border-fcb-border bg-fcb-nav/90 text-fcb-text hover:text-fcb-blue`
+- Durchgängig fcb-Tokens: `border-fcb-border bg-fcb-surface/90 text-fcb-text hover:text-fcb-blue`
 - `font-oswald` für den Vereinsnamen, `font-inter` für Nav-Links
 - Lucide `Menu`/`X`, **deutsche `aria-label`** ("Menü öffnen"/"Menü schließen")
 - Kommentare erklären das *Warum* (Hierarchie, Anti-Flacker-Schwelle)
@@ -82,5 +82,5 @@ Diese Komponente zeigt das vollständige moderne Muster – beim Bauen daran ori
 | `font-display` erwartet, dass Oswald lädt | `font-display` ist NICHT an next/font gebunden. `font-oswald` nehmen. |
 | Tailwind-v4-Syntax (`@theme`, CSS-`@config`) | Projekt ist v3.4. Tokens in `tailwind.config.ts`. |
 | CSS-`@keyframes` für neue Animation | Projektstandard ist Framer Motion. |
-| Rest-Altlast (`gray-*` in den zwei Profil-Komponenten) ungefragt „mitbereinigt" | Aufräumarbeiten sind beauftragungspflichtig. Nur ändern, was Basti benannt hat. |
+| Nachbar-Code ungefragt umgebaut/„mitverbessert" | Aufräumarbeiten sind beauftragungspflichtig. Nur ändern, was Basti benannt hat. |
 | `react-icons` für ein neues Icon | Altlast-Dependency. Lucide bzw. BrandIcons nutzen. |
