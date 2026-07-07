@@ -85,6 +85,10 @@ body {
 /* Allgemeine Schriftfarbe – folgt dem aktiven Theme */
 .fc {
   color: rgb(var(--color-text));
+  /* FullCalendar hinterlegt die sticky Kopfzeile (inkl. Ecke oben links und
+     Heute-Spaltenkopf) mit --fc-page-bg-color, Default weiß → leuchtete im
+     Dark-Theme. Auf das Surface-Token gelegt folgt sie jetzt dem Theme. */
+  --fc-page-bg-color: rgb(var(--color-surface));
 }
 
 /* Zeitleiste links: klein und zurückhaltend (Outlook-Muster) */
