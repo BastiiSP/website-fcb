@@ -77,7 +77,9 @@ body {
 
 /* ============================================================
    FullCalendar – theme-aware Styling (dual-theme via CSS-Tokens)
-   Ersetzt die früheren hardcodierten Hell-Farben (#111, #1f2937).
+   Outlook/Teams-Anmutung: dezente Gridlines, getintete Event-Chips
+   (EventChip.tsx), eigene Toolbar (KalenderToolbar.tsx statt
+   fc-button), Jetzt-Indikator, luftigere Zeilen.
    ============================================================ */
 
 /* Allgemeine Schriftfarbe – folgt dem aktiven Theme */
@@ -85,24 +87,12 @@ body {
   color: rgb(var(--color-text));
 }
 
-/* Kalender-Titel (Monat/Woche/Tag) */
-.fc .fc-toolbar-title {
-  color: rgb(var(--color-text));
-  font-weight: 600;
-}
-
-/* Tagesnamen-Kopfzeile (Mo–So) */
-.fc-col-header-cell-cushion {
-  color: rgb(var(--color-muted));
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-/* Zeitleiste links: Hintergrund und Schrift folgen dem Theme */
+/* Zeitleiste links: klein und zurückhaltend (Outlook-Muster) */
 .fc .fc-timegrid-slot-label {
   background-color: rgb(var(--color-bg));
-  color: rgb(var(--color-text));
-  font-weight: 600;
+  color: rgb(var(--color-muted));
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 /* Rasterlinien und Trennstriche des Kalenders */
@@ -112,31 +102,56 @@ body {
   border-color: rgb(var(--color-border));
 }
 
-/* Navigations-Buttons (Vor/Zurück/Heute/Ansichtsauswahl) – immer FCB-Blau */
-.fc .fc-button-primary {
-  background-color: #1d5fad;
-  border-color: #1d5fad;
-}
-.fc .fc-button-primary:hover {
-  background-color: rgba(29, 95, 173, 0.9);
-  border-color: rgba(29, 95, 173, 0.9);
-}
-.fc .fc-button-primary:not(:disabled):active,
-.fc .fc-button-primary:not(:disabled).fc-button-active {
-  background-color: rgba(29, 95, 173, 0.85);
-  border-color: rgba(29, 95, 173, 0.85);
+/* Halbstunden-Linien noch dezenter als volle Stunden */
+.fc .fc-timegrid-slot-minor {
+  border-top-style: dotted;
 }
 
-/* Heutiger Tag: dezenter FCB-Blau-Hintergrund */
+/* Luftigere Zeitraster-Zeilen – wirkt aufgeräumter als das enge Default */
+.fc .fc-timegrid-slot {
+  height: 2.6rem;
+}
+
+/* Heutiger Tag: sehr dezenter FCB-Blau-Schleier (der Kreis im Spaltenkopf
+   trägt die eigentliche Heute-Markierung) */
 .fc .fc-day-today {
-  background-color: rgba(29, 95, 173, 0.10) !important;
+  background-color: rgba(29, 95, 173, 0.06) !important;
+}
+
+/* Jetzt-Indikator (rote Linie) – Wert des fcb-red-Tokens */
+.fc .fc-timegrid-now-indicator-line {
+  border-color: #cc1f1f;
+  border-width: 1.5px 0 0;
+}
+.fc .fc-timegrid-now-indicator-arrow {
+  border-color: #cc1f1f;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+/* Events: Optik kommt vollständig aus EventChip – FullCalendar-Eigenstyles neutralisieren */
+.fc .fc-event {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+.fc .fc-event .fc-event-main {
+  padding: 0;
+  color: inherit;
+}
+/* Kompakt-Chips der Monatsansicht: kein zusätzlicher Innenabstand */
+.fc .fc-daygrid-event {
+  border-radius: 6px;
 }
 
 /* Kalender hebt sich von der Surface-Karte ab: Zellen = bg, Container = surface */
 .fc-theme-standard .fc-scrollgrid { border-color: rgb(var(--color-border)); }
 .fc .fc-timegrid-slot,
 .fc .fc-daygrid-day { background-color: rgb(var(--color-bg)); }
-.fc .fc-col-header-cell { background-color: rgb(var(--color-surface)); }
+.fc .fc-col-header-cell {
+  background-color: rgb(var(--color-surface));
+  padding: 2px 0;
+}
 
 /* ============================================================
    react-datepicker – theme-aware Styling (dual-theme via CSS-Tokens)
@@ -231,6 +246,15 @@ body {
 .dark .tippy-box[data-theme~='custom'] {
   background-color: rgb(var(--color-surface));
   color: rgb(var(--color-text));
+  border-color: rgb(var(--color-border));
+}
+
+/* Pfeil des custom-Themes folgt der Tooltip-Fläche (beide Themes) */
+.tippy-box[data-theme~='custom'] .tippy-arrow {
+  color: #ffffff;
+}
+.dark .tippy-box[data-theme~='custom'] .tippy-arrow {
+  color: rgb(var(--color-surface));
 }
 
 /* 🔽 Custom Fade-In Animation beim Scrollen (Footer z. B.) */
