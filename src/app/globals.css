@@ -165,67 +165,82 @@ body {
 /* ============================================================
    react-datepicker – theme-aware Styling (dual-theme via CSS-Tokens)
    Überschreibt die eingebetteten hellen Standardfarben der Bibliothek.
+   WICHTIG: `html`-Präfix (+ gezielte !important beim Zeit-Panel) erhöht
+   die Spezifität, damit die Overrides unabhängig von der Bundler-
+   CSS-Reihenfolge gewinnen – die Bibliotheks-CSS wird inzwischen von
+   mehreren Komponenten importiert (Buchungsformular + BearbeitenModal),
+   was die Reihenfolge verschoben und den Kalender im Dark-Theme
+   weiß gemacht hatte.
    ============================================================ */
 
 /* Haupt-Popup-Box */
-.react-datepicker {
+html .react-datepicker {
   background: rgb(var(--color-surface));
   color: rgb(var(--color-text));
   border-color: rgb(var(--color-border));
   font-family: var(--font-inter), Inter, ui-sans-serif, sans-serif;
 }
 
+/* Pfeil-Dreieck zum Eingabefeld folgt der Popup-Fläche */
+html .react-datepicker__triangle {
+  color: rgb(var(--color-surface));
+  fill: rgb(var(--color-surface));
+  stroke: rgb(var(--color-border));
+}
+
 /* Monatskopf (Monatsname + Jahr + Navigationspfeile) */
-.react-datepicker__header {
+html .react-datepicker__header {
   background: rgb(var(--color-bg));
   border-color: rgb(var(--color-border));
 }
 
 /* Textfarben innerhalb des Kalenders */
-.react-datepicker__current-month,
-.react-datepicker__day-name,
-.react-datepicker__day,
-.react-datepicker-time__header,
-.react-datepicker__time-name {
+html .react-datepicker__current-month,
+html .react-datepicker__day-name,
+html .react-datepicker__day,
+html .react-datepicker-time__header,
+html .react-datepicker__time-name {
   color: rgb(var(--color-text));
 }
 
 /* Hover-Effekt auf Tagen */
-.react-datepicker__day:hover {
+html .react-datepicker__day:hover {
   background: rgb(var(--color-border));
 }
 
 /* Ausgewählter Tag */
-.react-datepicker__day--selected,
-.react-datepicker__day--keyboard-selected {
+html .react-datepicker__day--selected,
+html .react-datepicker__day--keyboard-selected {
   background: #1d5fad;
   color: #ffffff;
 }
 
-/* Zeit-Panel (rechte Spalte mit Uhrzeiten) */
-.react-datepicker__time-container,
-.react-datepicker__time,
-.react-datepicker__time-box {
-  background: rgb(var(--color-surface));
-  color: rgb(var(--color-text));
+/* Zeit-Panel (rechte Spalte mit Uhrzeiten): die Bibliothek stylt hier mit
+   deutlich spezifischeren Verschachtelungs-Selektoren – deshalb !important
+   statt Selektor-Wettrüsten */
+html .react-datepicker__time-container,
+html .react-datepicker__time,
+html .react-datepicker__time-box {
+  background: rgb(var(--color-surface)) !important;
+  color: rgb(var(--color-text)) !important;
 }
 
 /* Uhrzeit-Hover */
-.react-datepicker__time-list-item:hover {
-  background: rgb(var(--color-border));
+html .react-datepicker__time-list-item:hover {
+  background: rgb(var(--color-border)) !important;
 }
 
 /* Ausgewählte Uhrzeit */
-.react-datepicker__time-list-item--selected {
+html .react-datepicker__time-list-item--selected {
   background: #1d5fad !important;
   color: #ffffff !important;
 }
 
 /* Navigations-Pfeile sichtbar machen */
-.react-datepicker__navigation-icon::before {
+html .react-datepicker__navigation-icon::before {
   border-color: rgb(var(--color-muted));
 }
-.react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+html .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
   border-color: rgb(var(--color-text));
 }
 

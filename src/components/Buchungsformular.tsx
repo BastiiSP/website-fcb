@@ -312,6 +312,7 @@ export default function Buchungsformular({
               }}
               locale="de"
               showTimeSelect
+              timeCaption="Uhrzeit"
               timeFormat="HH:mm"
               timeIntervals={15}
               dateFormat="dd.MM.yyyy HH:mm"
@@ -332,6 +333,7 @@ export default function Buchungsformular({
               onChange={(date) => setEndzeit(date)}
               locale="de"
               showTimeSelect
+              timeCaption="Uhrzeit"
               timeFormat="HH:mm"
               timeIntervals={15}
               dateFormat="dd.MM.yyyy HH:mm"

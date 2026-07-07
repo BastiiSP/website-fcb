@@ -339,6 +339,7 @@ export default function BearbeitenModal({
               }}
               locale="de"
               showTimeSelect
+              timeCaption="Uhrzeit"
               timeFormat="HH:mm"
               timeIntervals={15}
               dateFormat="dd.MM.yyyy HH:mm"
@@ -358,6 +359,7 @@ export default function BearbeitenModal({
               }}
               locale="de"
               showTimeSelect
+              timeCaption="Uhrzeit"
               timeFormat="HH:mm"
               timeIntervals={15}
               dateFormat="dd.MM.yyyy HH:mm"
