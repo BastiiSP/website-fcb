@@ -26,8 +26,13 @@ export type Buchung = {
   serien_id?: string | null;
 };
 
-/** Bearbeitungs-/Lösch-Umfang bei Serienterminen */
-export type SerienBereich = "einzeln" | "serie";
+/**
+ * Bearbeitungs-/Lösch-Umfang bei Serienterminen (Outlook-Semantik, relativ
+ * zum AUSGEWÄHLTEN Termin – nicht zu "jetzt"):
+ * einzeln = nur dieser Termin, abDiesem = dieser + alle folgenden,
+ * alle = jeder Termin der Serie (auch vergangene).
+ */
+export type SerienBereich = "einzeln" | "abDiesem" | "alle";
 
 type Props = {
   show: boolean;
@@ -101,9 +106,10 @@ export default function BearbeitenModal({
       return;
     }
 
-    // Serien-Pfad: Änderung auf alle zukünftigen Termine der Serie übertragen.
-    // Die Belegungsprüfung läuft dort pro Termin – Konflikte werden übersprungen.
-    if (bereich === "serie" && form.serien_id && initialData) {
+    // Serien-Pfad: Änderung auf die gewählten Termine der Serie übertragen
+    // (dieser + folgende oder alle). Die Belegungsprüfung läuft dort pro
+    // Termin – Konflikte werden übersprungen.
+    if (bereich !== "einzeln" && form.serien_id && initialData) {
       try {
         const serienErgebnis = await aktualisiereSerie(
           {
@@ -112,6 +118,12 @@ export default function BearbeitenModal({
             alteEndzeit: new Date(initialData.endzeit).toISOString(),
             neueStartzeit: startISO,
             neueEndzeit: endISO,
+            // Pivot ist der ausgewählte Termin, nicht "jetzt": bei "abDiesem"
+            // bleiben frühere Termine der Serie unangetastet.
+            abStartzeitISO:
+              bereich === "abDiesem"
+                ? new Date(initialData.startzeit).toISOString()
+                : null,
             felder: {
               platz: form.platz,
               platzanteil: form.platzanteil,
@@ -125,7 +137,9 @@ export default function BearbeitenModal({
         );
 
         const anzahl = serienErgebnis.aktualisiert.length;
-        let meldung = `Serie aktualisiert: ${anzahl} Termin${anzahl !== 1 ? "e" : ""} angepasst`;
+        let meldung = `${
+          bereich === "abDiesem" ? "Serie ab diesem Termin" : "Ganze Serie"
+        } aktualisiert: ${anzahl} Termin${anzahl !== 1 ? "e" : ""} angepasst`;
         if (serienErgebnis.uebersprungen.length > 0) {
           meldung += `, ${serienErgebnis.uebersprungen.length} übersprungen (z. B. Platz belegt)`;
         }
@@ -239,17 +253,29 @@ export default function BearbeitenModal({
               <input
                 type="radio"
                 name="serien-bereich"
-                checked={bereich === "serie"}
-                onChange={() => setBereich("serie")}
+                checked={bereich === "abDiesem"}
+                onChange={() => setBereich("abDiesem")}
                 className="h-4 w-4 accent-fcb-blue"
               />
-              Ganze Serie bearbeiten (alle zukünftigen Termine)
+              Diesen und alle folgenden Termine bearbeiten
             </label>
-            {bereich === "serie" && (
+            <label className="flex items-center gap-2 cursor-pointer font-inter text-sm text-fcb-text">
+              <input
+                type="radio"
+                name="serien-bereich"
+                checked={bereich === "alle"}
+                onChange={() => setBereich("alle")}
+                className="h-4 w-4 accent-fcb-blue"
+              />
+              Alle Termine der Serie bearbeiten (auch vergangene)
+            </label>
+            {bereich !== "einzeln" && (
               <p className="font-inter text-xs text-fcb-muted">
-                Die Zeitverschiebung und alle Feldänderungen werden auf jeden
-                zukünftigen Termin der Serie übertragen. Termine mit
-                Belegungskonflikt bleiben unverändert.
+                Die Zeitverschiebung und alle Feldänderungen werden auf{" "}
+                {bereich === "abDiesem"
+                  ? "diesen und alle folgenden Termine"
+                  : "sämtliche Termine der Serie"}{" "}
+                übertragen. Termine mit Belegungskonflikt bleiben unverändert.
               </p>
             )}
           </div>

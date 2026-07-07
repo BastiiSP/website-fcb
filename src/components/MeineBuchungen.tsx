@@ -163,13 +163,21 @@ export default function MeineBuchungen({ userId }: Props) {
   const loeschenBestaetigen = async (bereich: SerienBereich) => {
     if (!loeschBuchung) return;
 
-    if (bereich === "serie" && loeschBuchung.serien_id) {
+    if (bereich !== "einzeln" && loeschBuchung.serien_id) {
       try {
-        const anzahl = await loescheSerie(loeschBuchung.serien_id, supabase);
+        // Pivot ist der ausgewählte Termin: "abDiesem" storniert ihn + alle
+        // folgenden, "alle" die komplette Serie inkl. vergangener Termine.
+        const anzahl = await loescheSerie(
+          loeschBuchung.serien_id,
+          supabase,
+          bereich === "abDiesem"
+            ? new Date(loeschBuchung.startzeit).toISOString()
+            : null
+        );
         setErfolg(
-          `Serie storniert: ${anzahl} ${
-            anzahl === 1 ? "zukünftiger Termin" : "zukünftige Termine"
-          } entfernt.`
+          `${
+            bereich === "abDiesem" ? "Serie ab diesem Termin" : "Ganze Serie"
+          } storniert: ${anzahl} Termin${anzahl !== 1 ? "e" : ""} entfernt.`
         );
         ladeBuchungen();
       } catch (e) {

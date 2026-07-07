@@ -84,11 +84,21 @@ export default function LoeschenModal({
             <input
               type="radio"
               name="loesch-bereich"
-              checked={bereich === "serie"}
-              onChange={() => setBereich("serie")}
+              checked={bereich === "abDiesem"}
+              onChange={() => setBereich("abDiesem")}
               className="h-4 w-4 accent-fcb-blue"
             />
-            Ganze Serie löschen (alle zukünftigen Termine)
+            Diesen und alle folgenden Termine löschen
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer font-inter text-sm text-fcb-text">
+            <input
+              type="radio"
+              name="loesch-bereich"
+              checked={bereich === "alle"}
+              onChange={() => setBereich("alle")}
+              className="h-4 w-4 accent-fcb-blue"
+            />
+            Alle Termine der Serie löschen (auch vergangene)
           </label>
         </div>
       )}

@@ -124,13 +124,21 @@ export default function KalenderSeite() {
       return;
     }
 
-    if (bereich === "serie" && zuLoeschendeBuchung.serien_id) {
+    if (bereich !== "einzeln" && zuLoeschendeBuchung.serien_id) {
       try {
-        const anzahl = await loescheSerie(zuLoeschendeBuchung.serien_id, supabase);
+        // Pivot ist der ausgewählte Termin: "abDiesem" löscht ihn + alle
+        // folgenden, "alle" die komplette Serie inkl. vergangener Termine.
+        const anzahl = await loescheSerie(
+          zuLoeschendeBuchung.serien_id,
+          supabase,
+          bereich === "abDiesem"
+            ? new Date(zuLoeschendeBuchung.startzeit).toISOString()
+            : null
+        );
         setSuccessMessage(
-          `Serie gelöscht: ${anzahl} ${
-            anzahl === 1 ? "zukünftiger Termin" : "zukünftige Termine"
-          } entfernt.`
+          `${
+            bereich === "abDiesem" ? "Serie ab diesem Termin" : "Ganze Serie"
+          } gelöscht: ${anzahl} Termin${anzahl !== 1 ? "e" : ""} entfernt.`
         );
         fetchEvents(supabase, setEvents);
       } catch {

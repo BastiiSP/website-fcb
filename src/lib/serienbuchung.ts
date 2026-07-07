@@ -23,6 +23,11 @@ export interface SerienErgebnis {
 /** Änderungen, die beim Bearbeiten einer ganzen Serie auf alle Termine übertragen werden */
 export interface SerienAenderung {
   serienId: string;
+  /**
+   * Bereichsauswahl des Aufrufers: null bearbeitet die komplette Serie,
+   * ein ISO-String nur den ausgewählten Termin und alle folgenden.
+   */
+  abStartzeitISO: string | null;
   /** Zeiten der bearbeiteten Instanz VOR der Änderung (ISO) – Basis für die Zeitverschiebung */
   alteStartzeit: string;
   alteEndzeit: string;
@@ -222,12 +227,11 @@ async function verarbeiteTermin(
 }
 
 /**
- * Überträgt eine Bearbeitung auf alle ZUKÜNFTIGEN Termine einer Serie:
+ * Überträgt eine Bearbeitung auf den vom Aufrufer gewählten Bereich einer Serie:
  * Die Zeitdifferenz der bearbeiteten Instanz (z. B. Training 30 min später)
  * wird auf jeden Termin angewendet, die übrigen Felder werden übernommen.
  * Jeder verschobene Termin durchläuft erneut die Belegungsprüfung –
  * Konflikte überspringen den Einzeltermin, nie die restliche Serie.
- * Vergangene Termine bleiben unangetastet (Historie).
  */
 export async function aktualisiereSerie(
   aenderung: SerienAenderung,
@@ -245,14 +249,18 @@ export async function aktualisiereSerie(
   const deltaEndeMs =
     new Date(aenderung.neueEndzeit).getTime() - new Date(aenderung.alteEndzeit).getTime();
 
-  const jetztISO = new Date().toISOString();
-
-  const { data: termine, error: ladeFehler } = await supabase
+  let termineAbfrage = supabase
     .from("buchungen")
     .select("*")
-    .eq("serien_id", aenderung.serienId)
-    .gte("startzeit", jetztISO)
-    .order("startzeit", { ascending: true });
+    .eq("serien_id", aenderung.serienId);
+
+  if (aenderung.abStartzeitISO !== null) {
+    termineAbfrage = termineAbfrage.gte("startzeit", aenderung.abStartzeitISO);
+  }
+
+  const { data: termine, error: ladeFehler } = await termineAbfrage.order("startzeit", {
+    ascending: true,
+  });
 
   if (ladeFehler) {
     throw new Error(`Fehler beim Laden der Serientermine: ${ladeFehler.message}`);
@@ -340,21 +348,24 @@ export async function aktualisiereSerie(
 }
 
 /**
- * Löscht alle ZUKÜNFTIGEN Termine einer Serie (Storno). Vergangene Termine
- * bleiben als Historie erhalten. Gibt die Anzahl der gelöschten Termine zurück.
+ * Löscht den vom Aufrufer gewählten Bereich einer Serie und gibt die Anzahl
+ * der gelöschten Termine zurück.
  */
 export async function loescheSerie(
   serienId: string,
   supabase: SerienSupabaseClient,
+  abStartzeitISO: string | null,
 ): Promise<number> {
-  const jetztISO = new Date().toISOString();
-
-  const { data, error } = await supabase
+  let loeschenAbfrage = supabase
     .from("buchungen")
     .delete()
-    .eq("serien_id", serienId)
-    .gte("startzeit", jetztISO)
-    .select("id");
+    .eq("serien_id", serienId);
+
+  if (abStartzeitISO !== null) {
+    loeschenAbfrage = loeschenAbfrage.gte("startzeit", abStartzeitISO);
+  }
+
+  const { data, error } = await loeschenAbfrage.select("id");
 
   if (error) {
     throw new Error(`Fehler beim Löschen der Serie: ${error.message}`);
