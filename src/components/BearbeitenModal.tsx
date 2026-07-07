@@ -3,6 +3,9 @@
 import React, { useState, useEffect } from "react";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Repeat } from "lucide-react";
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { de } from "date-fns/locale";
 import Modal from "@/components/ui/Modal";
 import Select from "@/components/ui/Select";
 import TextField from "@/components/ui/TextField";
@@ -62,19 +65,13 @@ const ANLASS_OPTIONEN = [
   { value: "platzpflege", label: "Platzpflege" },
 ];
 
-// Zeitwert → Wert für <input type="datetime-local"> in LOKALER Zeit.
-// Wichtig: Supabase liefert timestamptz als UTC-ISO-String – das frühere
-// .slice(0, 16) zeigte dadurch die UTC-Uhrzeit an, während bearbeitete Felder
-// als lokale Zeit interpretiert wurden. Diese gemischten Zeitbasen führten zu
-// falschen "Endzeit vor Startzeit"-Fehlern. new Date() normalisiert beide
-// Formen (UTC-ISO und lokalen Input-String) auf denselben Zeitpunkt.
-function zuLokalemInputWert(zeitwert: string): string {
-  const d = new Date(zeitwert);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours()
-  )}:${pad(d.getMinutes())}`;
-}
+// Deutsch-Locale für react-datepicker registrieren (idempotent, wie im Buchungsformular)
+registerLocale("de", de);
+
+// Gemeinsamer Input-Stil für die DatePicker – identisch zum Buchungsformular,
+// damit Anlegen und Bearbeiten denselben Picker mit derselben Optik nutzen
+const DATEPICKER_INPUT_KLASSEN =
+  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none";
 
 export default function BearbeitenModal({
   show,
@@ -325,29 +322,48 @@ export default function BearbeitenModal({
           </div>
         </div>
 
-        {/* Start- und Endzeit – native datetime-local Felder (Bearbeitungsformular
-            nutzt String-Werte aus Supabase ISO-Timestamps, nicht react-datepicker) */}
+        {/* Start- und Endzeit – derselbe react-datepicker wie im Buchungsformular
+            (deutsche Lokalisierung, 15-Minuten-Raster, theme-aware via globals.css).
+            Der Formular-State bleibt String-basiert: DatePicker liefert Date-Objekte,
+            gespeichert wird der ISO-String – so funktioniert der restliche
+            Speicherpfad unverändert und zeitzonen-korrekt. */}
         <div className="flex gap-4 flex-wrap">
           <div className="space-y-1.5 flex-1 min-w-[180px]">
             <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
               Startzeit
             </label>
-            <input
-              type="datetime-local"
-              value={zuLokalemInputWert(form.startzeit)}
-              onChange={(e) => handleChange("startzeit", e.target.value)}
-              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
+            <DatePicker
+              selected={form.startzeit ? new Date(form.startzeit) : null}
+              onChange={(date) => {
+                if (date) handleChange("startzeit", date.toISOString());
+              }}
+              locale="de"
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="dd.MM.yyyy HH:mm"
+              className={DATEPICKER_INPUT_KLASSEN}
+              wrapperClassName="w-full"
+              popperPlacement="bottom-start"
             />
           </div>
           <div className="space-y-1.5 flex-1 min-w-[180px]">
             <label className="block font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
               Endzeit
             </label>
-            <input
-              type="datetime-local"
-              value={zuLokalemInputWert(form.endzeit)}
-              onChange={(e) => handleChange("endzeit", e.target.value)}
-              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
+            <DatePicker
+              selected={form.endzeit ? new Date(form.endzeit) : null}
+              onChange={(date) => {
+                if (date) handleChange("endzeit", date.toISOString());
+              }}
+              locale="de"
+              showTimeSelect
+              timeFormat="HH:mm"
+              timeIntervals={15}
+              dateFormat="dd.MM.yyyy HH:mm"
+              className={DATEPICKER_INPUT_KLASSEN}
+              wrapperClassName="w-full"
+              popperPlacement="bottom-start"
             />
           </div>
         </div>
