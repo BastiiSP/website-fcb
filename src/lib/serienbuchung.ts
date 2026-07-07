@@ -16,6 +16,33 @@ export interface SerienSpezifikation {
 export interface SerienErgebnis {
   erstellt: { startzeit: Date; endzeit: Date }[];
   uebersprungen: { startzeit: Date; endzeit: Date; grund: string }[];
+  /** Gemeinsame ID aller angelegten Termine – Grundlage für Serien-Bearbeitung/-Löschung */
+  serienId: string;
+}
+
+/** Änderungen, die beim Bearbeiten einer ganzen Serie auf alle Termine übertragen werden */
+export interface SerienAenderung {
+  serienId: string;
+  /** Zeiten der bearbeiteten Instanz VOR der Änderung (ISO) – Basis für die Zeitverschiebung */
+  alteStartzeit: string;
+  alteEndzeit: string;
+  /** Zeiten der bearbeiteten Instanz NACH der Änderung (ISO) */
+  neueStartzeit: string;
+  neueEndzeit: string;
+  /** Feldwerte, die alle Serientermine übernehmen */
+  felder: {
+    platz: string;
+    platzanteil: string;
+    anlass: string;
+    mannschaft: string;
+    buchende_person: string;
+    bemerkung?: string | null;
+  };
+}
+
+export interface SerienAktualisierungsErgebnis {
+  aktualisiert: { startzeit: Date; endzeit: Date }[];
+  uebersprungen: { startzeit: Date; endzeit: Date; grund: string }[];
 }
 
 type Platzanteil = SerienSpezifikation["platzanteil"];
@@ -31,6 +58,7 @@ type BuchungRow = {
   buchende_person: string;
   bemerkung: string | null;
   user_id: string | null;
+  serien_id: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -46,6 +74,7 @@ type BuchungInsert = {
   buchende_person: string;
   bemerkung?: string | null;
   user_id: string;
+  serien_id?: string | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -77,9 +106,14 @@ export async function erstelleSerienbuchung(
   spezifikation: SerienSpezifikation,
   supabase: SerienSupabaseClient,
 ): Promise<SerienErgebnis> {
+  // Gemeinsame ID verbindet alle Termine der Serie – Voraussetzung dafür,
+  // dass später "ganze Serie bearbeiten/löschen" möglich ist.
+  const serienId = crypto.randomUUID();
+
   const ergebnis: SerienErgebnis = {
     erstellt: [],
     uebersprungen: [],
+    serienId,
   };
 
   const serienEndeKalendertag = startOfKalendertag(spezifikation.serienEnddatum).getTime();
@@ -97,7 +131,7 @@ export async function erstelleSerienbuchung(
         grund: "Die Endzeit muss nach der Startzeit liegen.",
       });
     } else {
-      await verarbeiteTermin(spezifikation, terminStart, terminEnde, supabase, ergebnis);
+      await verarbeiteTermin(spezifikation, terminStart, terminEnde, serienId, supabase, ergebnis);
     }
 
     startzeit = verschiebeUmWochen(startzeit, 1);
@@ -111,6 +145,7 @@ async function verarbeiteTermin(
   spezifikation: SerienSpezifikation,
   startzeit: Date,
   endzeit: Date,
+  serienId: string,
   supabase: SerienSupabaseClient,
   ergebnis: SerienErgebnis,
 ): Promise<void> {
@@ -171,6 +206,7 @@ async function verarbeiteTermin(
     buchende_person: spezifikation.buchendePerson,
     bemerkung: spezifikation.bemerkung ?? null,
     user_id: spezifikation.userId,
+    serien_id: serienId,
   });
 
   if (insertError) {
@@ -183,6 +219,148 @@ async function verarbeiteTermin(
   }
 
   ergebnis.erstellt.push({ startzeit, endzeit });
+}
+
+/**
+ * Überträgt eine Bearbeitung auf alle ZUKÜNFTIGEN Termine einer Serie:
+ * Die Zeitdifferenz der bearbeiteten Instanz (z. B. Training 30 min später)
+ * wird auf jeden Termin angewendet, die übrigen Felder werden übernommen.
+ * Jeder verschobene Termin durchläuft erneut die Belegungsprüfung –
+ * Konflikte überspringen den Einzeltermin, nie die restliche Serie.
+ * Vergangene Termine bleiben unangetastet (Historie).
+ */
+export async function aktualisiereSerie(
+  aenderung: SerienAenderung,
+  supabase: SerienSupabaseClient,
+): Promise<SerienAktualisierungsErgebnis> {
+  const ergebnis: SerienAktualisierungsErgebnis = {
+    aktualisiert: [],
+    uebersprungen: [],
+  };
+
+  // Verschiebung aus der bearbeiteten Instanz ableiten – Start und Ende
+  // getrennt, damit auch eine geänderte Termindauer übernommen wird.
+  const deltaStartMs =
+    new Date(aenderung.neueStartzeit).getTime() - new Date(aenderung.alteStartzeit).getTime();
+  const deltaEndeMs =
+    new Date(aenderung.neueEndzeit).getTime() - new Date(aenderung.alteEndzeit).getTime();
+
+  const jetztISO = new Date().toISOString();
+
+  const { data: termine, error: ladeFehler } = await supabase
+    .from("buchungen")
+    .select("*")
+    .eq("serien_id", aenderung.serienId)
+    .gte("startzeit", jetztISO)
+    .order("startzeit", { ascending: true });
+
+  if (ladeFehler) {
+    throw new Error(`Fehler beim Laden der Serientermine: ${ladeFehler.message}`);
+  }
+
+  for (const termin of termine ?? []) {
+    const neuerStart = new Date(new Date(termin.startzeit).getTime() + deltaStartMs);
+    const neuesEnde = new Date(new Date(termin.endzeit).getTime() + deltaEndeMs);
+
+    if (neuesEnde <= neuerStart) {
+      ergebnis.uebersprungen.push({
+        startzeit: neuerStart,
+        endzeit: neuesEnde,
+        grund: "Die Endzeit muss nach der Startzeit liegen.",
+      });
+      continue;
+    }
+
+    const startISO = neuerStart.toISOString();
+    const endISO = neuesEnde.toISOString();
+
+    // Belegungsprüfung wie beim Anlegen; nur der Termin selbst wird
+    // ausgeschlossen. Andere Serienmitglieder liegen im Wochenraster ohnehin
+    // auf anderen Tagen und kollidieren mit der Verschiebung nicht.
+    const { data: existing, error: fetchError } = await supabase
+      .from("buchungen")
+      .select("startzeit, endzeit, platzanteil")
+      .eq("platz", aenderung.felder.platz)
+      .neq("id", termin.id)
+      .gte("endzeit", startISO)
+      .lte("startzeit", endISO);
+
+    if (fetchError) {
+      ergebnis.uebersprungen.push({
+        startzeit: neuerStart,
+        endzeit: neuesEnde,
+        grund: `Fehler beim Abrufen bestehender Buchungen: ${fetchError.message}`,
+      });
+      continue;
+    }
+
+    let belegung = 0;
+    for (const buchung of existing ?? []) {
+      const startB = new Date(buchung.startzeit).getTime();
+      const endB = new Date(buchung.endzeit).getTime();
+      if (neuerStart.getTime() < endB && neuesEnde.getTime() > startB) {
+        belegung += ANTEIL_WERTE[buchung.platzanteil] ?? 0;
+      }
+    }
+
+    const neuerWert =
+      ANTEIL_WERTE[aenderung.felder.platzanteil as Platzanteil] ?? 0;
+    if (belegung + neuerWert > 1) {
+      ergebnis.uebersprungen.push({
+        startzeit: neuerStart,
+        endzeit: neuesEnde,
+        grund: "Platz bereits belegt",
+      });
+      continue;
+    }
+
+    const { error: updateError } = await supabase
+      .from("buchungen")
+      .update({
+        ...aenderung.felder,
+        platzanteil: aenderung.felder.platzanteil as Platzanteil,
+        startzeit: startISO,
+        endzeit: endISO,
+      })
+      .eq("id", termin.id);
+
+    if (updateError) {
+      ergebnis.uebersprungen.push({
+        startzeit: neuerStart,
+        endzeit: neuesEnde,
+        grund: `Fehler beim Speichern: ${updateError.message}`,
+      });
+      continue;
+    }
+
+    ergebnis.aktualisiert.push({ startzeit: neuerStart, endzeit: neuesEnde });
+  }
+
+  return ergebnis;
+}
+
+/**
+ * Löscht alle ZUKÜNFTIGEN Termine einer Serie (Storno). Vergangene Termine
+ * bleiben als Historie erhalten. Gibt die Anzahl der gelöschten Termine zurück.
+ */
+export async function loescheSerie(
+  serienId: string,
+  supabase: SerienSupabaseClient,
+): Promise<number> {
+  const jetztISO = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("buchungen")
+    .delete()
+    .eq("serien_id", serienId)
+    .gte("startzeit", jetztISO)
+    .select("id");
+
+  if (error) {
+    throw new Error(`Fehler beim Löschen der Serie: ${error.message}`);
+  }
+
+  return data?.length ?? 0;
 }
 
 function startOfKalendertag(datum: Date): Date {

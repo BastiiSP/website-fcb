@@ -4,8 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
-import BearbeitenModal, { type Buchung } from "@/components/BearbeitenModal";
+import BearbeitenModal, {
+  type Buchung,
+  type SerienBereich,
+} from "@/components/BearbeitenModal";
 import LoeschenModal from "@/components/LoeschenModal";
+import { loescheSerie } from "@/lib/serienbuchung";
 import ToastMessage from "@/components/ToastMessage";
 import { Pencil, Trash2 } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -187,9 +191,28 @@ export default function BuchungenVerwaltung() {
     setSeite(0);
   };
 
-  // Löschen bestätigen → DB-Delete → Toast + Liste neu laden (kein Seitenreload)
-  const loeschenBestaetigen = async () => {
+  // Löschen bestätigen → DB-Delete → Toast + Liste neu laden (kein Seitenreload).
+  // bereich steuert bei Serien: nur diese Instanz oder alle zukünftigen Termine.
+  const loeschenBestaetigen = async (bereich: SerienBereich) => {
     if (!loeschBuchung) return;
+
+    if (bereich === "serie" && loeschBuchung.serien_id) {
+      try {
+        const anzahl = await loescheSerie(loeschBuchung.serien_id, supabase);
+        setErfolg(
+          `Serie gelöscht: ${anzahl} ${
+            anzahl === 1 ? "zukünftiger Termin" : "zukünftige Termine"
+          } entfernt.`
+        );
+        ladeBuchungen();
+      } catch (e) {
+        setAktionsFehler(
+          e instanceof Error ? e.message : "Löschen der Serie fehlgeschlagen."
+        );
+      }
+      setLoeschBuchung(null);
+      return;
+    }
 
     const { error } = await supabase
       .from("buchungen")
@@ -399,8 +422,8 @@ export default function BuchungenVerwaltung() {
         onClose={() => setBearbeiteBuchung(null)}
         supabase={supabase}
         initialData={bearbeiteBuchung}
-        onSave={() => {
-          setErfolg("Buchung erfolgreich aktualisiert.");
+        onSave={(meldung) => {
+          setErfolg(meldung ?? "Buchung erfolgreich aktualisiert.");
           ladeBuchungen();
         }}
       />
@@ -411,6 +434,7 @@ export default function BuchungenVerwaltung() {
         onClose={() => setLoeschBuchung(null)}
         onConfirm={loeschenBestaetigen}
         mannschaft={loeschBuchung?.mannschaft}
+        serienWahl={!!loeschBuchung?.serien_id}
       />
 
       {/* Aktions-Feedback */}

@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { Repeat } from "lucide-react";
 import Modal from "@/components/ui/Modal";
 import Select from "@/components/ui/Select";
 import TextField from "@/components/ui/TextField";
 import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 import Banner from "@/components/ui/Banner";
+import { aktualisiereSerie } from "@/lib/serienbuchung";
 
 export type Buchung = {
   id: string;
@@ -20,14 +22,20 @@ export type Buchung = {
   mannschaft: string;
   bemerkung?: string;
   user_id: string;
+  /** Gemeinsame ID aller Termine einer wöchentlichen Serie; null/undefined = Einzelbuchung */
+  serien_id?: string | null;
 };
+
+/** Bearbeitungs-/Lösch-Umfang bei Serienterminen */
+export type SerienBereich = "einzeln" | "serie";
 
 type Props = {
   show: boolean;
   onClose: () => void;
   supabase: SupabaseClient;
   initialData: Buchung | null;
-  onSave: () => void;
+  /** meldung: optionaler Erfolgstext (z. B. Serien-Zusammenfassung) für den Toast des Aufrufers */
+  onSave: (meldung?: string) => void;
 };
 
 // Optionslisten für die Auswahl-Felder
@@ -62,10 +70,15 @@ export default function BearbeitenModal({
   // Fehlermeldung im Modal (z. B. Belegungskonflikt) – ersetzt das frühere alert()
   const [fehler, setFehler] = useState("");
 
+  // Bei Serienterminen wählbar: nur diese Instanz oder alle zukünftigen Termine.
+  // Default bewusst "einzeln" – Einzeltermine einer Serie bleiben frei anpassbar.
+  const [bereich, setBereich] = useState<SerienBereich>("einzeln");
+
   // Wenn sich die übergebenen Props ändern, Formular aktualisieren
   useEffect(() => {
     setForm(initialData || null);
     setFehler("");
+    setBereich("einzeln");
   }, [initialData]);
 
   // Formularfeldänderungen übernehmen
@@ -85,6 +98,47 @@ export default function BearbeitenModal({
 
     if (new Date(endISO) <= new Date(startISO)) {
       setFehler("Die Endzeit muss nach der Startzeit liegen.");
+      return;
+    }
+
+    // Serien-Pfad: Änderung auf alle zukünftigen Termine der Serie übertragen.
+    // Die Belegungsprüfung läuft dort pro Termin – Konflikte werden übersprungen.
+    if (bereich === "serie" && form.serien_id && initialData) {
+      try {
+        const serienErgebnis = await aktualisiereSerie(
+          {
+            serienId: form.serien_id,
+            alteStartzeit: new Date(initialData.startzeit).toISOString(),
+            alteEndzeit: new Date(initialData.endzeit).toISOString(),
+            neueStartzeit: startISO,
+            neueEndzeit: endISO,
+            felder: {
+              platz: form.platz,
+              platzanteil: form.platzanteil,
+              anlass: form.anlass,
+              mannschaft: form.mannschaft,
+              buchende_person: form.buchende_person,
+              bemerkung: form.bemerkung ?? null,
+            },
+          },
+          supabase
+        );
+
+        const anzahl = serienErgebnis.aktualisiert.length;
+        let meldung = `Serie aktualisiert: ${anzahl} Termin${anzahl !== 1 ? "e" : ""} angepasst`;
+        if (serienErgebnis.uebersprungen.length > 0) {
+          meldung += `, ${serienErgebnis.uebersprungen.length} übersprungen (z. B. Platz belegt)`;
+        }
+        meldung += ".";
+
+        setFehler("");
+        onSave(meldung);
+        onClose();
+      } catch (e) {
+        setFehler(
+          e instanceof Error ? e.message : "Fehler beim Aktualisieren der Serie."
+        );
+      }
       return;
     }
 
@@ -159,6 +213,47 @@ export default function BearbeitenModal({
         <form onSubmit={handleSubmit} className="space-y-4">
         {/* Fehlermeldung (z. B. Belegungskonflikt) direkt im Modal */}
         {fehler && <Banner variant="error" message={fehler} />}
+
+        {/* Bereichswahl nur bei Serienterminen: Einzeltermin bleibt der Default */}
+        {form.serien_id && (
+          <div
+            role="radiogroup"
+            aria-label="Bearbeitungsumfang"
+            className="rounded-lg border border-fcb-border bg-fcb-bg p-3 space-y-2"
+          >
+            <p className="flex items-center gap-1.5 font-inter text-xs font-medium uppercase tracking-wider text-fcb-muted">
+              <Repeat size={14} aria-hidden />
+              Teil einer wöchentlichen Serie
+            </p>
+            <label className="flex items-center gap-2 cursor-pointer font-inter text-sm text-fcb-text">
+              <input
+                type="radio"
+                name="serien-bereich"
+                checked={bereich === "einzeln"}
+                onChange={() => setBereich("einzeln")}
+                className="h-4 w-4 accent-fcb-blue"
+              />
+              Nur diesen Termin bearbeiten
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer font-inter text-sm text-fcb-text">
+              <input
+                type="radio"
+                name="serien-bereich"
+                checked={bereich === "serie"}
+                onChange={() => setBereich("serie")}
+                className="h-4 w-4 accent-fcb-blue"
+              />
+              Ganze Serie bearbeiten (alle zukünftigen Termine)
+            </label>
+            {bereich === "serie" && (
+              <p className="font-inter text-xs text-fcb-muted">
+                Die Zeitverschiebung und alle Feldänderungen werden auf jeden
+                zukünftigen Termin der Serie übertragen. Termine mit
+                Belegungskonflikt bleiben unverändert.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* Platz, Platzanteil, Anlass */}
         <div className="flex gap-4 flex-wrap">

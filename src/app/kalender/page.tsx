@@ -16,8 +16,12 @@ import Link from "next/link";
 import ToastMessage from "@/components/ToastMessage";
 import Buchungsformular from "@/components/Buchungsformular";
 import LoeschenModal from "@/components/LoeschenModal";
-import BearbeitenModal, { type Buchung } from "@/components/BearbeitenModal";
+import BearbeitenModal, {
+  type Buchung,
+  type SerienBereich,
+} from "@/components/BearbeitenModal";
 import TooltipContent from "@/components/TooltipContent";
+import { loescheSerie } from "@/lib/serienbuchung";
 import KalenderToolbar, {
   type KalenderAnsicht,
 } from "@/components/kalender/KalenderToolbar";
@@ -103,8 +107,9 @@ export default function KalenderSeite() {
     pruefeZugang();
   }, []);
 
-  // 🗑️ Termin löschen
-  const handleLoeschen = async () => {
+  // 🗑️ Termin löschen – bereich steuert bei Serien: nur diese Instanz oder
+  // alle zukünftigen Termine der Serie
+  const handleLoeschen = async (bereich: SerienBereich) => {
     if (!zuLoeschendeBuchung) return;
 
     // Rechte-Check wie beim Bearbeiten – RLS würde das Löschen ohnehin blocken,
@@ -115,6 +120,22 @@ export default function KalenderSeite() {
       zuLoeschendeBuchung.user_id === userId;
     if (!darfLoeschen) {
       setErrorMessage("Du darfst diese Buchung nicht löschen.");
+      setZuLoeschendeBuchung(null);
+      return;
+    }
+
+    if (bereich === "serie" && zuLoeschendeBuchung.serien_id) {
+      try {
+        const anzahl = await loescheSerie(zuLoeschendeBuchung.serien_id, supabase);
+        setSuccessMessage(
+          `Serie gelöscht: ${anzahl} ${
+            anzahl === 1 ? "zukünftiger Termin" : "zukünftige Termine"
+          } entfernt.`
+        );
+        fetchEvents(supabase, setEvents);
+      } catch {
+        setErrorMessage("Löschen der Serie fehlgeschlagen.");
+      }
       setZuLoeschendeBuchung(null);
       return;
     }
@@ -421,12 +442,13 @@ export default function KalenderSeite() {
         )}
       </PageShell>
 
-      {/* Lösch-Bestätigung */}
+      {/* Lösch-Bestätigung – bei Serienterminen mit Auswahl Einzeltermin/Serie */}
       <LoeschenModal
         show={zuLoeschendeBuchung !== null}
         onClose={() => setZuLoeschendeBuchung(null)}
         onConfirm={handleLoeschen}
         mannschaft={zuLoeschendeBuchung?.mannschaft || ""}
+        serienWahl={!!zuLoeschendeBuchung?.serien_id}
       />
 
       {/* Bearbeiten-Modal */}
@@ -435,8 +457,9 @@ export default function KalenderSeite() {
         onClose={() => setBearbeiteBuchung(null)}
         supabase={supabase}
         initialData={bearbeiteBuchung!}
-        onSave={() => {
+        onSave={(meldung) => {
           setBearbeiteBuchung(null);
+          setSuccessMessage(meldung ?? "Buchung erfolgreich aktualisiert.");
           fetchEvents(supabase, setEvents);
         }}
       />

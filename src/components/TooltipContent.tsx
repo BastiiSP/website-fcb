@@ -1,5 +1,13 @@
 import { EventApi } from "@fullcalendar/core";
-import { Clock, MapPin, Pencil, StickyNote, Trash2, User } from "lucide-react";
+import {
+  Clock,
+  MapPin,
+  Pencil,
+  Repeat,
+  StickyNote,
+  Trash2,
+  User,
+} from "lucide-react";
 import type { Buchung } from "@/components/BearbeitenModal";
 
 type Props = {
@@ -84,6 +92,11 @@ export default function TooltipContent({
         </DetailZeile>
 
         <DetailZeile Icon={User}>{props.buchende_person}</DetailZeile>
+
+        {/* Serien-Kennzeichnung: Bearbeiten/Löschen bietet dann die Bereichswahl an */}
+        {props.serien_id && (
+          <DetailZeile Icon={Repeat}>Wöchentliche Serie</DetailZeile>
+        )}
 
         {props.bemerkung && (
           <DetailZeile Icon={StickyNote}>{props.bemerkung}</DetailZeile>
