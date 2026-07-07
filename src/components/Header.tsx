@@ -6,7 +6,7 @@ import { useState } from "react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import UserDropdown from "@/components/UserDropdown";
-import Navigation from "@/components/Navigation";
+import VereinsSwitcher from "@/components/VereinsSwitcher";
 
 /**
  * Globaler Header – Smart-Sticky, fcb-Design-Tokens, beide Wappen, öffentliche Nav-Links.
@@ -15,8 +15,8 @@ import Navigation from "@/components/Navigation";
  * erscheint beim Scrollen nach oben (delta < -5). Pattern übernommen von VariantsNavbar.
  *
  * Struktur:
- *   Links  – Vereinswappen + Stadtwappen + Vereinsname (Oswald)
- *   Mitte  – Öffentliche Links + rollenbasierte Navigation (Desktop)
+ *   Links  – Vereinswappen + Stadtwappen + Vereinsname (Oswald) + Vereins-Switcher
+ *   Mitte  – Öffentliche Links (Desktop) – rollenbasierte Bereiche liegen im Account-Menü
  *   Rechts – UserDropdown + Hamburger (Mobile)
  */
 const PUBLIC_LINKS = [
@@ -87,9 +87,12 @@ export default function Header() {
               FCB
             </span>
           </Link>
+
+          {/* Vereins-Switcher: Vorbereitung für den späteren FCB ↔ JFG-Wechsel (nur UI) */}
+          <VereinsSwitcher />
         </div>
 
-        {/* Desktop Nav: öffentliche Links + rollenbasierte Links */}
+        {/* Desktop Nav: nur öffentliche Links – rollenbasierte Bereiche liegen im Account-Menü */}
         <div className="hidden items-center gap-6 md:flex">
           {PUBLIC_LINKS.map(({ label, href }) => (
             <Link
@@ -100,7 +103,6 @@ export default function Header() {
               {label}
             </Link>
           ))}
-          <Navigation />
         </div>
 
         {/* Rechte Seite: Auth (Buttons ausgeloggt / Avatar eingeloggt) */}
@@ -131,8 +133,6 @@ export default function Header() {
                   {label}
                 </Link>
               ))}
-              {/* Rollenbasierte Links – Navigation rendert null wenn nicht eingeloggt */}
-              <Navigation onLinkClick={() => setMenuOpen(false)} />
             </div>
           </motion.div>
         )}
