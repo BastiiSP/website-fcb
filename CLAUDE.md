@@ -102,6 +102,14 @@ Anfragen von `mitglied`-Nutzern zum Beitritt/Austritt aus einer Mannschaft. Wird
 
 RLS: Nutzer sehen/erstellen nur eigene Anfragen; vorstand und admin verwalten alle.
 
+### Tabelle: `keepalive` (technisch)
+
+Verhindert das Pausieren des Supabase-Free-Tiers: Der GitHub-Actions-Workflow
+`.github/workflows/supabase-keepalive.yml` schreibt alle 3 Tage per anon-INSERT einen
+Eintrag (RLS-Policy erlaubt anon nur INSERT). Kein Fach-Schema – nicht umbauen, nicht in
+Features verwenden. Hintergrund: anon-Leseanfragen zählt Supabase nicht zuverlässig als
+Aktivität, deshalb Write statt Read.
+
 ## Code-Regeln
 
 - **Tabellenname**: `profiles` (Plural) – niemals `profile` (Singular, das war der alte kaputte Name)
@@ -110,7 +118,7 @@ RLS: Nutzer sehen/erstellen nur eigene Anfragen; vorstand und admin verwalten al
 - **RLS immer aktiv**: Zugangskontrolle läuft in der Datenbank, nicht nur im Frontend
 - **GRANTs nicht vergessen**: Bei jeder neuen Tabelle explizit `GRANT SELECT, INSERT, UPDATE, DELETE ON public.<tabelle> TO authenticated;` ausführen – ohne das greift RLS nie, da Postgres vorher mit „permission denied" abbricht. Bereits zweimal vergessen: `buchungen` (2026-05-22) und `mitglieder` (2026-05-26).
 - **Neue Tabelle anlegen**: Immer das Skill `supabase-tabelle-anlegen` nutzen (`.claude/skills/`) – verifiziertes Rezept mit korrekter Trigger-Funktion (`handle_updated_at()`), RLS-Muster (`get_own_rolle()`), GRANT und Workflow-Checkliste.
-- **Komponente bauen/ändern**: Immer das Skill `fcb-komponente-bauen` nutzen (`.claude/skills/`) – verifizierte Werte für Tokens, Fonts, Icons, Framer Motion, A11y + die Migrations-Eigenheit (neu = `fcb.*`/dunkel, Legacy = noch hell, nicht blind kopieren).
+- **Komponente bauen/ändern**: Immer das Skill `fcb-komponente-bauen` nutzen (`.claude/skills/`) – verifizierte Werte für Tokens (Dual-Theme!), Fonts, Icons, Framer Motion, A11y und die `ui/`-Primitive.
 - **Supabase MCP nutzen**: Für alle Datenbankoperationen den MCP-Server verwenden
 - **Keine direkten DB-Calls ohne RLS-Check** in Server Components
 - **Fehlerbehandlung**: Alle Supabase-Calls mit try/catch und aussagekräftigen Fehlermeldungen
@@ -122,56 +130,93 @@ RLS: Nutzer sehen/erstellen nur eigene Anfragen; vorstand und admin verwalten al
 ```
 src/
 ├── app/
+│   ├── page.tsx                   ← Homepage (Hero, Instagram-Sektion, Brücke zur News-Seite)
+│   ├── verein/page.tsx            ← Öffentliche Vereinsseite
+│   ├── mannschaften/page.tsx      ← Teams (TeamCards) + BFV-Spielbetrieb (Tabelle & Spiele)
+│   ├── news/page.tsx              ← News-Seite (Instagram-only, kein CMS)
+│   ├── kontakt/page.tsx           ← Öffentliche Kontaktseite
 │   ├── kalender/page.tsx          ← Buchungskalender (nur trainer/vorstand/admin)
-│   ├── vorstand/page.tsx          ← Admin-Bereich (nur vorstand/admin)
+│   ├── vorstand/page.tsx          ← Vorstandsbereich inkl. Buchungsübersicht (nur vorstand/admin)
 │   ├── mitglieder/page.tsx        ← Mitgliederverwaltung (nur vorstand/admin)
 │   ├── mein-verein/page.tsx       ← Vereinslinks & Info (mitglied + höher)
 │   ├── profil/page.tsx            ← Profilverwaltung (alle eingeloggten Rollen)
-│   ├── login/page.tsx
-│   ├── registrieren/page.tsx
-│   └── confirm-email/page.tsx
+│   ├── login/ · registrieren/ · confirm-email/  ← Auth-Seiten (Pitch-Look)
+│   ├── auth/callback/page.tsx     ← OAuth-Redirect (Google-Login)
+│   ├── impressum/ · datenschutz/  ← Rechtstexte (RechtstextLayout)
+│   └── api/
+│       ├── spielbetrieb/route.ts  ← Debug-Endpoint für BFV-Daten (?team=herren-1)
+│       ├── instagram/route.ts     ← Instagram-Feed (Behold)
+│       ├── keep-alive/route.ts    ← Supabase-Ping (Haupt-Keepalive läuft als GitHub Action, s. Tabelle keepalive)
+│       └── benutzer-ablehnen/route.ts
 ├── components/
-│   ├── Navigation.tsx             ← Rollenbasierte Navigation (modern, fcb-Tokens)
-│   ├── Header.tsx                 ← Smart-Sticky-Nav, kanonisches Design-Vorbild (modern)
-│   ├── Footer.tsx
+│   ├── Header.tsx                 ← Smart-Sticky-Nav, kanonisches Design-Vorbild
+│   ├── Navigation.tsx             ← Rollenbasierte Navigation
+│   ├── Footer.tsx                 ← Dreispaltig, enthält den Theme-Umschalter
 │   ├── ConditionalChrome.tsx      ← Blendet Header/Footer auf Auth-Routen aus
-│   ├── UserDropdown.tsx           ← Nutzer-Menü in der Nav (modern, fcb-Tokens)
-│   ├── ThemeToggle.tsx            ← Hell/Dunkel-Umschaltung (darkMode: 'class')
-│   ├── Buchungsformular.tsx
+│   ├── UserDropdown.tsx           ← Nutzer-Menü in der Nav
+│   ├── Buchungsformular.tsx / BearbeitenModal.tsx / LoeschenModal.tsx
+│   ├── BuchungenVerwaltung.tsx    ← Buchungsübersicht im Vorstand-Bereich (Filter, Pagination, Mobile-Cards)
 │   ├── BenutzerListe.tsx          ← Nutzerverwaltung + Mannschaftsanfragen im Vorstand-Bereich
 │   ├── MannschaftsanfragenVerwaltung.tsx
-│   ├── BearbeitenModal.tsx / LoeschenModal.tsx
-│   ├── MitgliederVerwaltung.tsx   ← Mitgliederverwaltung (Phase 2)
-│   ├── MitgliedBearbeitenModal.tsx
-│   ├── TrainerVerzeichnis.tsx
-│   ├── NewsCard.tsx / NewsSection.tsx  ← Neuigkeiten (NewsCard noch Legacy-hell)
-│   ├── TooltipContent.tsx
+│   ├── MitgliederVerwaltung.tsx / MitgliedBearbeitenModal.tsx   ← Mitgliederverwaltung (Phase 2)
+│   ├── TrainerVerzeichnis.tsx / TooltipContent.tsx
 │   ├── ToastMessage.tsx           ← Globale Erfolgs-/Fehlermeldungen
-│   ├── icons/BrandIcons.tsx       ← Facebook/Instagram als Inline-SVG (Lucide hat keine Brand-Icons)
-│   ├── instagram/                 ← InstagramSection / InstagramCarousel (modern)
-│   ├── hero/                      ← Hero-Varianten (Design-Exploration)
-│   ├── auth/                      ← Permanente Auth-UI (Pitch-Look: Shell, Background, Felder, Google-Button)
-│   └── profil/                    ← Profil-Unterkomponenten
-│       ├── PersoenlicheDaten.tsx
-│       ├── AccountSicherheit.tsx
-│       ├── AvatarUploadModal.tsx
-│       ├── MannschaftLizenzen.tsx
-│       └── MannschaftsAnfrageModal.tsx
+│   ├── ui/                        ← Design-System-Primitive: Button, ButtonLink, buttonStyles,
+│   │                                Card, Banner, Badge, IconBadge, TeamCard, Modal, PageShell,
+│   │                                PageHeader, Tabs, Select, TextField, Textarea, ThemeToggle
+│   ├── icons/BrandIcons.tsx       ← Facebook/Instagram/WhatsApp/Google als Inline-SVG (Lucide hat keine Brand-Icons)
+│   ├── spielbetrieb/              ← BFV-UI: SpielbetriebSection, SpielbetriebExplorer (Verein → Mannschaft), SpielbetriebCard
+│   ├── news/NewsPostCard.tsx      ← Instagram-Post-Card der News-Seite
+│   ├── instagram/                 ← InstagramSection / InstagramCarousel (Homepage)
+│   ├── consent/                   ← DSGVO: ConsentProvider, CookieBanner, ConsentGate
+│   ├── rechtstexte/RechtstextLayout.tsx
+│   ├── hero/                      ← Homepage-Hero (HybridPitch, HybridCanvas, RotatingText)
+│   ├── auth/                      ← Auth-UI (Pitch-Look: Shell, Background, Felder, Google-Button)
+│   └── profil/                    ← Profil-Unterkomponenten (PersoenlicheDaten, AccountSicherheit,
+│                                    AvatarUploadModal, MannschaftLizenzen, MannschaftsAnfrageModal)
+├── hooks/
+│   └── useTheme.ts                ← Theme lesen/umschalten (localStorage + .dark/.light auf <html>)
 ├── lib/
-│   ├── supabaseClient.ts          ← Supabase-Client (anon key), importiert als @/lib/supabaseClient
-│   ├── mannschaften.ts            ← Mannschaftsliste (Konstanten)
+│   ├── supabaseClient.ts          ← Supabase-Singleton (anon key); Exporte: `supabase` + `createClient()`
+│   ├── teams.ts                   ← Team-Daten + getTeamAccent() (FCB/JFG-Akzent-Klassen)
+│   ├── mannschaften.ts            ← Mannschaftsliste für Formulare (Konstanten)
+│   ├── bfv.ts                     ← BFV-Widget-API: BFV_TEAMS-Konfiguration + getSpielbetrieb()
+│   ├── bfvTypes.ts                ← Typen für BFV-Tabelle & Spiele
+│   ├── beholdFeed.ts              ← Instagram-Feed via Behold (Parsing, Caption-Split, Datum)
+│   ├── consent.ts                 ← Consent-Kategorien & localStorage-Handling
+│   ├── theme.ts                   ← Theme-Konstanten + applyTheme() (Default: dark)
 │   ├── lizenzen.ts                ← Lizenz-Daten
-│   └── vereinslinks.ts            ← Externe Vereinslinks (WhatsApp, Social Media etc.)
+│   ├── vereinslinks.ts            ← Externe Vereinslinks (WhatsApp, Social Media etc.)
+│   └── auth/signInWithGoogle.ts   ← Google-OAuth-Start
 └── utils/
     ├── checkSession.ts            ← Session + Rolle prüfen
     ├── getUserRolle.ts            ← Rolle eines Users abrufen
     ├── fetchEvents.ts             ← Buchungen laden
-    ├── fetchNews.ts               ← Neuigkeiten laden
     ├── getEventColor.ts           ← Kalender-Farben nach Mannschaft
     ├── formatKalenderTitel.ts     ← Buchungstitel formatieren
     ├── formatCapitalized.ts       ← Hilfsfunktion Großschreibung
     └── passwortStaerke.ts         ← Passwort-Stärke-Berechnung
 ```
+
+Außerhalb von `src/`: `e2e/smoke.spec.ts` (Playwright-Smoke-Suite) und
+`.github/workflows/supabase-keepalive.yml` (Keepalive-Cron, s. Tabelle `keepalive`).
+
+## BFV-Spielbetrieb (Tabelle & Spiele)
+
+Live-Sportdaten (Tabelle, Ergebnisse, Termine) der Herrenmannschaften kommen **ohne Login**
+von der öffentlichen BFV-Widget-API (`https://widget-prod.bfv.de/api/service/widget/v1`) –
+Quelle ist bfv.de, nicht fussball.de.
+
+- **Konfiguration**: `BFV_TEAMS` in `src/lib/bfv.ts`. Pro Team wird nur die stabile
+  `teamPermanentId` aus der öffentlichen BFV-Mannschafts-URL gepflegt – Liga, Staffel und
+  `compoundId` liefert der Matches-Endpunkt automatisch. Schritt-für-Schritt-Anleitung zum
+  Ergänzen weiterer Teams steht als Kommentar direkt über `BFV_TEAMS`.
+- **Caching**: 1 Stunde (`REVALIDATE_SECONDS` / `revalidate = 3600`) – die BFV-Quelle nicht
+  häufiger abfragen.
+- **Debug**: `/api/spielbetrieb?team=herren-1` zeigt die Rohdaten pro Team (ohne Parameter:
+  alle konfigurierten Teams), ohne die Seite rendern zu müssen.
+- **UI**: `src/components/spielbetrieb/` – `SpielbetriebSection` auf `/mannschaften`,
+  `SpielbetriebExplorer` (Auswahl Verein → Mannschaft), `SpielbetriebCard` (Tabelle + Spiele).
 
 ## Supabase MCP
 
@@ -188,14 +233,16 @@ cd ~/Workspace/website-fcb
 npm run dev        # Entwicklungsserver auf localhost:3000
 npm run build      # Production Build – schlägt LOKAL oft fehl (s. Deployment), Vercel baut sauber
 npm run lint       # ESLint
+npm run test:e2e   # Playwright-Smoke-Suite (e2e/smoke.spec.ts, braucht laufenden Dev-Server bzw. Build)
 ```
 
 **Environment:** `.env.local` mit `NEXT_PUBLIC_SUPABASE_URL` und
 `NEXT_PUBLIC_SUPABASE_ANON_KEY`. `src/lib/supabaseClient.ts` hat Placeholder-Fallbacks,
 damit Preview-Branches ohne Env-Vars trotzdem bauen – auf `main` sind echte Werte gesetzt.
 
-**Tests:** Keine automatisierten Tests (nur `dev`/`build`/`start`/`lint`). Verifikation läuft
-über Lint, `npx tsc --noEmit` und manuelles Testen (s. „Manuell zu testen").
+**Tests:** Playwright-Smoke-Suite in `e2e/smoke.spec.ts` (`npm run test:e2e`, Konfiguration
+`playwright.config.ts`). Darüber hinaus läuft Verifikation über Lint, `npx tsc --noEmit`
+und manuelles Testen (s. „Manuell zu testen").
 
 ## Deployment
 
@@ -212,43 +259,48 @@ git commit -m "feat: [beschreibung]"
 git push
 ```
 
-## Design-Spec (abgestimmt mit Claudian – Stand 2026-05-28)
+## Design-Spec (abgestimmt mit Claudian – Stand 2026-07-07)
 
 Alle Designentscheidungen wurden gemeinsam mit Basti besprochen und sind verbindlich.
 Bei neuen Komponenten und Änderungen **immer** diese Spec einhalten.
 Die vollständige Designdokumentation liegt in der Obsidian-Projektdatei `02 Projekte/Website FCB.md`.
 
-> **Migrationsstatus (wichtig!):** Das Projekt zieht schrittweise auf dieses Design um.
-> Die `fcb.*`-Token-Optik (dunkel, Oswald/Inter) ist bereits in den **neuen/überarbeiteten**
-> Komponenten umgesetzt (`Header`, `Navigation`, `UserDropdown`, `instagram/`, Homepage, alle
-> Preview-Routen). **Viele Legacy-Seiten sind noch hell** (`gray-*`, `var(--background)`,
-> Geist/Arial-Body in `globals.css`): u. a. `login`, `registrieren`, `profil`, `vorstand`,
-> `kalender`, `mitglieder`, `NewsCard`. → **Beim Bauen das moderne Vorbild `Header.tsx` nehmen,
-> NICHT die Legacy-Komponenten kopieren.** Legacy-Seiten nur dann aufs neue Design ziehen, wenn
-> Basti das ausdrücklich beauftragt – nie ungefragt „mitmigrieren".
+> **Status:** Die Design-Migration ist abgeschlossen (Design-System + Dual-Theme live seit
+> 2026-06-19). **Alle Routen** laufen auf den semantischen `fcb.*`-Tokens und unterstützen
+> Hell- und Dunkel-Theme (Default: dunkel, Umschalter im Footer). Kanonische Vorbilder:
+> `Header.tsx` und die Primitive in `src/components/ui/`. Einzige bekannte Rest-Altlast:
+> vereinzelte `gray-*`-Klassen in `profil/AvatarUploadModal.tsx` und
+> `profil/AccountSicherheit.tsx` – nur auf Beauftragung bereinigen.
+> **Neue Komponenten müssen in beiden Themes funktionieren** – Tokens statt fester Farben,
+> beim manuellen Test einmal umschalten.
 
 ### Vereinskontext
 - **FCB** = 1. FC 1911 Burgkunstadt – Mannschaften: 2× Herren, E-/F-/G-Jugend
 - **JFG** = JFG Kunstadt-Obermain – Leistungsjugend: A-/B-/C-/D-Jugend (teils B1+B2)
 - FCB und JFG teilen dieselbe Basis-Palette, unterscheiden sich durch ihre Akzentfarbe
 
-### Farbpalette
-Tokens sind in `tailwind.config.ts` unter `fcb.*` definiert:
+### Farbpalette (Dual-Theme)
+Die `fcb.*`-Klassen (`tailwind.config.ts`) sind **semantische Tokens**: Sie lösen über
+CSS-Variablen aus `globals.css` auf, die je nach `.dark`-/`.light`-Klasse auf `<html>`
+andere Werte tragen (`darkMode: "class"`, Default dunkel, Umschalter im Footer /
+`hooks/useTheme.ts`). Opacity-Modifier funktionieren (`bg-fcb-surface/80`). Nur die
+Brand-Akzente `blue`/`red` sind feste Hex-Werte, in beiden Themes konstant.
 
-| Token | Klasse | Hex | Verwendung |
-|---|---|---|---|
-| Hintergrund | `bg-fcb-bg` | `#0a0a0a` | Seiten-BG, Hero, dunkle Sections |
-| Surface | `bg-fcb-surface` | `#161616` | Cards, Panels, Modals |
-| Border | `border-fcb-border` | `#2a2a2a` | Trennlinien, Rahmen |
-| Text | `text-fcb-text` | `#ffffff` | Primärtext |
-| Muted | `text-fcb-muted` | `#888888` | Datum, Metainfo |
-| Navbar | `bg-fcb-nav` | `#52525b` | Navbar-Hintergrund |
-| FCB-Blau | `text-fcb-blue` / `bg-fcb-blue` | `#1d5fad` | FCB-Akzent: Links, aktive States, CTAs |
-| JFG-Rot | `text-fcb-red` / `bg-fcb-red` | `#cc1f1f` | JFG-Bereich-Akzent |
+| Token | Klasse | Dark | Light | Verwendung |
+|---|---|---|---|---|
+| Hintergrund | `bg-fcb-bg` | `#0a0a0a` | `#ffffff` | Seiten-BG, Hero, Sections |
+| Surface | `bg-fcb-surface` | `#161616` | `#f5f5f5` | Cards, Panels, Modals |
+| Footer | `bg-fcb-footer` | `#262626` | `#e5e5e5` | Footer-Fläche |
+| Border | `border-fcb-border` | `#2a2a2a` | `#d4d4d4` | Trennlinien, Rahmen |
+| Text | `text-fcb-text` | `#ffffff` | `#111111` | Primärtext |
+| Muted | `text-fcb-muted` | `#888888` | `#5a5a5a` | Datum, Metainfo |
+| Navbar | `bg-fcb-nav` | `#52525b` | `#e4e4e7` | Navbar-Hintergrund |
+| FCB-Blau | `text-fcb-blue` / `bg-fcb-blue` | `#1d5fad` | (konstant) | FCB-Akzent: Links, aktive States, CTAs |
+| JFG-Rot | `text-fcb-red` / `bg-fcb-red` | `#cc1f1f` | (konstant) | JFG-Bereich-Akzent |
 
 ### Typografie
 - **Display / Headlines**: `font-oswald` → Oswald (via `next/font/google`, CSS-Variable – lädt zuverlässig) – Gewicht 600–700, gerne Großbuchstaben. **Hinweis:** `font-display` existiert ebenfalls, ist aber NICHT an `next/font` gebunden → für neue Komponenten `font-oswald` nehmen.
-- **Fließtext / UI**: `font-inter` → Inter – Gewicht 400/500. (Globaler Default in `layout.tsx` ist aktuell noch Geist; Oswald/Inter werden per Klasse aktiviert.)
+- **Fließtext / UI**: `font-inter` → Inter – Gewicht 400/500. Der Body-Default ist Inter (via `globals.css` über die CSS-Variable aus `layout.tsx`); `font-oswald` wird per Klasse aktiviert.
 
 ### Design-Prinzipien
 - **Keine Emojis** in der UI – ausschließlich Lucide-Icons
