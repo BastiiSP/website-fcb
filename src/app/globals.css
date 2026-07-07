@@ -163,17 +163,20 @@ body {
 }
 
 /* ============================================================
-   react-datepicker – theme-aware Styling (dual-theme via CSS-Tokens)
-   Überschreibt die eingebetteten hellen Standardfarben der Bibliothek.
-   WICHTIG: `html`-Präfix (+ gezielte !important beim Zeit-Panel) erhöht
-   die Spezifität, damit die Overrides unabhängig von der Bundler-
-   CSS-Reihenfolge gewinnen – die Bibliotheks-CSS wird inzwischen von
-   mehreren Komponenten importiert (Buchungsformular + BearbeitenModal),
-   was die Reihenfolge verschoben und den Kalender im Dark-Theme
-   weiß gemacht hatte.
+   react-datepicker v8 – Theme-Layer (dual-theme via CSS-Tokens)
+   EIN geordneter Block statt Einzel-Patches. Zwei Regeln dahinter:
+   1. Die Selektoren spiegeln exakt die dist-CSS der installierten
+      Version 8.2.1 – insbesondere die :not([aria-disabled=true])-
+      Hover-Ketten, die einfache ".…:hover"-Overrides schlagen würden.
+   2. Jeder Selektor trägt ein `html`-Präfix: dadurch gewinnen die
+      Overrides unabhängig von der Bundle-Reihenfolge (die Bibliotheks-
+      CSS wird von mehreren Komponenten importiert und kann vor ODER
+      nach globals.css landen). Das tief verschachtelte Zeit-Panel
+      braucht zusätzlich !important.
+   Farben ausschließlich aus den Tokens + Brand-Blau #1d5fad (fcb-blue).
    ============================================================ */
 
-/* Haupt-Popup-Box */
+/* --- Grundflächen --- */
 html .react-datepicker {
   background: rgb(var(--color-surface));
   color: rgb(var(--color-text));
@@ -188,59 +191,92 @@ html .react-datepicker__triangle {
   stroke: rgb(var(--color-border));
 }
 
-/* Monatskopf (Monatsname + Jahr + Navigationspfeile) */
+/* Monatskopf (Monatsname + Jahr + Wochentage) */
 html .react-datepicker__header {
   background: rgb(var(--color-bg));
   border-color: rgb(var(--color-border));
 }
 
-/* Textfarben innerhalb des Kalenders */
+/* --- Textfarben --- */
 html .react-datepicker__current-month,
 html .react-datepicker__day-name,
 html .react-datepicker__day,
+html .react-datepicker__month-text,
+html .react-datepicker__quarter-text,
+html .react-datepicker__year-text,
 html .react-datepicker-time__header,
 html .react-datepicker__time-name {
   color: rgb(var(--color-text));
 }
 
-/* Hover-Effekt auf Tagen */
-html .react-datepicker__day:hover {
-  background: rgb(var(--color-border));
+/* Tage außerhalb des Monats / deaktivierte Tage zurücknehmen */
+html .react-datepicker__day--outside-month,
+html .react-datepicker__day--disabled {
+  color: rgb(var(--color-muted));
 }
 
-/* Ausgewählter Tag */
+/* --- Hover (Tage/Monate/Quartale/Jahre) ---
+   Selektorform exakt wie in der v8-dist-CSS, sonst verliert der Override */
+html .react-datepicker__day:not([aria-disabled=true]):hover,
+html .react-datepicker__month-text:not([aria-disabled=true]):hover,
+html .react-datepicker__quarter-text:not([aria-disabled=true]):hover,
+html .react-datepicker__year-text:not([aria-disabled=true]):hover {
+  background: rgb(var(--color-border));
+  color: rgb(var(--color-text));
+}
+
+/* --- Auswahl --- */
 html .react-datepicker__day--selected,
-html .react-datepicker__day--keyboard-selected {
+html .react-datepicker__day--in-selecting-range,
+html .react-datepicker__day--in-range {
   background: #1d5fad;
   color: #ffffff;
 }
+html .react-datepicker__day--selected:not([aria-disabled=true]):hover,
+html .react-datepicker__day--in-selecting-range:not([aria-disabled=true]):hover,
+html .react-datepicker__day--in-range:not([aria-disabled=true]):hover {
+  background: rgba(29, 95, 173, 0.9);
+  color: #ffffff;
+}
 
-/* Zeit-Panel (rechte Spalte mit Uhrzeiten): die Bibliothek stylt hier mit
-   deutlich spezifischeren Verschachtelungs-Selektoren – deshalb !important
-   statt Selektor-Wettrüsten */
+/* Tastatur-Fokus (keyboard-selected): dezenter Blau-Tint statt Bibliotheks-Hellblau */
+html .react-datepicker__day--keyboard-selected,
+html .react-datepicker__month-text--keyboard-selected,
+html .react-datepicker__quarter-text--keyboard-selected,
+html .react-datepicker__year-text--keyboard-selected {
+  background: rgba(29, 95, 173, 0.25);
+  color: rgb(var(--color-text));
+}
+html .react-datepicker__day--keyboard-selected:not([aria-disabled=true]):hover,
+html .react-datepicker__month-text--keyboard-selected:not([aria-disabled=true]):hover,
+html .react-datepicker__quarter-text--keyboard-selected:not([aria-disabled=true]):hover,
+html .react-datepicker__year-text--keyboard-selected:not([aria-disabled=true]):hover {
+  background: rgba(29, 95, 173, 0.4);
+  color: rgb(var(--color-text));
+}
+
+/* --- Zeit-Panel (rechte Spalte) ---
+   Die Bibliothek stylt hier mit tiefen Verschachtelungs-Selektoren
+   (.time-container .time .time-box ul li…) – !important statt Wettrüsten */
 html .react-datepicker__time-container,
 html .react-datepicker__time,
 html .react-datepicker__time-box {
   background: rgb(var(--color-surface)) !important;
   color: rgb(var(--color-text)) !important;
 }
-
-/* Uhrzeit-Hover */
 html .react-datepicker__time-list-item:hover {
   background: rgb(var(--color-border)) !important;
 }
-
-/* Ausgewählte Uhrzeit */
 html .react-datepicker__time-list-item--selected {
   background: #1d5fad !important;
   color: #ffffff !important;
 }
 
-/* Navigations-Pfeile sichtbar machen */
+/* --- Navigation (Vor-/Zurück-Pfeile) --- */
 html .react-datepicker__navigation-icon::before {
   border-color: rgb(var(--color-muted));
 }
-html .react-datepicker__navigation:hover .react-datepicker__navigation-icon::before {
+html .react-datepicker__navigation:hover *::before {
   border-color: rgb(var(--color-text));
 }
 
