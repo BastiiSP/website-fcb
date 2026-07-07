@@ -6,15 +6,17 @@ import { checkSession } from "@/utils/checkSession";
 import BenutzerListe from "@/components/BenutzerListe";
 import MannschaftsanfragenVerwaltung from "@/components/MannschaftsanfragenVerwaltung";
 import BuchungenVerwaltung from "@/components/BuchungenVerwaltung";
+import SportheimAnfragenVerwaltung from "@/components/SportheimAnfragenVerwaltung";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Tabs from "@/components/ui/Tabs";
 
-// Tab-Typ: Benutzer, Mannschaftsanfragen, Buchungsübersicht
+// Tab-Typ: Benutzer, Mannschaftsanfragen, Buchungsübersicht, Sportheimanfragen
 const TABS = [
   { id: "benutzer",  label: "Benutzer" },
   { id: "anfragen",  label: "Mannschaftsanfragen" },
   { id: "buchungen", label: "Buchungen" },
+  { id: "sportheim", label: "Sportheim" },
 ];
 
 export default function VorstandPage() {
@@ -23,9 +25,9 @@ export default function VorstandPage() {
   const [loading, setLoading] = useState(true);
   const [zugelassen, setZugelassen] = useState(false);
   const [eigeneRolle, setEigeneRolle] = useState("");
-  const [activeTab, setActiveTab] = useState<"benutzer" | "anfragen" | "buchungen">(
-    "benutzer"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "benutzer" | "anfragen" | "buchungen" | "sportheim"
+  >("benutzer");
 
   useEffect(() => {
     const checkAccess = async () => {
@@ -82,7 +84,9 @@ export default function VorstandPage() {
         <Tabs
           tabs={TABS}
           active={activeTab}
-          onChange={(id) => setActiveTab(id as "benutzer" | "anfragen" | "buchungen")}
+          onChange={(id) =>
+            setActiveTab(id as "benutzer" | "anfragen" | "buchungen" | "sportheim")
+          }
         />
       </div>
 
@@ -101,6 +105,12 @@ export default function VorstandPage() {
       {activeTab === "buchungen" && (
         <section>
           <BuchungenVerwaltung />
+        </section>
+      )}
+
+      {activeTab === "sportheim" && (
+        <section>
+          <SportheimAnfragenVerwaltung />
         </section>
       )}
     </PageShell>

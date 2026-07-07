@@ -293,6 +293,57 @@ async function fetchBfvJson<TData>(
 }
 
 /**
+ * Ein Heimspiel der Herrenmannschaften für den Sportheim-Belegungskalender.
+ * Bewusst schlank: nur was der öffentliche Kalender anzeigen muss.
+ */
+export interface Heimspiel {
+  /** Anstoß als ISO-String (UTC, aus deutscher Ortszeit berechnet) */
+  anstoss: string;
+  heim: string;
+  gast: string;
+  /** Anzeigename aus BFV_TEAMS, z. B. "1. Mannschaft" */
+  mannschaft: string;
+}
+
+/**
+ * Lädt alle Heimspiele der konfigurierten BFV-Teams (für die Sportheim-Seite).
+ *
+ * Heimspiel-Erkennung über `homeTeamPermanentId === teamPermanentId` – Namens-
+ * vergleiche wären fragil (BFV schreibt "1.FC Burgkunstadt" uneinheitlich).
+ * Fehler einzelner Teams brechen nicht den gesamten Abruf: fetchBfvJson liefert
+ * dann null und das Team fällt still aus der Liste.
+ */
+export async function getHeimspiele(): Promise<Heimspiel[]> {
+  const teams = Object.values(BFV_TEAMS);
+
+  const proTeam = await Promise.all(
+    teams.map(async (config) => {
+      const matchesUrl = `${BFV_WIDGET_API_BASE}/team/${config.teamPermanentId}/matches`;
+      const response = await fetchBfvJson<BfvMatchesData>(matchesUrl);
+      if (!response) return [] as Heimspiel[];
+
+      return response.data.matches
+        .filter((match) => match.homeTeamPermanentId === config.teamPermanentId)
+        .map((match): Heimspiel | null => {
+          const anstoss = bfvAnstossZuIso(match.kickoffDate, match.kickoffTime);
+          if (!anstoss) return null;
+          return {
+            anstoss,
+            heim: match.homeTeamName,
+            gast: match.guestTeamName,
+            mannschaft: config.anzeigename,
+          };
+        })
+        .filter((spiel): spiel is Heimspiel => spiel !== null);
+    }),
+  );
+
+  return proTeam
+    .flat()
+    .sort((a, b) => new Date(a.anstoss).getTime() - new Date(b.anstoss).getTime());
+}
+
+/**
  * Lädt Tabelle und Spiele eines konfigurierten BFV-Teams.
  *
  * Der Tabellen-Endpunkt hängt an `compoundId`, nicht an `teamPermanentId`.

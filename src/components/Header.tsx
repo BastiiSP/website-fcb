@@ -23,6 +23,7 @@ const PUBLIC_LINKS = [
   { label: "Verein", href: "/verein" },
   { label: "Mannschaften", href: "/mannschaften" },
   { label: "News", href: "/news" },
+  { label: "Sportheim", href: "/sportheim" },
   { label: "Kontakt", href: "/kontakt" },
 ];
 
