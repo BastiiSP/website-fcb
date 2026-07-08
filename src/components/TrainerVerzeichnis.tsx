@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { MapPin, Phone, Users } from "lucide-react";
 import { createClient } from "@/lib/supabaseClient";
 
 // Nur die für das Verzeichnis relevanten Felder aus der profiles-Tabelle
@@ -11,6 +12,9 @@ type TrainerProfil = {
   telefonnummer: string | null;
   rolle: string;
   mannschaft: string[] | null;
+  strasse: string | null;
+  plz: string | null;
+  ort: string | null;
 };
 
 // Lesbare Bezeichnung für die angezeigte Rolle
@@ -36,7 +40,7 @@ export default function TrainerVerzeichnis() {
     // Datenschutz: Trainer sehen KEINE Vereinsmitglieder, nur andere Trainer/Vorstand/Admin
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, vorname, nachname, telefonnummer, rolle, mannschaft")
+      .select("id, vorname, nachname, telefonnummer, rolle, mannschaft, strasse, plz, ort")
       .in("rolle", ["trainer", "vorstand", "admin"])
       .order("nachname");
 
@@ -76,44 +80,65 @@ export default function TrainerVerzeichnis() {
       )}
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {profile.map((p) => (
-          <div
-            key={p.id}
-            className="border border-fcb-border rounded p-4 bg-fcb-surface text-fcb-text space-y-1"
-          >
-            <p className="font-semibold text-base">
-              {p.vorname} {p.nachname}
-            </p>
+        {profile.map((p) => {
+          const adresszeile = [p.plz, p.ort].filter(Boolean).join(" ");
+          const hatAdresse = Boolean(p.strasse || adresszeile);
+          const hatKontaktinfos = Boolean(
+            p.telefonnummer || (p.mannschaft && p.mannschaft.length > 0) || hatAdresse
+          );
 
-            <p className="text-xs opacity-60">
-              {ROLLEN_LABEL[p.rolle] ?? p.rolle}
-            </p>
+          return (
+            <div
+              key={p.id}
+              className="space-y-3 rounded-lg border border-fcb-border bg-fcb-surface p-4 text-fcb-text"
+            >
+              <div>
+                <p className="text-base font-semibold">
+                  {p.vorname} {p.nachname}
+                </p>
 
-            {p.telefonnummer && (
-              <p className="text-sm">
-                📞{" "}
-                <a
-                  href={`tel:${p.telefonnummer}`}
-                  className="hover:underline"
-                >
-                  {p.telefonnummer}
-                </a>
-              </p>
-            )}
+                <p className="text-xs text-fcb-muted">
+                  {ROLLEN_LABEL[p.rolle] ?? p.rolle}
+                </p>
+              </div>
 
-            {p.mannschaft && p.mannschaft.length > 0 && (
-              <p className="text-sm opacity-80">
-                ⚽ {p.mannschaft.join(", ")}
-              </p>
-            )}
+              {p.telefonnummer && (
+                <p className="flex items-center gap-2 text-sm">
+                  <Phone size={16} aria-hidden className="shrink-0 text-fcb-muted" />
+                  <a
+                    href={`tel:${p.telefonnummer}`}
+                    className="hover:text-fcb-blue hover:underline"
+                  >
+                    {p.telefonnummer}
+                  </a>
+                </p>
+              )}
 
-            {!p.telefonnummer && (!p.mannschaft || p.mannschaft.length === 0) && (
-              <p className="text-sm italic opacity-50">
-                Keine weiteren Kontaktinfos
-              </p>
-            )}
-          </div>
-        ))}
+              {p.mannschaft && p.mannschaft.length > 0 && (
+                <p className="flex items-start gap-2 text-sm text-fcb-muted">
+                  <Users size={16} aria-hidden className="mt-0.5 shrink-0" />
+                  <span>{p.mannschaft.join(", ")}</span>
+                </p>
+              )}
+
+              {hatAdresse && (
+                <p className="flex items-start gap-2 text-sm text-fcb-muted">
+                  <MapPin size={16} aria-hidden className="mt-0.5 shrink-0" />
+                  <span>
+                    {p.strasse && <span className="block">{p.strasse}</span>}
+                    {adresszeile && <span className="block">{adresszeile}</span>}
+                  </span>
+                </p>
+              )}
+
+              {!hatKontaktinfos && (
+                <p className="text-sm italic text-fcb-muted">
+                  Keine weiteren Kontaktinfos
+                </p>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
