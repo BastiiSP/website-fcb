@@ -51,6 +51,22 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  // Alte Routennamen (/kalender, /vorstand) dauerhaft auf die neuen, konsistenten
+  // Routen umleiten – schützt bestehende Bookmarks/geteilte Links (z. B. bei Trainern).
+  async redirects() {
+    return [
+      {
+        source: "/kalender",
+        destination: "/platzbuchung",
+        permanent: true,
+      },
+      {
+        source: "/vorstand",
+        destination: "/vorstandsbereich",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

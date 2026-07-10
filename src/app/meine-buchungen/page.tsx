@@ -38,7 +38,10 @@ export default function MeineBuchungenSeite() {
 
   return (
     <PageShell maxWidth="2xl">
-      <PageHeader title="Meine Buchungen" />
+      <PageHeader
+        title="Meine Buchungen"
+        subtitle="Deine eigenen Platzbuchungen – bearbeiten oder stornieren"
+      />
 
       {!geprueft || !userId ? (
         <p className="font-inter text-center text-fcb-muted">Lade …</p>

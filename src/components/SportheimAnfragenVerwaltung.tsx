@@ -119,7 +119,7 @@ function StatusAktionen({
 /**
  * Vorstandsübersicht der Sportheim-Anfragen: alle Anfragen inkl. Kontaktdaten,
  * Status setzen (offen/angenommen/abgelehnt) und eigene Sperrtermine anlegen.
- * Zugriff nur für vorstand/admin – abgesichert durch RLS, die Seite /vorstand
+ * Zugriff nur für vorstand/admin – abgesichert durch RLS, die Seite /vorstandsbereich
  * prüft die Rolle zusätzlich im Frontend.
  */
 export default function SportheimAnfragenVerwaltung() {

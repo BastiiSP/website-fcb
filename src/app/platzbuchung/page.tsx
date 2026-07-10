@@ -38,7 +38,7 @@ const supabase = createClient();
 // Zugriff nur für Trainer, Vorstand und Admin – RLS in der DB sichert dies zusätzlich ab
 const ERLAUBTE_ROLLEN = ["trainer", "vorstand", "admin"];
 
-export default function KalenderSeite() {
+export default function PlatzbuchungSeite() {
   // 🔁 States für User, Rollen und Events
   const [events, setEvents] = useState<EventInput[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
@@ -278,7 +278,10 @@ export default function KalenderSeite() {
       )}
 
       <PageShell maxWidth="2xl">
-        <PageHeader title="Platzbelegung" />
+        <PageHeader
+          title="Platzbuchung"
+          subtitle="Trainings- und Spielzeiten auf Haupt- und Nebenplatz buchen"
+        />
 
         {!isLoggedIn ? (
           <div className="text-center font-inter space-y-4">

@@ -39,10 +39,10 @@ interface RollenLink {
 // auch mit Rolle "ausstehend" – reicht die Rolle für einen Bereich nicht aus, erklärt
 // die Zielseite selbst per ZugriffsHinweis warum (statt den Link im Menü zu verstecken).
 const ALLE_LINKS: RollenLink[] = [
-  { href: "/kalender", label: "Platzbuchung", icon: CalendarDays },
+  { href: "/platzbuchung", label: "Platzbuchung", icon: CalendarDays },
   { href: "/meine-buchungen", label: "Meine Buchungen", icon: ClipboardList },
   { href: "/mitglieder", label: "Mitglieder", icon: Users },
-  { href: "/vorstand", label: "Vorstand", icon: Shield },
+  { href: "/vorstandsbereich", label: "Vorstandsbereich", icon: Shield },
   { href: "/mein-verein", label: "Mein Verein", icon: Home },
 ];
 

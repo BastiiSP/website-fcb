@@ -250,7 +250,7 @@ test("Auth-Seite /login folgt dem globalen Theme (kein Dark-Island)", async ({
 // 5. Geschützte Routen leiten auf /login um (kein Crash)
 // ──────────────────────────────────────────────
 test.describe("Geschützte Routen – Redirect zu /login", () => {
-  const gatedRoutes = ["/profil", "/mein-verein", "/vorstand", "/kalender"];
+  const gatedRoutes = ["/profil", "/mein-verein", "/vorstandsbereich", "/platzbuchung"];
 
   for (const path of gatedRoutes) {
     test(`${path} leitet aus (kein Server-Fehler)`, async ({ page }) => {
@@ -269,10 +269,30 @@ test.describe("Geschützte Routen – Redirect zu /login", () => {
 });
 
 // ──────────────────────────────────────────────
+// 5b. Alte Routennamen leiten dauerhaft auf die neuen um (next.config.ts)
+// ──────────────────────────────────────────────
+test.describe("Alte Routen – Redirect auf neue Routennamen", () => {
+  const umbenannteRouten = [
+    { alt: "/kalender", neu: "/platzbuchung" },
+    { alt: "/vorstand", neu: "/vorstandsbereich" },
+  ];
+
+  for (const { alt, neu } of umbenannteRouten) {
+    test(`${alt} leitet auf ${neu} um`, async ({ page }) => {
+      await seedStorage(page);
+      await page.goto(alt, { waitUntil: "load" });
+
+      // Nach dem Redirect landet die URL auf der neuen Route (Query/Hash ignorieren)
+      expect(new URL(page.url()).pathname).toBe(neu);
+    });
+  }
+});
+
+// ──────────────────────────────────────────────
 // 6. Rollen-Gates zeigen einheitliche Zugriffshinweise
 // ──────────────────────────────────────────────
 test.describe("Geschützte Routen – Rollen-Hinweise", () => {
-  const freigabeRouten = ["/kalender", "/vorstand", "/mitglieder", "/mein-verein"];
+  const freigabeRouten = ["/platzbuchung", "/vorstandsbereich", "/mitglieder", "/mein-verein"];
 
   for (const path of freigabeRouten) {
     test(`${path} zeigt für ausstehende Nutzer den Freigabe-Hinweis`, async ({
@@ -292,7 +312,7 @@ test.describe("Geschützte Routen – Rollen-Hinweise", () => {
     });
   }
 
-  for (const path of ["/kalender", "/mitglieder"]) {
+  for (const path of ["/platzbuchung", "/mitglieder"]) {
     test(`${path} zeigt für Mitglieder den Rollen-Hinweis statt Freigabe-Hinweis`, async ({
       page,
     }) => {
@@ -347,7 +367,7 @@ test("UserDropdown zeigt ausstehenden Nutzern alle Bereichslinks", async ({
     "Platzbuchung",
     "Meine Buchungen",
     "Mitglieder",
-    "Vorstand",
+    "Vorstandsbereich",
     "Mein Verein",
   ]) {
     // Headless UI rendert Menu.Item-Kinder mit role="menuitem", nicht "link"

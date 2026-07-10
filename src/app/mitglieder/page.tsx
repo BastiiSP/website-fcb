@@ -55,30 +55,25 @@ export default function MitgliederPage() {
   const istVorstandOderAdmin = rolle === "vorstand" || rolle === "admin";
   const zugelassen = istTrainer || istVorstandOderAdmin;
 
+  // Einheitliches "Mitglieder"-H1 für alle Rollen – der rollenspezifische
+  // Unterschied steckt nur noch im Untertitel, nicht mehr in der Überschrift.
+  const untertitel = !zugelassen
+    ? "Trainer-Verzeichnis und Mitgliederverwaltung"
+    : istTrainer
+      ? "Trainer-Verzeichnis"
+      : "Mitgliederverwaltung – hinzufügen, bearbeiten, löschen und exportieren";
+
   return (
     <PageShell maxWidth="2xl">
+      <PageHeader title="Mitglieder" subtitle={untertitel} />
+
       {!zugelassen ? (
-        <>
-          <PageHeader title="Mitglieder" />
-          <ZugriffsHinweis rolle={rolle} erlaubteRollen={ERLAUBTE_ROLLEN} />
-        </>
+        <ZugriffsHinweis rolle={rolle} erlaubteRollen={ERLAUBTE_ROLLEN} />
       ) : istTrainer ? (
-        <>
-          <PageHeader
-            title="Trainer-Verzeichnis"
-            subtitle="Kontaktdaten aller Trainer, Platzwarte und Vorstandsmitglieder"
-          />
-          <TrainerVerzeichnis />
-        </>
+        <TrainerVerzeichnis />
       ) : (
-        <>
-          <PageHeader
-            title="Mitgliederverwaltung"
-            subtitle="Vereinsmitglieder verwalten – hinzufügen, bearbeiten, löschen und exportieren"
-          />
-          {/* userId ist hier garantiert nicht null, da wir oben auf !uid prüfen */}
-          <MitgliederVerwaltung eigeneUserId={userId!} />
-        </>
+        // userId ist hier garantiert nicht null, da wir oben auf !uid prüfen
+        <MitgliederVerwaltung eigeneUserId={userId!} />
       )}
     </PageShell>
   );

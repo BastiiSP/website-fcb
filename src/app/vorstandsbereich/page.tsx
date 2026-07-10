@@ -23,7 +23,7 @@ const TABS = [
 // Zugriff nur für Vorstand und Admin – RLS in der DB sichert dies zusätzlich ab
 const ERLAUBTE_ROLLEN = ["vorstand", "admin"];
 
-export default function VorstandPage() {
+export default function VorstandsbereichPage() {
   const supabase = createClient();
 
   const [loading, setLoading] = useState(true);

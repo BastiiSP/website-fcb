@@ -163,6 +163,7 @@ export default function ProfilPage() {
       {/* Seitentitel + Rollen-Badge */}
       <PageHeader
         title="Profil"
+        subtitle="Deine persönlichen Daten und Kontoeinstellungen"
         actions={
           <Badge variant={rollenInfo.variant}>
             Rolle: {rollenInfo.label}
