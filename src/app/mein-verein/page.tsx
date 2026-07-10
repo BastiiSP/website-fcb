@@ -8,10 +8,10 @@ import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/icons/Br
 import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import { VEREINSLINKS, type VereinsLink, type VereinsLinkIcon } from "@/lib/vereinslinks";
-// PageShell/PageHeader/Banner sind Default-Exporte
+// PageShell/PageHeader/ZugriffsHinweis sind Default-Exporte
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
-import Banner from "@/components/ui/Banner";
+import ZugriffsHinweis from "@/components/ui/ZugriffsHinweis";
 
 // Icon-Komponente – wählt anhand des icon-Feldes das passende Icon aus.
 // BrandIcons für Facebook/Instagram (Lucide enthält keine Brand-Glyphen),
@@ -82,14 +82,17 @@ export default function MeinVereinPage() {
     );
   }
 
-  // Ausstehende Nutzer sehen dieselbe Sperrseite wie auf anderen geschützten Seiten
-  if (rolle === "ausstehend" || !rolle) {
+  // Nur ausstehende Nutzer haben hier keinen Zugriff – alle anderen Rollen dürfen rein
+  const ERLAUBTE_ROLLEN = ["mitglied", "trainer", "vorstand", "admin"];
+
+  if (!ERLAUBTE_ROLLEN.includes(rolle ?? "")) {
     return (
       <PageShell maxWidth="2xl">
-        <Banner
-          variant="warning"
-          message="Kein Zugriff – Dein Konto wurde noch nicht freigegeben. Sobald ein Vorstandsmitglied dein Konto aktiviert hat, kannst du diese Seite aufrufen."
+        <PageHeader
+          title="Mein Verein"
+          subtitle="Wichtige Vereinslinks auf einen Blick"
         />
+        <ZugriffsHinweis rolle={rolle} erlaubteRollen={ERLAUBTE_ROLLEN} />
       </PageShell>
     );
   }

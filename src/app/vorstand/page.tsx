@@ -10,6 +10,7 @@ import SportheimAnfragenVerwaltung from "@/components/SportheimAnfragenVerwaltun
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Tabs from "@/components/ui/Tabs";
+import ZugriffsHinweis from "@/components/ui/ZugriffsHinweis";
 
 // Tab-Typ: Benutzer, Mannschaftsanfragen, Buchungsübersicht, Sportheimanfragen
 const TABS = [
@@ -19,12 +20,14 @@ const TABS = [
   { id: "sportheim", label: "Sportheim" },
 ];
 
+// Zugriff nur für Vorstand und Admin – RLS in der DB sichert dies zusätzlich ab
+const ERLAUBTE_ROLLEN = ["vorstand", "admin"];
+
 export default function VorstandPage() {
   const supabase = createClient();
 
   const [loading, setLoading] = useState(true);
-  const [zugelassen, setZugelassen] = useState(false);
-  const [eigeneRolle, setEigeneRolle] = useState("");
+  const [rolle, setRolle] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<
     "benutzer" | "anfragen" | "buchungen" | "sportheim"
   >("benutzer");
@@ -32,16 +35,7 @@ export default function VorstandPage() {
   useEffect(() => {
     const checkAccess = async () => {
       const session = await checkSession(supabase);
-      const rolle = session?.rolle ?? "";
-
-      // Zugriff nur für Vorstand und Admin – RLS in der DB sichert dies zusätzlich ab
-      if (rolle === "vorstand" || rolle === "admin") {
-        setZugelassen(true);
-        setEigeneRolle(rolle);
-      } else {
-        setZugelassen(false);
-      }
-
+      setRolle(session?.rolle ?? null);
       setLoading(false);
     };
 
@@ -57,20 +51,7 @@ export default function VorstandPage() {
     );
   }
 
-  if (!zugelassen) {
-    return (
-      <PageShell maxWidth="2xl">
-        <div className="text-center space-y-4">
-          <p className="font-oswald text-xl font-semibold uppercase tracking-wide text-fcb-text">
-            Kein Zugriff
-          </p>
-          <p className="font-inter text-sm text-fcb-muted">
-            Diese Seite ist nur für Vorstandsmitglieder und Admins zugänglich.
-          </p>
-        </div>
-      </PageShell>
-    );
-  }
+  const zugelassen = rolle === "vorstand" || rolle === "admin";
 
   return (
     <PageShell maxWidth="2xl">
@@ -79,39 +60,45 @@ export default function VorstandPage() {
         subtitle="Vereinsverwaltung"
       />
 
-      {/* Tab-Navigation – a11y-konform via Tabs-Primitiv */}
-      <div className="mb-8">
-        <Tabs
-          tabs={TABS}
-          active={activeTab}
-          onChange={(id) =>
-            setActiveTab(id as "benutzer" | "anfragen" | "buchungen" | "sportheim")
-          }
-        />
-      </div>
+      {!zugelassen ? (
+        <ZugriffsHinweis rolle={rolle} erlaubteRollen={ERLAUBTE_ROLLEN} />
+      ) : (
+        <>
+          {/* Tab-Navigation – a11y-konform via Tabs-Primitiv */}
+          <div className="mb-8">
+            <Tabs
+              tabs={TABS}
+              active={activeTab}
+              onChange={(id) =>
+                setActiveTab(id as "benutzer" | "anfragen" | "buchungen" | "sportheim")
+              }
+            />
+          </div>
 
-      {activeTab === "benutzer" && (
-        <section>
-          <BenutzerListe eigeneRolle={eigeneRolle} />
-        </section>
-      )}
+          {activeTab === "benutzer" && (
+            <section>
+              <BenutzerListe eigeneRolle={rolle ?? ""} />
+            </section>
+          )}
 
-      {activeTab === "anfragen" && (
-        <section>
-          <MannschaftsanfragenVerwaltung />
-        </section>
-      )}
+          {activeTab === "anfragen" && (
+            <section>
+              <MannschaftsanfragenVerwaltung />
+            </section>
+          )}
 
-      {activeTab === "buchungen" && (
-        <section>
-          <BuchungenVerwaltung />
-        </section>
-      )}
+          {activeTab === "buchungen" && (
+            <section>
+              <BuchungenVerwaltung />
+            </section>
+          )}
 
-      {activeTab === "sportheim" && (
-        <section>
-          <SportheimAnfragenVerwaltung />
-        </section>
+          {activeTab === "sportheim" && (
+            <section>
+              <SportheimAnfragenVerwaltung />
+            </section>
+          )}
+        </>
       )}
     </PageShell>
   );

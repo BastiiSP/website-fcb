@@ -8,6 +8,10 @@ import TrainerVerzeichnis from "@/components/TrainerVerzeichnis";
 import MitgliederVerwaltung from "@/components/MitgliederVerwaltung";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
+import ZugriffsHinweis from "@/components/ui/ZugriffsHinweis";
+
+// Zugriff nur für Trainer, Vorstand und Admin – RLS in der DB sichert dies zusätzlich ab
+const ERLAUBTE_ROLLEN = ["trainer", "vorstand", "admin"];
 
 export default function MitgliederPage() {
   const supabase = createClient();
@@ -44,32 +48,21 @@ export default function MitgliederPage() {
     );
   }
 
-  // ausstehend und mitglied haben keinen Zugriff – nur trainer/vorstand/admin
-  if (rolle === "ausstehend" || rolle === "mitglied") {
-    return (
-      <PageShell maxWidth="2xl">
-        <div className="flex min-h-[50vh] items-center justify-center">
-          <div className="text-center space-y-3 max-w-md">
-            <p className="font-oswald text-xl font-semibold uppercase tracking-wide text-fcb-text">
-              Kein Zugriff
-            </p>
-            <p className="font-inter text-sm text-fcb-muted">
-              Dein Konto wurde noch nicht freigegeben. Sobald ein Vorstandsmitglied
-              dein Konto aktiviert hat, kannst du diese Seite aufrufen.
-            </p>
-          </div>
-        </div>
-      </PageShell>
-    );
-  }
-
-  // Rollenweiche: trainer → Trainer-Verzeichnis, vorstand/admin → Mitgliederverwaltung
+  // Rollenweiche: trainer → Trainer-Verzeichnis, vorstand/admin → Mitgliederverwaltung.
+  // Jede andere Rolle (inkl. fehlender/unbekannter Rolle – fail-closed statt
+  // versehentlich Zugriff zu gewähren) bekommt den ZugriffsHinweis statt Inhalt.
   const istTrainer = rolle === "trainer";
   const istVorstandOderAdmin = rolle === "vorstand" || rolle === "admin";
+  const zugelassen = istTrainer || istVorstandOderAdmin;
 
   return (
     <PageShell maxWidth="2xl">
-      {istTrainer && (
+      {!zugelassen ? (
+        <>
+          <PageHeader title="Mitglieder" />
+          <ZugriffsHinweis rolle={rolle} erlaubteRollen={ERLAUBTE_ROLLEN} />
+        </>
+      ) : istTrainer ? (
         <>
           <PageHeader
             title="Trainer-Verzeichnis"
@@ -77,9 +70,7 @@ export default function MitgliederPage() {
           />
           <TrainerVerzeichnis />
         </>
-      )}
-
-      {istVorstandOderAdmin && (
+      ) : (
         <>
           <PageHeader
             title="Mitgliederverwaltung"
@@ -88,13 +79,6 @@ export default function MitgliederPage() {
           {/* userId ist hier garantiert nicht null, da wir oben auf !uid prüfen */}
           <MitgliederVerwaltung eigeneUserId={userId!} />
         </>
-      )}
-
-      {/* Fallback: eingeloggt, aber unbekannte Rolle */}
-      {!istTrainer && !istVorstandOderAdmin && (
-        <div className="flex items-center justify-center min-h-[50vh]">
-          <p className="font-inter text-center text-fcb-muted">Unbekannte Rolle – kein Zugriff.</p>
-        </div>
       )}
     </PageShell>
   );

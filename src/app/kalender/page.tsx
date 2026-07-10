@@ -30,8 +30,13 @@ import { fetchEvents } from "@/utils/fetchEvents";
 import { PLATZ_FARBEN } from "@/utils/getEventColor";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
+import Banner from "@/components/ui/Banner";
+import ZugriffsHinweis from "@/components/ui/ZugriffsHinweis";
 
 const supabase = createClient();
+
+// Zugriff nur für Trainer, Vorstand und Admin – RLS in der DB sichert dies zusätzlich ab
+const ERLAUBTE_ROLLEN = ["trainer", "vorstand", "admin"];
 
 export default function KalenderSeite() {
   // 🔁 States für User, Rollen und Events
@@ -52,8 +57,9 @@ export default function KalenderSeite() {
     string | null
   >(null);
 
-  // Redirect-State
-  const [redirectMessage, setRedirectMessage] = useState<string | null>(null);
+  // Fehler beim Profil-Laden (z. B. Netzwerkfehler) – vom Rollen-Zugriff getrennt,
+  // damit ein Ladefehler nicht mit "Rolle reicht nicht" verwechselt wird
+  const [profilFehler, setProfilFehler] = useState<string | null>(null);
 
   // Eigene Toolbar (Outlook-Muster) statt der FullCalendar-headerToolbar:
   // Ref steuert die Kalender-API, Titel/Ansicht kommen aus datesSet zurück.
@@ -83,25 +89,21 @@ export default function KalenderSeite() {
 
       if (profileError) {
         console.error("Fehler beim Laden des Profils:", profileError.message);
-        setRedirectMessage(
+        setProfilFehler(
           "Dein Profil konnte nicht geladen werden. Bitte versuch es erneut."
         );
+        setIsLoggedIn(true);
         return;
       }
 
       const nutzerRolle = profile?.rolle ?? null;
-
-      // mitglied hat keinen Zugriff auf den Kalender (nur trainer/vorstand/admin)
-      if (nutzerRolle === "ausstehend" || nutzerRolle === "mitglied" || !nutzerRolle) {
-        setRedirectMessage(
-          "Dein Konto wartet noch auf Freigabe durch den Vorstand."
-        );
-        return;
-      }
-
       setRolle(nutzerRolle);
       setIsLoggedIn(true);
-      fetchEvents(supabase, setEvents);
+
+      // Kalenderdaten nur laden, wenn die Rolle auch Zugriff hat
+      if (ERLAUBTE_ROLLEN.includes(nutzerRolle ?? "")) {
+        fetchEvents(supabase, setEvents);
+      }
     };
 
     pruefeZugang();
@@ -278,18 +280,7 @@ export default function KalenderSeite() {
       <PageShell maxWidth="2xl">
         <PageHeader title="Platzbelegung" />
 
-        {/* Zugriff ausstehend oder Profil nicht ladbar */}
-        {redirectMessage ? (
-          <div className="text-center font-inter space-y-4">
-            <p className="text-fcb-muted">{redirectMessage}</p>
-            <Link
-              href="/"
-              className="inline-block rounded-lg bg-fcb-blue px-4 py-2 font-semibold text-white transition hover:bg-fcb-blue/90"
-            >
-              Zur Startseite
-            </Link>
-          </div>
-        ) : !isLoggedIn ? (
+        {!isLoggedIn ? (
           <div className="text-center font-inter space-y-4">
             <p className="text-fcb-muted">
               Du bist nicht eingeloggt. Bitte logge dich ein, um die
@@ -302,6 +293,10 @@ export default function KalenderSeite() {
               Zum Login / zur Registrierung
             </Link>
           </div>
+        ) : profilFehler ? (
+          <Banner variant="error" message={profilFehler} />
+        ) : !ERLAUBTE_ROLLEN.includes(rolle ?? "") ? (
+          <ZugriffsHinweis rolle={rolle} erlaubteRollen={ERLAUBTE_ROLLEN} />
         ) : (
           <>
             {/* Farb-Legende: zeigt dauerhaft, welche Farbe für welchen Platz steht */}
