@@ -9,6 +9,7 @@ import {
   User,
 } from "lucide-react";
 import type { Buchung } from "@/components/BearbeitenModal";
+import { ANLASS_LABEL, PLATZANTEIL_LABEL } from "@/lib/buchungsOptionen";
 
 type Props = {
   props: Buchung; // Buchungsdetails (z. B. Platz, Person, Bemerkung etc.)
@@ -17,20 +18,6 @@ type Props = {
   rolle: string | null;
   onEdit: () => void;
   onDelete: () => void;
-};
-
-// Anzeige-Labels für die enum-artigen DB-Werte
-const ANLASS_LABEL: Record<string, string> = {
-  training: "Training",
-  freundschaftsspiel: "Freundschaftsspiel",
-  punktspiel: "Punktspiel",
-  platzpflege: "Platzpflege",
-};
-
-const PLATZANTEIL_LABEL: Record<string, string> = {
-  viertel: "1/4 Platz",
-  halb: "1/2 Platz",
-  ganz: "Ganzer Platz",
 };
 
 // Detail-Zeile mit Lucide-Icon – ersetzt die frühere Emoji-Liste (Design-Spec:

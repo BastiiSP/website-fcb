@@ -17,6 +17,7 @@ import {
   type SerienErgebnis,
   type SerienSpezifikation,
 } from "@/lib/serienbuchung";
+import { PLATZANTEIL_OPTIONEN, ANLASS_OPTIONEN } from "@/lib/buchungsOptionen";
 
 // Deutsch-Locale für react-datepicker registrieren
 registerLocale("de", de);
@@ -28,20 +29,6 @@ type Props = {
   setSuccessMessage: (msg: string) => void;
   setErrorMessage: (msg: string) => void;
 };
-
-// Optionslisten für die Auswahl-Felder
-const PLATZANTEIL_OPTIONEN = [
-  { value: "viertel", label: "1/4 Platz" },
-  { value: "halb", label: "1/2 Platz" },
-  { value: "ganz", label: "Ganzer Platz" },
-];
-
-const ANLASS_OPTIONEN = [
-  { value: "training", label: "Training" },
-  { value: "freundschaftsspiel", label: "Freundschaftsspiel" },
-  { value: "punktspiel", label: "Punktspiel" },
-  { value: "platzpflege", label: "Platzpflege" },
-];
 
 export default function Buchungsformular({
   userId,

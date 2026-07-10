@@ -15,6 +15,7 @@ import { Pencil, Trash2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Select from "@/components/ui/Select";
 import { getEventColor } from "@/utils/getEventColor";
+import { ANLASS_LABEL, PLATZANTEIL_LABEL, PLATZ_OPTIONEN } from "@/lib/buchungsOptionen";
 
 // Supabase-Client auf Modul-Ebene → stabile Referenz, kein useCallback-Dep-Churn
 // (gleiches Muster wie kalender/page.tsx)
@@ -23,26 +24,8 @@ const supabase = createClient();
 // Einträge pro Seite – server-seitige Pagination via Supabase .range()
 const PRO_SEITE = 20;
 
-// Anzeige-Labels für die enum-artigen DB-Werte (CHECK-Constraints der Tabelle)
-const ANLASS_LABEL: Record<string, string> = {
-  training: "Training",
-  freundschaftsspiel: "Freundschaftsspiel",
-  punktspiel: "Punktspiel",
-  platzpflege: "Platzpflege",
-};
-
-const PLATZANTEIL_LABEL: Record<string, string> = {
-  viertel: "1/4 Platz",
-  halb: "1/2 Platz",
-  ganz: "Ganzer Platz",
-};
-
-// Platz-Filter-Optionen (leere Option = alle Plätze)
-const PLATZ_FILTER_OPTIONEN = [
-  { value: "", label: "Alle Plätze" },
-  { value: "hauptplatz", label: "Hauptplatz" },
-  { value: "nebenplatz", label: "Nebenplatz" },
-];
+// Platz-Filter-Optionen (leere Option = alle Plätze, sonst zentrale Liste)
+const PLATZ_FILTER_OPTIONEN = [{ value: "", label: "Alle Plätze" }, ...PLATZ_OPTIONEN];
 
 // Einheitliche Styles für die nativen <input type="date">-Felder (fcb-Tokens,
 // gleiches Muster wie die datetime-local-Felder in BearbeitenModal).

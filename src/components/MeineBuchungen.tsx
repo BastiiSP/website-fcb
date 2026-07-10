@@ -15,26 +15,13 @@ import { Pencil, Trash2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Tabs from "@/components/ui/Tabs";
 import { getEventColor } from "@/utils/getEventColor";
+import { ANLASS_LABEL, PLATZANTEIL_LABEL } from "@/lib/buchungsOptionen";
 
 // Supabase-Client auf Modul-Ebene → stabile Referenz (Muster wie BuchungenVerwaltung)
 const supabase = createClient();
 
 // Einträge pro Seite – server-seitige Pagination via Supabase .range()
 const PRO_SEITE = 20;
-
-// Anzeige-Labels für die enum-artigen DB-Werte (CHECK-Constraints der Tabelle)
-const ANLASS_LABEL: Record<string, string> = {
-  training: "Training",
-  freundschaftsspiel: "Freundschaftsspiel",
-  punktspiel: "Punktspiel",
-  platzpflege: "Platzpflege",
-};
-
-const PLATZANTEIL_LABEL: Record<string, string> = {
-  viertel: "1/4 Platz",
-  halb: "1/2 Platz",
-  ganz: "Ganzer Platz",
-};
 
 const TABS = [
   { id: "kommende", label: "Kommende" },

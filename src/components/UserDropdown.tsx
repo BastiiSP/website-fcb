@@ -59,13 +59,21 @@ export default function UserDropdown() {
       const { data: { user } } = await supabase.auth.getUser();
 
       if (user) {
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from("profiles")
           .select("*")
           .eq("id", user.id)
           .single();
 
+        if (profileError) {
+          console.error(
+            "Fehler beim Laden des Profils im Nutzer-Menü:",
+            profileError.message
+          );
+        }
+
         // Profilinformationen setzen – avatar_url aus profiles, E-Mail aus Auth-User
+        // (auch bei Fehler: rendert mit den verfügbaren, ggf. leeren Profildaten weiter)
         setUser({
           email: user.email ?? "",
           vorname: profile?.vorname ?? "",

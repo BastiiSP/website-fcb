@@ -13,6 +13,11 @@ import Textarea from "@/components/ui/Textarea";
 import Button from "@/components/ui/Button";
 import Banner from "@/components/ui/Banner";
 import { aktualisiereSerie } from "@/lib/serienbuchung";
+import {
+  PLATZ_OPTIONEN,
+  PLATZANTEIL_OPTIONEN,
+  ANLASS_OPTIONEN,
+} from "@/lib/buchungsOptionen";
 
 export type Buchung = {
   id: string;
@@ -45,25 +50,6 @@ type Props = {
   /** meldung: optionaler Erfolgstext (z. B. Serien-Zusammenfassung) für den Toast des Aufrufers */
   onSave: (meldung?: string) => void;
 };
-
-// Optionslisten für die Auswahl-Felder
-const PLATZ_OPTIONEN = [
-  { value: "hauptplatz", label: "Hauptplatz" },
-  { value: "nebenplatz", label: "Nebenplatz" },
-];
-
-const PLATZANTEIL_OPTIONEN = [
-  { value: "viertel", label: "1/4 Platz" },
-  { value: "halb", label: "1/2 Platz" },
-  { value: "ganz", label: "Ganzer Platz" },
-];
-
-const ANLASS_OPTIONEN = [
-  { value: "training", label: "Training" },
-  { value: "freundschaftsspiel", label: "Freundschaftsspiel" },
-  { value: "punktspiel", label: "Punktspiel" },
-  { value: "platzpflege", label: "Platzpflege" },
-];
 
 // Deutsch-Locale für react-datepicker registrieren (idempotent, wie im Buchungsformular)
 registerLocale("de", de);
