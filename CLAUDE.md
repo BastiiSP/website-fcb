@@ -361,6 +361,19 @@ Nur **Lucide** (`lucide-react`); Brand-/Social-Icons ausschließlich über `src/
 - **Icon-Badge-Muster** (`src/components/ui/IconBadge.tsx`): Lucide-Icon in dezentem Container – Tint `bg-<akzent>/10` + `border-<akzent>/40`, Akzent `neutral`/`blue`/`red`, Größen `sm` (32 px Box / 16er-Icon, `rounded-lg`), `md` (40/20, `rounded-xl`), `lg` (48/24, `rounded-xl`). Für Feature-Aufzählungen, Card-Köpfe, Team-Cards.
 - **A11y**: dekorative Icons `aria-hidden`; bedeutungstragende Icons mit deutschem `aria-label` (IconBadge: `label`-Prop → `role="img"`).
 
+### Banner / Statusmeldungen
+Primitiv: `src/components/ui/Banner.tsx` – vier Varianten, je mit fester Farbe + Lucide-Icon:
+
+| Variante | Farbe | Icon | Einsatz |
+|---|---|---|---|
+| `warning` | Gelb (`border-yellow-500/40 bg-yellow-500/10`, Icon `text-yellow-600 dark:text-yellow-500`) | `TriangleAlert` | **Standard für „wartet auf Freigabe/Prüfung"**-Meldungen (z. B. Konto-Status `ausstehend`) – nicht pro Fall neu einfärben, immer dieses Gelb |
+| `info` | FCB-Blau (`border-fcb-blue/40 bg-fcb-blue/10`, Icon `text-fcb-blue`) | `Info` | neutrale Hinweise ohne Handlungsdruck, z. B. „Rolle reicht für diesen Bereich nicht aus" (`ZugriffsHinweis`) |
+| `success` | Grün | `CheckCircle2` | erfolgreiche Aktionen |
+| `error` | Rot (`fcb-red`) | `AlertCircle` | Fehler, blockierende Probleme |
+
+- **Rollen-Zugriffshinweis** (`src/components/ui/ZugriffsHinweis.tsx`): einheitliche Komponente für Seiten mit Rollen-Gate (`/kalender`, `/vorstand`, `/mitglieder`, `/mein-verein`). Unterscheidet bewusst zwei Fälle statt einer generischen „Kein Zugriff"-Meldung: Rolle `ausstehend` oder fehlend/unbekannt (fail-closed) → `warning`-Banner „Konto wartet auf Freigabe"; jede andere, bereits freigeschaltete Rolle ohne ausreichende Berechtigung → `info`-Banner „Rolle nicht vorgesehen". Das Account-Menü (`UserDropdown.tsx`) zeigt dafür allen eingeloggten Rollen (inkl. `ausstehend`) grundsätzlich alle Bereiche – die Zielseite kommuniziert fehlenden Zugriff selbst, statt den Link zu verstecken.
+- **Banner vs. eigene Sperrseite**: Bei Rollen-Gates immer `ZugriffsHinweis` statt eine Seite händisch mit „Kein Zugriff"-Überschrift zu bauen – sonst entsteht wieder visuelle Uneinheitlichkeit.
+
 ### Mannschaftsdarstellung
 - **Träger bestimmt den Akzent**: FCB-Teams (Herren, E-/F-/G-Jugend) → `fcb-blue`; JFG-Jugendteams (A-/B-/C-/D-Junioren) → `fcb-red`. Klassen-Sets liefert `getTeamAccent(traeger)` aus `src/lib/teams.ts` – nie manuell zusammenbauen.
 - **Team-Daten**: `interface Team` in `src/lib/teams.ts` (`id`, `name`, `kurzname?`, `altersklasse?`, `liga?`, `traeger: "fcb" | "jfg"`, `beschreibung?`, `trainer?: string[]`).

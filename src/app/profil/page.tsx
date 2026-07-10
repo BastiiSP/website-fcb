@@ -14,6 +14,7 @@ import Badge from "@/components/ui/Badge";
 import Tabs from "@/components/ui/Tabs";
 import Banner from "@/components/ui/Banner";
 import Button from "@/components/ui/Button";
+import { ROLLEN_LABELS } from "@/lib/rollen";
 
 type Tab = "persoenlich" | "mannschaft" | "account";
 
@@ -35,13 +36,15 @@ interface ProfilDaten {
 
 // Read-only Anzeige der aktuellen Rolle im Profil. Ändert NICHTS am
 // Rollenkonzept (Vergabe bleibt Vorstand/Admin vorbehalten) – reine Information
-// für den Nutzer, v. a. für den Status 'ausstehend'.
-const ROLLEN_BADGE: Record<string, { label: string; variant: "yellow" | "blue" | "green" | "purple" | "red" | "neutral" }> = {
-  ausstehend: { label: "Ausstehend", variant: "yellow" },
-  mitglied:   { label: "Mitglied",   variant: "blue" },
-  trainer:    { label: "Trainer",    variant: "green" },
-  vorstand:   { label: "Vorstand",   variant: "purple" },
-  admin:      { label: "Admin",      variant: "red" },
+// für den Nutzer, v. a. für den Status 'ausstehend'. Labels kommen aus der
+// gemeinsamen rollen.ts (auch von ZugriffsHinweis genutzt), nur die Badge-Farbe
+// ist hier profil-spezifisch.
+const ROLLEN_BADGE_VARIANTE: Record<string, "yellow" | "blue" | "green" | "purple" | "red"> = {
+  ausstehend: "yellow",
+  mitglied:   "blue",
+  trainer:    "green",
+  vorstand:   "purple",
+  admin:      "red",
 };
 
 export default function ProfilPage() {
@@ -143,8 +146,11 @@ export default function ProfilPage() {
     );
   }
 
-  // Rollen-Badge: bekannte Rollen → Variant; unbekannte → neutral
-  const rollenInfo = ROLLEN_BADGE[profil.rolle] ?? { label: profil.rolle, variant: "neutral" as const };
+  // Rollen-Badge: bekannte Rollen → Label + Variant; unbekannte → Rohwert, neutral
+  const rollenInfo = {
+    label: ROLLEN_LABELS[profil.rolle] ?? profil.rolle,
+    variant: ROLLEN_BADGE_VARIANTE[profil.rolle] ?? ("neutral" as const),
+  };
 
   const tabs = [
     { id: "persoenlich", label: "Persönliche Daten" },

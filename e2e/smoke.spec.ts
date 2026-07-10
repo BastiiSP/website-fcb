@@ -4,6 +4,12 @@ import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 const CONSENT_KEY = "fcb_consent_v1";
 const CONSENT_VALUE = JSON.stringify({ notwendig: true, externeInhalte: false });
 const THEME_KEY = "theme";
+const SUPABASE_URL =
+  process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://jktvmckqfklfziszfsxf.supabase.co";
+const SUPABASE_REF = new URL(SUPABASE_URL).hostname.split(".")[0];
+const SUPABASE_AUTH_STORAGE_KEY = `sb-${SUPABASE_REF}-auth-token`;
+const TEST_USER_ID = "11111111-1111-4111-8111-111111111111";
+const TEST_USER_EMAIL = "basti.test@example.com";
 
 /** Setzt Consent + optionales Theme via addInitScript, bevor die Seite lädt. */
 async function seedStorage(
@@ -22,6 +28,80 @@ async function seedStorage(
       theme: opts.theme ?? null,
     }
   );
+}
+
+/** Mockt eine eingeloggte Supabase-Session plus Profilrolle für clientseitige Gates. */
+async function mockEingeloggterNutzer(
+  page: Page,
+  opts: { rolle: string }
+) {
+  const now = Math.floor(Date.now() / 1000);
+  const user = {
+    id: TEST_USER_ID,
+    aud: "authenticated",
+    role: "authenticated",
+    email: TEST_USER_EMAIL,
+    email_confirmed_at: new Date(now * 1000).toISOString(),
+    phone: "",
+    confirmed_at: new Date(now * 1000).toISOString(),
+    last_sign_in_at: new Date(now * 1000).toISOString(),
+    app_metadata: { provider: "email", providers: ["email"] },
+    user_metadata: {},
+    identities: [],
+    created_at: new Date(now * 1000).toISOString(),
+    updated_at: new Date(now * 1000).toISOString(),
+    is_anonymous: false,
+  };
+  const session = {
+    access_token: "test-access-token",
+    refresh_token: "test-refresh-token",
+    token_type: "bearer",
+    expires_in: 3600,
+    expires_at: now + 3600,
+    user,
+  };
+  const profile = {
+    id: TEST_USER_ID,
+    vorname: "Basti",
+    nachname: "Tester",
+    email: TEST_USER_EMAIL,
+    telefonnummer: null,
+    avatar_url: null,
+    rolle: opts.rolle,
+    mannschaft: [],
+  };
+
+  await page.addInitScript(
+    ({ storageKey, sessionValue }) => {
+      localStorage.setItem(storageKey, JSON.stringify(sessionValue));
+    },
+    { storageKey: SUPABASE_AUTH_STORAGE_KEY, sessionValue: session }
+  );
+
+  await page.route("**/auth/v1/user", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(user),
+    });
+  });
+
+  await page.route("**/auth/v1/token**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(session),
+    });
+  });
+
+  await page.route("**/rest/v1/profiles**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      headers: { "content-range": "0-0/1" },
+      body: JSON.stringify(profile),
+    });
+  });
 }
 
 // ──────────────────────────────────────────────
@@ -185,5 +265,92 @@ test.describe("Geschützte Routen – Redirect zu /login", () => {
       // Nach Redirect ist die Seite geladen – body muss sichtbar sein
       await expect(page.locator("body")).toBeVisible();
     });
+  }
+});
+
+// ──────────────────────────────────────────────
+// 6. Rollen-Gates zeigen einheitliche Zugriffshinweise
+// ──────────────────────────────────────────────
+test.describe("Geschützte Routen – Rollen-Hinweise", () => {
+  const freigabeRouten = ["/kalender", "/vorstand", "/mitglieder", "/mein-verein"];
+
+  for (const path of freigabeRouten) {
+    test(`${path} zeigt für ausstehende Nutzer den Freigabe-Hinweis`, async ({
+      page,
+    }) => {
+      await seedStorage(page);
+      await mockEingeloggterNutzer(page, { rolle: "ausstehend" });
+
+      await page.goto(path, { waitUntil: "load" });
+
+      await expect(page.locator("body")).toContainText(
+        "Dein Konto wartet noch auf Freigabe durch den Vorstand."
+      );
+      await expect(page.locator("body")).toContainText(
+        "Sobald du freigeschaltet bist, hast du hier Zugriff."
+      );
+    });
+  }
+
+  for (const path of ["/kalender", "/mitglieder"]) {
+    test(`${path} zeigt für Mitglieder den Rollen-Hinweis statt Freigabe-Hinweis`, async ({
+      page,
+    }) => {
+      await seedStorage(page);
+      await mockEingeloggterNutzer(page, { rolle: "mitglied" });
+
+      await page.goto(path, { waitUntil: "load" });
+
+      await expect(page.locator("body")).toContainText(
+        "Dieser Bereich ist für deine aktuelle Rolle (Mitglied) nicht vorgesehen."
+      );
+      await expect(page.locator("body")).toContainText("Zugriff haben:");
+      await expect(page.locator("body")).not.toContainText(
+        "wartet auf Freigabe"
+      );
+    });
+  }
+
+  test("/mein-verein zeigt für Mitglieder Inhalt statt Zugriffs-Hinweis", async ({
+    page,
+  }) => {
+    await seedStorage(page);
+    await mockEingeloggterNutzer(page, { rolle: "mitglied" });
+
+    await page.goto("/mein-verein", { waitUntil: "load" });
+
+    await expect(page.getByRole("heading", { name: "Mein Verein" })).toBeVisible();
+    await expect(page.locator("body")).toContainText("WhatsApp-Gruppe");
+    await expect(page.locator("body")).not.toContainText(
+      "wartet noch auf Freigabe"
+    );
+    await expect(page.locator("body")).not.toContainText("nicht vorgesehen");
+  });
+});
+
+// ──────────────────────────────────────────────
+// 7. Account-Menü zeigt alle Rollenbereiche
+// ──────────────────────────────────────────────
+test("UserDropdown zeigt ausstehenden Nutzern alle Bereichslinks", async ({
+  page,
+}) => {
+  await seedStorage(page);
+  await mockEingeloggterNutzer(page, { rolle: "ausstehend" });
+
+  await page.goto("/impressum", { waitUntil: "load" });
+
+  await page.getByRole("button", { name: "BT" }).click();
+  const menu = page.locator('[role="menu"]').first();
+  await expect(menu).toBeVisible();
+
+  for (const label of [
+    "Platzbuchung",
+    "Meine Buchungen",
+    "Mitglieder",
+    "Vorstand",
+    "Mein Verein",
+  ]) {
+    // Headless UI rendert Menu.Item-Kinder mit role="menuitem", nicht "link"
+    await expect(menu.getByRole("menuitem", { name: label })).toBeVisible();
   }
 });

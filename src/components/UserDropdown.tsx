@@ -34,28 +34,17 @@ interface RollenLink {
 // zeigt nur noch öffentliche Seiten. "Platzbuchung" hieß früher "Kalender" (umbenannt,
 // weil eindeutiger). "Profil" braucht keinen Eintrag hier: "Profil bearbeiten" steht
 // fest im unteren Menü-Abschnitt.
-const TRAINER_LINKS: RollenLink[] = [
-  { href: "/kalender", label: "Platzbuchung", icon: CalendarDays },
-  { href: "/meine-buchungen", label: "Meine Buchungen", icon: ClipboardList },
-  { href: "/mitglieder", label: "Mitglieder", icon: Users },
-  { href: "/mein-verein", label: "Mein Verein", icon: Home },
-];
-
-const VORSTAND_LINKS: RollenLink[] = [
+//
+// Bewusst KEINE Rollen-Filterung mehr: jeder eingeloggte Nutzer sieht alle Bereiche,
+// auch mit Rolle "ausstehend" – reicht die Rolle für einen Bereich nicht aus, erklärt
+// die Zielseite selbst per ZugriffsHinweis warum (statt den Link im Menü zu verstecken).
+const ALLE_LINKS: RollenLink[] = [
   { href: "/kalender", label: "Platzbuchung", icon: CalendarDays },
   { href: "/meine-buchungen", label: "Meine Buchungen", icon: ClipboardList },
   { href: "/mitglieder", label: "Mitglieder", icon: Users },
   { href: "/vorstand", label: "Vorstand", icon: Shield },
   { href: "/mein-verein", label: "Mein Verein", icon: Home },
 ];
-
-const ROLLEN_LINKS: Record<string, RollenLink[]> = {
-  ausstehend: [],
-  mitglied: [{ href: "/mein-verein", label: "Mein Verein", icon: Home }],
-  trainer: TRAINER_LINKS,
-  vorstand: VORSTAND_LINKS,
-  admin: VORSTAND_LINKS,
-};
 
 export default function UserDropdown() {
   const supabase = createClient();
@@ -183,25 +172,23 @@ export default function UserDropdown() {
         </div>
 
         {/* Rollenbasierte Bereiche – kamen früher aus der Hauptnav (Navigation.tsx) */}
-        {(ROLLEN_LINKS[user?.rolle ?? ""] ?? []).length > 0 && (
-          <div className="border-t border-fcb-border p-1">
-            {(ROLLEN_LINKS[user?.rolle ?? ""] ?? []).map(({ href, label, icon: Icon }) => (
-              <Menu.Item key={href}>
-                {({ active }) => (
-                  <Link
-                    href={href}
-                    className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
-                      active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
-                    }`}
-                  >
-                    <Icon className="h-4 w-4 text-fcb-muted" aria-hidden />
-                    {label}
-                  </Link>
-                )}
-              </Menu.Item>
-            ))}
-          </div>
-        )}
+        <div className="border-t border-fcb-border p-1">
+          {ALLE_LINKS.map(({ href, label, icon: Icon }) => (
+            <Menu.Item key={href}>
+              {({ active }) => (
+                <Link
+                  href={href}
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 font-inter text-sm transition-colors ${
+                    active ? "bg-fcb-border text-fcb-text" : "text-fcb-text"
+                  }`}
+                >
+                  <Icon className="h-4 w-4 text-fcb-muted" aria-hidden />
+                  {label}
+                </Link>
+              )}
+            </Menu.Item>
+          ))}
+        </div>
 
         {/* Aktionen */}
         <div className="border-t border-fcb-border p-1">
