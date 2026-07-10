@@ -49,6 +49,12 @@ Niemals ohne Rücksprache ändern. Das Rollensystem ist das Herzstück der Zugan
 | `mannschaft` | TEXT[] | Mehrfachauswahl möglich |
 | `created_at` | TIMESTAMPTZ | auto |
 | `updated_at` | TIMESTAMPTZ | auto via Trigger |
+| `geburtsdatum` | DATE | optional |
+| `strasse` | TEXT | optional |
+| `plz` | TEXT | optional |
+| `ort` | TEXT | optional |
+| `trainer_lizenzen` | TEXT[] | optional, Mehrfachauswahl möglich |
+| `avatar_url` | TEXT | optional, öffentliche Supabase-Storage-URL |
 
 ### Tabelle: `buchungen`
 
@@ -135,9 +141,9 @@ src/
 │   ├── mannschaften/page.tsx      ← Teams (TeamCards) + BFV-Spielbetrieb (Tabelle & Spiele)
 │   ├── news/page.tsx              ← News-Seite (Instagram-only, kein CMS)
 │   ├── kontakt/page.tsx           ← Öffentliche Kontaktseite
-│   ├── kalender/page.tsx          ← Buchungskalender (nur trainer/vorstand/admin)
-│   ├── vorstand/page.tsx          ← Vorstandsbereich inkl. Buchungsübersicht (nur vorstand/admin)
-│   ├── mitglieder/page.tsx        ← Mitgliederverwaltung (nur vorstand/admin)
+│   ├── platzbuchung/page.tsx      ← Buchungskalender (nur trainer/vorstand/admin), Redirect von /kalender
+│   ├── vorstandsbereich/page.tsx  ← Vorstandsbereich inkl. Buchungsübersicht (nur vorstand/admin), Redirect von /vorstand
+│   ├── mitglieder/page.tsx        ← Trainer-Verzeichnis (Rolle trainer) / Mitgliederverwaltung (vorstand/admin) – einheitliche H1 „Mitglieder" seit 2026-07-10, rollenspezifischer Untertitel
 │   ├── mein-verein/page.tsx       ← Vereinslinks & Info (mitglied + höher)
 │   ├── profil/page.tsx            ← Profilverwaltung (alle eingeloggten Rollen)
 │   ├── login/ · registrieren/ · confirm-email/  ← Auth-Seiten (Pitch-Look)
@@ -150,7 +156,7 @@ src/
 │       └── benutzer-ablehnen/route.ts
 ├── components/
 │   ├── Header.tsx                 ← Smart-Sticky-Nav, kanonisches Design-Vorbild
-│   ├── Navigation.tsx             ← Rollenbasierte Navigation
+│   (Navigation.tsx entfernt seit 2026-07-07 – Nav-Links leben in UserDropdown.tsx, Konstante ALLE_LINKS, seit 2026-07-10 rollenunabhängig für alle eingeloggten Nutzer sichtbar)
 │   ├── Footer.tsx                 ← Dreispaltig, enthält den Theme-Umschalter
 │   ├── ConditionalChrome.tsx      ← Blendet Header/Footer auf Auth-Routen aus
 │   ├── UserDropdown.tsx           ← Nutzer-Menü in der Nav
