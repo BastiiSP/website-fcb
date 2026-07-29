@@ -111,7 +111,7 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
                   Liegt auf bg-fcb-surface (Card-Fläche), nicht über dem Bild
                   → semantische Tokens statt literal white/white/70. */}
               <div className="relative z-10 flex flex-1 flex-col gap-1.5 p-4">
-                <p className="font-inter text-[0.7rem] uppercase tracking-wider text-fcb-blue">
+                <p className="font-inter text-[0.7rem] uppercase tracking-wider text-fcb-accent">
                   {formatPostDate(post.timestamp)}
                 </p>
                 {heading && (
@@ -138,7 +138,7 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
         type="button"
         onClick={prev}
         aria-label="Vorheriger Beitrag"
-        className="absolute left-2 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-blue sm:left-6"
+        className="absolute left-2 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-accent sm:left-6"
       >
         <ChevronLeft size={22} />
       </button>
@@ -146,7 +146,7 @@ export default function InstagramCarousel({ posts }: { posts: InstaPost[] }) {
         type="button"
         onClick={next}
         aria-label="Nächster Beitrag"
-        className="absolute right-2 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-blue sm:right-6"
+        className="absolute right-2 top-1/2 z-20 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full border border-white/20 bg-black/50 text-white backdrop-blur-sm transition-colors hover:bg-fcb-accent sm:right-6"
       >
         <ChevronRight size={22} />
       </button>

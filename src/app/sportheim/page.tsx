@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { Euro, ScrollText } from "lucide-react";
 
+import { getTenant } from "@/lib/tenant.server";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
@@ -12,11 +14,24 @@ import {
   SPORTHEIM_PREISE,
 } from "@/lib/sportheim";
 
-export const metadata: Metadata = {
-  title: "Sportheim mieten – 1. FC 1911 Burgkunstadt",
-  description:
-    "Das Sportheim des 1. FC 1911 Burgkunstadt für private Feiern und Veranstaltungen unverbindlich anfragen – mit Belegungskalender und Preisen.",
-};
+/**
+ * Statischer `metadata`-Export wurde auf `generateMetadata()` umgestellt, weil die
+ * Route markenexklusiv ist: auf dem JFG-Auftritt darf nicht der FCB-Sportheim-Titel
+ * im <head> bzw. in der Tab-Beschriftung der 404-Antwort landen.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenant();
+
+  if (tenant === "jfg") {
+    return { title: "Seite nicht gefunden" };
+  }
+
+  return {
+    title: "Sportheim mieten – 1. FC 1911 Burgkunstadt",
+    description:
+      "Das Sportheim des 1. FC 1911 Burgkunstadt für private Feiern und Veranstaltungen unverbindlich anfragen – mit Belegungskalender und Preisen.",
+  };
+}
 
 // Heimspiele ändern sich selten → stündliches Caching wie die übrige BFV-Anbindung
 export const revalidate = 3600;
@@ -24,6 +39,13 @@ export const revalidate = 3600;
 // Öffentliche Sportheim-Seite – Server Component, bewusst ohne Auth-Check:
 // jede und jeder darf die Belegung sehen und unverbindlich anfragen.
 export default async function SportheimSeite() {
+  // Das Sportheim ist FCB-Anlagenverwaltung. Auf dem JFG-Auftritt existiert dieser
+  // Pfad nicht – die Absicherung sitzt bewusst hier (nicht nur in der Nav), damit
+  // auch der direkte URL-Aufruf sauber mit 404 endet statt FCB-Inhalte auszuliefern.
+  if ((await getTenant()) === "jfg") {
+    notFound();
+  }
+
   const heimspiele = await getHeimspiele();
 
   return (
@@ -37,7 +59,7 @@ export default async function SportheimSeite() {
       <div className="mb-8 grid gap-4 sm:grid-cols-2">
         <Card>
           <div className="mb-4 flex items-center gap-3">
-            <IconBadge icon={Euro} accent="blue" size="md" label="Preise" />
+            <IconBadge icon={Euro} accent="brand" size="md" label="Preise" />
             <h2 className="font-oswald text-xl font-semibold uppercase tracking-wide text-fcb-text">
               Preise
             </h2>
@@ -70,7 +92,7 @@ export default async function SportheimSeite() {
           <div className="mb-4 flex items-center gap-3">
             <IconBadge
               icon={ScrollText}
-              accent="blue"
+              accent="brand"
               size="md"
               label="Nutzungsvorgaben"
             />

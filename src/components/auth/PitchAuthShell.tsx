@@ -9,7 +9,7 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
 /**
  * Gemeinsame Hülle für alle echten Auth-Seiten im Pitch-Look:
  *   - ruhiger Spielfeld-Hintergrund (PitchAuthBackground)
- *   - zentrierte Glas-Card mit DÜNNEM Border-Glow (border-fcb-blue/30 + weicher
+ *   - zentrierte Glas-Card mit DÜNNEM Border-Glow (border-fcb-accent/30 + weicher
  *     blauer Außenschatten)
  *   - Wappen-Glow-Header (verlinkt auf "/") + "1911 Schuhstädter"-Motiv
  *   - sanfter Card-Eintritt; bei reduzierter Bewegung neutralisiert
@@ -40,17 +40,17 @@ export default function PitchAuthShell({ children }: { children: React.ReactNode
           {...cardMotion}
           // Border-Glow ist statisch dezent; beim Hover wird er sanft verstärkt
           // (hellerer Rand + kräftigerer Schatten), weicher Übergang.
-          className="w-full max-w-md rounded-2xl border border-fcb-blue/30 bg-fcb-surface/80 p-6 shadow-[0_0_40px_-12px_rgba(29,95,173,0.45)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 hover:border-fcb-blue/60 hover:shadow-[0_0_60px_-10px_rgba(29,95,173,0.65)] sm:p-8"
+          className="w-full max-w-md rounded-2xl border border-fcb-accent/30 bg-fcb-surface/80 p-6 shadow-[0_0_40px_-12px_rgb(var(--color-accent)/0.45)] backdrop-blur-xl transition-[border-color,box-shadow] duration-300 hover:border-fcb-accent/60 hover:shadow-[0_0_60px_-10px_rgb(var(--color-accent)/0.65)] sm:p-8"
         >
           {/* Wappen-Glow-Header – Wappen verlinkt zurück zur Startseite (Ausstieg). */}
           <div className="flex flex-col items-center text-center">
-            <Link href="/" aria-label="Zur Startseite" className="relative rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue">
+            <Link href="/" aria-label="Zur Startseite" className="relative rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent">
               <div
                 aria-hidden="true"
                 className="absolute inset-0 -z-10 scale-150 blur-3xl"
                 style={{
                   background:
-                    "radial-gradient(circle, rgba(29,95,173,0.55) 0%, rgba(29,95,173,0) 70%)",
+                    "radial-gradient(circle, rgb(var(--color-accent) / 0.55) 0%, rgb(var(--color-accent) / 0) 70%)",
                 }}
               />
               <Image
@@ -59,14 +59,14 @@ export default function PitchAuthShell({ children }: { children: React.ReactNode
                 width={72}
                 height={72}
                 priority
-                className="h-16 w-16 drop-shadow-[0_0_24px_rgba(29,95,173,0.6)] sm:h-20 sm:w-20"
+                className="h-16 w-16 drop-shadow-[0_0_24px_rgb(var(--color-accent)/0.6)] sm:h-20 sm:w-20"
               />
             </Link>
 
             <div className="mt-4 flex items-center gap-3">
               <span className="h-0.5 w-12 bg-fcb-text/20" aria-hidden="true" />
               <span className="font-oswald text-xs uppercase tracking-[0.2em] text-fcb-muted">
-                <span className="text-fcb-blue">1911</span> Schuhstädter
+                <span className="text-fcb-accent">1911</span> Schuhstädter
               </span>
               <span className="h-0.5 w-12 bg-fcb-text/20" aria-hidden="true" />
             </div>

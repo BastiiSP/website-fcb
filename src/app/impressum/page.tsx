@@ -3,48 +3,72 @@ import {
   RechtstextLayout,
   RechtstextSektion,
 } from "@/components/rechtstexte/RechtstextLayout";
+import { getTenantConfigServer } from "@/lib/tenant.server";
+import { RECHTSTEXTE } from "@/lib/rechtstexte";
 
-export const metadata: Metadata = {
-  title: "Impressum – 1. FC 1911 Burgkunstadt",
-  description: "Impressum und Anbieterkennzeichnung des 1. FC 1911 Burgkunstadt e.V.",
-};
+// Titel/Beschreibung nennen den Verein namentlich – deshalb markenabhängig
+// über generateMetadata() statt statischem metadata-Export (Muster wie
+// /verein und /kontakt).
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenantConfigServer();
+  return {
+    title: `Impressum – ${tenant.name}`,
+    description: `Impressum und Anbieterkennzeichnung des ${tenant.vereinsname}.`,
+  };
+}
 
-export default function ImpressumPage() {
+export default async function ImpressumPage() {
+  const angaben = RECHTSTEXTE[(await getTenantConfigServer()).id];
+
   return (
-    <RechtstextLayout titel="Impressum" stand="Juni 2026">
+    <RechtstextLayout titel="Impressum" stand="Juli 2026">
       {/* Anbieterkennzeichnung: § 5 TMG wurde am 14.05.2024 durch § 5 DDG
           (Digitale-Dienste-Gesetz) abgelöst. */}
       <RechtstextSektion titel="Angaben gemäß § 5 DDG">
         <p>
-          1. FC 1911 Burgkunstadt e.V.
+          {angaben.vollerName}
+          {angaben.bekanntAls && ` (bekannt als ${angaben.bekanntAls})`}
           <br />
-          Alter Postweg 10
+          {angaben.strasse}
           <br />
-          96224 Burgkunstadt
+          {angaben.ort}
         </p>
       </RechtstextSektion>
 
       <RechtstextSektion titel="Vertreten durch">
-        <p>1. Vorsitzender: Wolfgang Strassgürtel</p>
+        <p>
+          {angaben.vertreterFunktion}: {angaben.vertreterName}
+        </p>
       </RechtstextSektion>
 
       <RechtstextSektion titel="Eintragung im Vereinsregister">
         <p>
-          Eingetragen im Vereinsregister beim Amtsgericht Coburg unter der
-          Nummer VR 20074.
+          Eingetragen im Vereinsregister beim {angaben.registergericht} unter
+          der Nummer {angaben.registerNummer}.
         </p>
       </RechtstextSektion>
 
       <RechtstextSektion titel="Kontakt">
         <p>
-          Telefon: 09572 2090152
-          <br />
+          {angaben.telefon && (
+            <>
+              Telefon:{" "}
+              {angaben.telefonHref ? (
+                <a href={angaben.telefonHref} className="hover:underline">
+                  {angaben.telefon}
+                </a>
+              ) : (
+                angaben.telefon
+              )}
+              <br />
+            </>
+          )}
           E-Mail:{" "}
           <a
-            href="mailto:info@fcburgkunstadt.de"
-            className="text-fcb-blue hover:underline"
+            href={`mailto:${angaben.email}`}
+            className="text-fcb-accent hover:underline"
           >
-            info@fcburgkunstadt.de
+            {angaben.email}
           </a>
         </p>
       </RechtstextSektion>
@@ -52,11 +76,11 @@ export default function ImpressumPage() {
       {/* § 55 Abs. 2 RStV ist seit Nov. 2020 außer Kraft – korrekt: § 18 Abs. 2 MStV. */}
       <RechtstextSektion titel="Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV">
         <p>
-          Wolfgang Strassgürtel
+          {angaben.vertreterName}
           <br />
-          Alter Postweg 10
+          {angaben.strasse}
           <br />
-          96224 Burgkunstadt
+          {angaben.ort}
         </p>
       </RechtstextSektion>
 

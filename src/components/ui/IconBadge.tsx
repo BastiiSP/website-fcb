@@ -4,13 +4,16 @@ import type { LucideIcon } from "lucide-react";
 // dezenten Container mit Tint-Fläche (Akzent/10 + Border Akzent/40).
 // Einsatz: Feature-Aufzählungen, Card-Köpfe, Team-Cards, Empty-States.
 
-type Accent = "neutral" | "blue" | "red";
+// "brand" = Marken-Akzent des aufgerufenen Auftritts (fcb-accent, tenant-abhängig).
+// "blue"/"red" bleiben die festen Trägerfarben der Mannschaftszuordnung.
+type Accent = "neutral" | "brand" | "blue" | "red";
 type Size = "sm" | "md" | "lg";
 
 // Tints folgen dem Badge-/Banner-Muster: /10-Fläche + /40-Border.
 // Neutral nutzt Surface/Border-Tokens und funktioniert so in beiden Themes.
 const ACCENTS: Record<Accent, string> = {
   neutral: "border-fcb-border bg-fcb-surface text-fcb-muted",
+  brand: "border-fcb-accent/40 bg-fcb-accent/10 text-fcb-accent",
   blue: "border-fcb-blue/40 bg-fcb-blue/10 text-fcb-blue",
   red: "border-fcb-red/40 bg-fcb-red/10 text-fcb-red",
 };

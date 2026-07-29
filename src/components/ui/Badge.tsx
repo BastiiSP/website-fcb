@@ -2,7 +2,7 @@ type Variant = "neutral" | "blue" | "green" | "yellow" | "red" | "purple";
 
 const STYLES: Record<Variant, string> = {
   neutral: "border-fcb-border bg-fcb-surface text-fcb-muted",
-  blue:    "border-fcb-blue/40 bg-fcb-blue/10 text-fcb-blue",
+  blue:    "border-fcb-accent/40 bg-fcb-accent/10 text-fcb-accent",
   green:   "border-green-500/40 bg-green-500/10 text-green-500",
   yellow:  "border-yellow-500/40 bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
   red:     "border-fcb-red/40 bg-fcb-red/10 text-fcb-red",

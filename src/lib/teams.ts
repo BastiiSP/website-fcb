@@ -159,3 +159,15 @@ export const TEAMS: Team[] = [
     beschreibung: "Der Einstieg in die JFG. Hier beginnt die leistungsgerechte Förderung.",
   },
 ];
+
+/**
+ * Mannschaften eines Trägers – in Reihenfolge von TEAMS.
+ *
+ * Zentral hier, weil im Multi-Tenant-Betrieb mehrere Seiten nach Träger
+ * filtern müssen (jede Marke zeigt „ihre" Mannschaften). Verstreute
+ * `TEAMS.filter(...)`-Aufrufe würden bei künftigen Team-Änderungen
+ * auseinanderlaufen.
+ */
+export function getTeamsFuerTraeger(traeger: Traeger): Team[] {
+  return TEAMS.filter((team) => team.traeger === traeger);
+}

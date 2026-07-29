@@ -98,7 +98,7 @@ export default function TooltipContent({
               e.stopPropagation();
               onEdit();
             }}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-fcb-border bg-fcb-surface px-2.5 py-1.5 font-inter text-xs font-medium text-fcb-text transition-colors hover:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-fcb-border bg-fcb-surface px-2.5 py-1.5 font-inter text-xs font-medium text-fcb-text transition-colors hover:border-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
           >
             <Pencil size={14} aria-hidden /> Bearbeiten
           </button>

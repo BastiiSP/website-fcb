@@ -7,11 +7,24 @@
  *
  * Caching: serverseitig 1 Stunde (next.revalidate). Behold Free-Tier erlaubt
  * nur 1.200 MAI-Views/Monat, deshalb darf der Feed nicht pro Request geladen
- * werden. Da alle Varianten-Seiten Server Components mit demselben Feed-URL
- * sind, dedupliziert Next.js identische Requests zusätzlich automatisch.
+ * werden. Identische Feed-URLs werden von Next.js automatisch dedupliziert;
+ * die unterschiedlichen URLs von FCB und JFG bleiben getrennte Cache-Einträge.
  */
 
+import { getTenantConfig, type TenantId } from "@/lib/tenant";
+
 const REVALIDATE_SECONDS = 60 * 60; // 1 Stunde
+
+/**
+ * Direkte Env-Zugriffe sind bewusst ausgeschrieben: Next.js kann nur so beide
+ * serverseitigen Variablen zuverlässig in die Build-/Runtime-Umgebung aufnehmen.
+ * Ein dynamisches `process.env[variablerName]` könnte wegoptimiert werden.
+ */
+const FEED_URLS: Record<TenantId, string | undefined> = {
+  fcb: process.env.BEHOLD_FEED_URL,
+  // VORLÄUFIG/PLATZHALTER: Basti trägt die JFG-Feed-URL später in Vercel ein.
+  jfg: process.env.BEHOLD_FEED_URL_JFG,
+};
 
 /** Ein einzelnes Bild eines Posts inkl. Maßen (für next/image). */
 export interface InstaImage {
@@ -104,13 +117,20 @@ interface BeholdFeed {
  * zurückgegeben, damit der Build/Render der Seite nie crasht – die Varianten
  * zeigen dann ihren leeren Zustand.
  *
+ * @param tenant Marke, deren eigener Behold-Feed geladen werden soll.
  * @param limit Maximale Anzahl Posts (Default 6 – alle Varianten zeigen 6).
  */
-export async function getInstagramPosts(limit = 6): Promise<InstaPost[]> {
-  const feedUrl = process.env.BEHOLD_FEED_URL;
+export async function getInstagramPosts(
+  tenant: TenantId,
+  limit = 6,
+): Promise<InstaPost[]> {
+  const config = getTenantConfig(tenant);
+  const feedUrl = FEED_URLS[tenant];
 
   if (!feedUrl) {
-    console.error("[beholdFeed] BEHOLD_FEED_URL ist nicht gesetzt.");
+    console.error(
+      `[beholdFeed] Für ${config.name} fehlt die Environment-Variable ${config.beholdFeedEnvVar}. Es werden keine Instagram-Beiträge geladen.`,
+    );
     return [];
   }
 

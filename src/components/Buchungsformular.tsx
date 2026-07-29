@@ -239,7 +239,7 @@ export default function Buchungsformular({
                     onClick={() => setPlatz(wert)}
                     className={`inline-flex items-center gap-2 px-4 py-2.5 font-inter text-sm font-medium transition border-r last:border-r-0 border-fcb-border ${
                       aktiv
-                        ? "bg-fcb-blue text-white"
+                        ? "bg-fcb-accent text-white"
                         : "bg-fcb-bg text-fcb-text hover:bg-fcb-surface"
                     }`}
                   >
@@ -305,7 +305,7 @@ export default function Buchungsformular({
               dateFormat="dd.MM.yyyy HH:mm"
               placeholderText="Startzeit wählen"
               // Wrapper-Klasse: Input-Stil nutzt fcb-Tokens via globals.css-Regeln
-              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-accent focus:outline-none"
               wrapperClassName="w-full"
               popperPlacement="bottom-start"
             />
@@ -325,7 +325,7 @@ export default function Buchungsformular({
               timeIntervals={15}
               dateFormat="dd.MM.yyyy HH:mm"
               placeholderText="Endzeit wählen"
-              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-accent focus:outline-none"
               wrapperClassName="w-full"
             />
           </div>
@@ -338,7 +338,7 @@ export default function Buchungsformular({
               type="checkbox"
               checked={serieAktiv}
               onChange={(e) => setSerieAktiv(e.target.checked)}
-              className="h-4 w-4 rounded border-fcb-border accent-fcb-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+              className="h-4 w-4 rounded border-fcb-border accent-fcb-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
             />
             <span className="inline-flex items-center gap-1.5 font-inter text-sm text-fcb-text">
               <Repeat size={16} aria-hidden className="text-fcb-muted" />
@@ -358,7 +358,7 @@ export default function Buchungsformular({
                 dateFormat="dd.MM.yyyy"
                 minDate={startzeit ?? undefined}
                 placeholderText="Enddatum der Serie wählen"
-                className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none"
+                className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-accent focus:outline-none"
                 wrapperClassName="w-full sm:w-64"
               />
               <p className="font-inter text-xs text-fcb-muted">
@@ -425,7 +425,7 @@ export default function Buchungsformular({
               type="button"
               onClick={() => setSerienErgebnis(null)}
               aria-label="Zusammenfassung schließen"
-              className="p-1 rounded text-fcb-muted hover:text-fcb-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+              className="p-1 rounded text-fcb-muted hover:text-fcb-text transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
             >
               <X size={16} />
             </button>

@@ -66,11 +66,11 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
               // Aktiv = Tint-Fläche + Akzent-Border (Badge-Muster), inaktiv =
               // neutrale Surface mit Hover zum Akzent – analog Card-Affordanz.
               // Volle Klassen-Literale (Tailwind-Scanner) – kein String-Bau.
-              className={`rounded-lg border p-4 text-left transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue ${
+              className={`rounded-lg border p-4 text-left transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent ${
                 aktiv
                   ? `${a.border} ${a.bgSoft}`
                   : t === "fcb"
-                    ? "border-fcb-border bg-fcb-surface hover:border-fcb-blue/40"
+                    ? "border-fcb-border bg-fcb-surface hover:border-fcb-accent/40"
                     : "border-fcb-border bg-fcb-surface hover:border-fcb-red/40"
               }`}
             >
@@ -96,11 +96,11 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
               aria-pressed={aktiv}
               onClick={() => setTeamId(team.id)}
               // Volle Klassen-Literale (Tailwind-Scanner) – kein String-Bau.
-              className={`rounded-full border px-3.5 py-1.5 font-inter text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue ${
+              className={`rounded-full border px-3.5 py-1.5 font-inter text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent ${
                 aktiv
                   ? `${accent.badge} font-medium`
                   : traeger === "fcb"
-                    ? "border-fcb-border text-fcb-muted hover:border-fcb-blue/40 hover:text-fcb-text"
+                    ? "border-fcb-border text-fcb-muted hover:border-fcb-accent/40 hover:text-fcb-text"
                     : "border-fcb-border text-fcb-muted hover:border-fcb-red/40 hover:text-fcb-text"
               }`}
             >

@@ -318,7 +318,7 @@ export default function MitgliederVerwaltung({ eigeneUserId }: Props) {
                       {/* Icon-Buttons: ghost-Stil ohne Button-Primitive um Padding schlank zu halten */}
                       <button
                         onClick={() => setBearbeitenMitglied(m)}
-                        className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+                        className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
                         title="Bearbeiten"
                       >
                         <Pencil size={16} />

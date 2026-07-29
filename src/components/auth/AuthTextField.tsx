@@ -38,7 +38,7 @@ export default function AuthTextField({
         placeholder={placeholder}
         required={required}
         autoComplete={autoComplete}
-        className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
+        className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40"
       />
     </div>
   );

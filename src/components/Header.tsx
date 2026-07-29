@@ -7,27 +7,26 @@ import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-
 import { Menu, X } from "lucide-react";
 import UserDropdown from "@/components/UserDropdown";
 import VereinsSwitcher from "@/components/VereinsSwitcher";
+import { useTenant } from "@/components/tenant/TenantProvider";
 
 /**
- * Globaler Header – Smart-Sticky, fcb-Design-Tokens, beide Wappen, öffentliche Nav-Links.
+ * Globaler Header – Smart-Sticky, fcb-Design-Tokens, Marken-Wappen, öffentliche Nav-Links.
+ *
+ * Multi-Tenant: Wappen, Vereinsname und Nav-Links kommen aus der Marken-Config
+ * (`useTenant()`), damit dieselbe Komponente FCB und JFG bedient. Insbesondere die
+ * Nav-Liste wird nur konsumiert – welche Links eine Marke hat (JFG z. B. ohne
+ * „Sportheim"), entscheidet ausschließlich `src/lib/tenant.ts`.
  *
  * Smart-Sticky: verschwindet beim Scrollen nach unten (delta > 5, scrollY > 80),
  * erscheint beim Scrollen nach oben (delta < -5). Pattern übernommen von VariantsNavbar.
  *
  * Struktur:
- *   Links  – Vereinswappen + Stadtwappen + Vereinsname (Oswald) + Vereins-Switcher
+ *   Links  – Vereinswappen (+ Stadtwappen nur FCB) + Vereinsname (Oswald) + Vereins-Switcher
  *   Mitte  – Öffentliche Links (Desktop) – rollenbasierte Bereiche liegen im Account-Menü
  *   Rechts – UserDropdown + Hamburger (Mobile)
  */
-const PUBLIC_LINKS = [
-  { label: "Verein", href: "/verein" },
-  { label: "Mannschaften", href: "/mannschaften" },
-  { label: "News", href: "/news" },
-  { label: "Sportheim", href: "/sportheim" },
-  { label: "Kontakt", href: "/kontakt" },
-];
-
 export default function Header() {
+  const tenant = useTenant();
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
@@ -58,33 +57,45 @@ export default function Header() {
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Menü schließen" : "Menü öffnen"}
             aria-expanded={menuOpen}
-            className="-ml-1 rounded p-1 text-fcb-text transition-colors hover:text-fcb-blue md:hidden"
+            className="-ml-1 rounded p-1 text-fcb-text transition-colors hover:text-fcb-accent md:hidden"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          {/* Vereinswappen + Stadtwappen + Name */}
+          {/* Vereinswappen (+ Stadtwappen nur FCB) + Name */}
           <Link href="/" className="flex items-center gap-2">
+            {/*
+              Fixe 36-px-Box mit object-contain: die Marken liefern unterschiedliche
+              Formate (FCB = SVG, JFG = PNG). Beide Dateien sind quadratisch, das
+              Ergebnis ist für den FCB damit unverändert – object-contain schützt
+              nur davor, dass ein später ausgetauschtes Wappen verzerrt wird.
+            */}
             <Image
-              src="/logo.svg"
-              alt="Vereinslogo 1. FC 1911 Burgkunstadt"
+              src={tenant.logoSrc}
+              alt={tenant.logoAlt}
               width={36}
               height={36}
-              className="drop-shadow-lg"
+              className="h-9 w-9 object-contain drop-shadow-lg"
             />
-            {/* Stadtwappen: kleiner + gedämpft – signalisiert Hierarchie (FCB > Stadt) */}
-            <Image
-              src="/stadtwappen-burgkunstadt.svg"
-              alt="Stadtwappen Burgkunstadt"
-              width={24}
-              height={24}
-              className="opacity-70"
-            />
+            {/*
+              Stadtwappen: kleiner + gedämpft – signalisiert Hierarchie (FCB > Stadt).
+              Nur beim FCB, weil die JFG als Fördergemeinschaft mehrere Orte umfasst;
+              ein einzelnes Stadtwappen wäre dort inhaltlich falsch.
+            */}
+            {tenant.id === "fcb" && (
+              <Image
+                src="/stadtwappen-burgkunstadt.svg"
+                alt="Stadtwappen Burgkunstadt"
+                width={24}
+                height={24}
+                className="opacity-70"
+              />
+            )}
             <span className="hidden font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text sm:inline">
-              1. FC 1911 Burgkunstadt
+              {tenant.name}
             </span>
             <span className="font-oswald text-base font-bold uppercase tracking-wide text-fcb-text sm:hidden">
-              FCB
+              {tenant.kurzname}
             </span>
           </Link>
 
@@ -94,11 +105,11 @@ export default function Header() {
 
         {/* Desktop Nav: nur öffentliche Links – rollenbasierte Bereiche liegen im Account-Menü */}
         <div className="hidden items-center gap-6 md:flex">
-          {PUBLIC_LINKS.map(({ label, href }) => (
+          {tenant.navLinks.map(({ label, href }) => (
             <Link
               key={label}
               href={href}
-              className="font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-blue"
+              className="font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-accent"
             >
               {label}
             </Link>
@@ -123,12 +134,12 @@ export default function Header() {
             className="overflow-hidden border-t border-fcb-border bg-fcb-surface/95 md:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-3">
-              {PUBLIC_LINKS.map(({ label, href }) => (
+              {tenant.navLinks.map(({ label, href }) => (
                 <Link
                   key={label}
                   href={href}
                   onClick={() => setMenuOpen(false)}
-                  className="py-1.5 font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-blue"
+                  className="py-1.5 font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-accent"
                 >
                   {label}
                 </Link>

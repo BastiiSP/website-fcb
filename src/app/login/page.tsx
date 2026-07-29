@@ -55,7 +55,7 @@ export default function LoginPage() {
             <RotatingText
               words={["Tradition", "Heimat", "Mannschaft", "1911"]}
               clip={false}
-              className="font-oswald font-semibold uppercase tracking-wide text-fcb-blue"
+              className="font-oswald font-semibold uppercase tracking-wide text-fcb-accent"
             />
           </p>
         </div>

@@ -21,6 +21,12 @@ const config: Config = {
           text:    "rgb(var(--color-text) / <alpha-value>)",
           muted:   "rgb(var(--color-muted) / <alpha-value>)",
           nav:     "rgb(var(--color-nav) / <alpha-value>)",
+          // Marken-Akzent des aufgerufenen Auftritts (Multi-Tenant):
+          // löst über --color-accent auf, gesetzt per data-tenant auf <html>
+          // (FCB = blau, JFG = rot). Für ALLES generische Marken-Chrome.
+          accent:  "rgb(var(--color-accent) / <alpha-value>)",
+          // Feste Trägerfarben – nur für die Zuordnung einzelner Mannschaften
+          // (getTeamAccent) und den Vereins-Switcher, tenant-unabhängig.
           blue:    "#1d5fad", // Brand-Akzent – in beiden Themes konstant
           red:     "#cc1f1f", // Brand-Akzent – in beiden Themes konstant
         },

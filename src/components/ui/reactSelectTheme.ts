@@ -13,7 +13,7 @@ export function reactSelectClassNames<
   return {
     control: ({ isFocused }) =>
       `rounded-lg border bg-fcb-bg px-1 py-1 text-sm transition-colors ${
-        isFocused ? "border-fcb-blue ring-2 ring-fcb-blue/40" : "border-fcb-border"
+        isFocused ? "border-fcb-accent ring-2 ring-fcb-accent/40" : "border-fcb-border"
       }`,
     valueContainer: () => "gap-1 px-1",
     placeholder: () => "text-fcb-muted/60 font-inter",
@@ -26,7 +26,7 @@ export function reactSelectClassNames<
     option: ({ isFocused, isSelected }) =>
       `px-3 py-2 text-sm font-inter cursor-pointer ${
         isSelected
-          ? "bg-fcb-blue text-white"
+          ? "bg-fcb-accent text-white"
           : isFocused
             ? "bg-fcb-border text-fcb-text"
             : "text-fcb-text"

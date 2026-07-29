@@ -7,6 +7,9 @@ import { MapPin } from "lucide-react";
 import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
 import { useConsent } from "@/components/consent/ConsentProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useTenant } from "@/components/tenant/TenantProvider";
+import { RECHTSTEXTE } from "@/lib/rechtstexte";
+import { VEREINSLINKS } from "@/lib/vereinslinks";
 
 /**
  * Vereins-Footer (Design-Runde 2, dreispaltig).
@@ -17,19 +20,11 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
  *   restlichen animierten Site. Daher "use client".
  */
 
-// Vereins- und Social-Daten (zuvor footer-preview/_data.ts; inline übernommen,
-// da die Preview-Routen mit Abschluss von Design-Runde 2 entfernt wurden).
-// Adresse aus dem Impressum (Stand 2025).
-const FCB_FOOTER = {
-  vereinsname: "1. FC 1911 Burgkunstadt e.V.",
-  strasse: "Alter Postweg 10",
-  ort: "96224 Burgkunstadt",
-  facebookUrl: "https://www.facebook.com/fc1911?locale=de_DE",
-  instagramUrl: "https://www.instagram.com/schuhstaedter1911",
-  // Google-Maps-Suche nach der Vereinsadresse (api=1 öffnet zuverlässig die Karte)
-  mapsUrl:
-    "https://www.google.com/maps/search/?api=1&query=Alter+Postweg+10%2C+96224+Burgkunstadt",
-} as const;
+// Multi-Tenant: Vereinsname, Wappen und Instagram-Kanal kommen aus der
+// Marken-Konfiguration (useTenant). Rechtsadresse kommt aus rechtstexte.ts
+// (JFG hat eine eigene, von der FCB-Anschrift abweichende Registeradresse).
+// Facebook zeigen wir nur, wenn die Marke tatsächlich einen Kanal hat (VEREINSLINKS) –
+// die JFG hat aktuell keine eigene Facebook-Seite.
 
 // Copyright-Jahr einmal auf Modulebene – stabil über Server/Client.
 const JAHR = new Date().getFullYear();
@@ -37,6 +32,14 @@ const JAHR = new Date().getFullYear();
 export default function Footer() {
   // Öffnet das Cookie-Banner erneut – ohne Reload oder Cookie-Löschen.
   const { openSettings } = useConsent();
+  // Marke des aufgerufenen Auftritts (Wappen, Name, Instagram-Kanal).
+  const tenant = useTenant();
+  const angaben = RECHTSTEXTE[tenant.id];
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${angaben.strasse}, ${angaben.ort}`,
+  )}`;
+  // Facebook nur zeigen, wenn die Marke tatsächlich einen eigenen Kanal hat.
+  const facebookLink = VEREINSLINKS[tenant.id].find((l) => l.icon === "facebook");
   return (
     <motion.footer
       initial={{ opacity: 0, y: 24 }}
@@ -66,33 +69,33 @@ export default function Footer() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <Image
-              src="/logo.svg"
-              alt="Vereinslogo 1. FC 1911 Burgkunstadt"
+              src={tenant.logoSrc}
+              alt={tenant.logoAlt}
               width={36}
               height={36}
               className="drop-shadow-lg"
             />
             <span className="font-oswald text-base font-semibold uppercase tracking-wide">
-              {FCB_FOOTER.vereinsname}
+              {tenant.vereinsname}
             </span>
           </div>
           {/* Icon + Adresse als direkter Google-Maps-Link */}
           <Link
-            href={FCB_FOOTER.mapsUrl}
+            href={mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Vereinsadresse in Google Maps öffnen"
-            className="flex w-fit items-center gap-2 font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
+            className="flex w-fit items-center gap-2 font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent"
           >
             {/* Icon-Slot in Wappenbreite (w-9 = 36px), damit der Adresstext exakt
                 unter dem Vereinsnamen beginnt (Logo ist ebenfalls 36px breit). */}
             <span className="flex w-9 shrink-0 justify-center">
-              <MapPin className="h-7 w-7 text-fcb-blue" />
+              <MapPin className="h-7 w-7 text-fcb-accent" />
             </span>
             <span>
-              {FCB_FOOTER.strasse}
+              {angaben.strasse}
               <br />
-              {FCB_FOOTER.ort}
+              {angaben.ort}
             </span>
           </Link>
         </div>
@@ -104,13 +107,13 @@ export default function Footer() {
           </h3>
           <Link
             href="/impressum"
-            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
+            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent"
           >
             Impressum
           </Link>
           <Link
             href="/datenschutz"
-            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
+            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent"
           >
             Datenschutz
           </Link>
@@ -119,7 +122,7 @@ export default function Footer() {
           <button
             type="button"
             onClick={openSettings}
-            className="w-fit text-left font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+            className="w-fit text-left font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
           >
             Cookie-Einstellungen
           </button>
@@ -131,17 +134,19 @@ export default function Footer() {
             Folge uns
           </h3>
           <div className="flex items-center gap-4">
+            {facebookLink && (
+              <Link
+                href={facebookLink.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-fcb-muted transition-colors hover:text-fcb-accent"
+              >
+                <FacebookIcon className="h-6 w-6" />
+              </Link>
+            )}
             <Link
-              href={FCB_FOOTER.facebookUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="text-fcb-muted transition-colors hover:text-fcb-blue"
-            >
-              <FacebookIcon className="h-6 w-6" />
-            </Link>
-            <Link
-              href={FCB_FOOTER.instagramUrl}
+              href={tenant.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -156,7 +161,7 @@ export default function Footer() {
           <span className="font-inter text-xs text-fcb-muted sm:text-right">
             © {JAHR}
             <br />
-            {FCB_FOOTER.vereinsname}
+            {tenant.vereinsname}
           </span>
         </div>
       </div>

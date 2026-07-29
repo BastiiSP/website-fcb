@@ -4,27 +4,30 @@ import PageHeader from "@/components/ui/PageHeader";
 import ButtonLink from "@/components/ui/ButtonLink";
 import NewsPostCard from "@/components/news/NewsPostCard";
 import { getInstagramPosts } from "@/lib/beholdFeed";
-import { VEREINSLINKS } from "@/lib/vereinslinks";
+import { getTenantConfigServer } from "@/lib/tenant.server";
 
-export const metadata: Metadata = {
-  title: "News – 1. FC 1911 Burgkunstadt",
-  description:
-    "Neuigkeiten vom 1. FC 1911 Burgkunstadt: Spielberichte, Termine und Bilder direkt aus unserem Instagram-Kanal.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const config = await getTenantConfigServer();
+
+  return {
+    title: `News – ${config.name}`,
+    description: `Neuigkeiten vom ${config.name}: Spielberichte, Termine und Bilder direkt aus unserem Instagram-Kanal.`,
+  };
+}
 
 // News-Seite = prominente Instagram-Ansicht. Bewusst KEIN eigenes CMS:
 // Der Verein pflegt Inhalte nur auf Instagram, die Seite zieht sie automatisch
 // über den Behold-Feed (1-h-Cache in getInstagramPosts → ISR, Free-Tier-schonend).
 
 export default async function NewsPage() {
-  const posts = await getInstagramPosts();
-  const instagramLink = VEREINSLINKS.find((l) => l.icon === "instagram");
+  const config = await getTenantConfigServer();
+  const posts = await getInstagramPosts(config.id);
 
   return (
     <PageShell maxWidth="lg">
       <PageHeader
         title="News"
-        subtitle="Was beim FCB los ist: unsere Instagram-Beiträge, automatisch aktuell."
+        subtitle={`Was beim ${config.kurzname} los ist: unsere Instagram-Beiträge, automatisch aktuell.`}
       />
 
       {posts.length === 0 ? (
@@ -34,13 +37,11 @@ export default async function NewsPage() {
             Gerade können wir hier keine Beiträge laden. Schau am besten direkt
             auf unserem Instagram-Kanal vorbei, da ist immer was los.
           </p>
-          {instagramLink && (
-            <div className="mt-5 flex justify-center">
-              <ButtonLink href={instagramLink.url} external variant="primary">
-                Zu unserem Instagram
-              </ButtonLink>
-            </div>
-          )}
+          <div className="mt-5 flex justify-center">
+            <ButtonLink href={config.instagramUrl} external variant="primary">
+              Zu unserem Instagram
+            </ButtonLink>
+          </div>
         </div>
       ) : (
         <>
@@ -51,22 +52,20 @@ export default async function NewsPage() {
           </div>
 
           {/* Abschluss: mehr gibt es auf Instagram */}
-          {instagramLink && (
-            <div className="mt-12 text-center">
-              <p className="font-inter text-sm text-fcb-muted">
-                Noch mehr Bilder und Stories gibt es auf unserem Kanal.
-              </p>
-              <div className="mt-4 flex justify-center">
-                <ButtonLink
-                  href={instagramLink.url}
-                  external
-                  variant="secondary"
-                >
-                  @schuhstaedter1911 auf Instagram
-                </ButtonLink>
-              </div>
+          <div className="mt-12 text-center">
+            <p className="font-inter text-sm text-fcb-muted">
+              Noch mehr Bilder und Stories gibt es auf unserem Kanal.
+            </p>
+            <div className="mt-4 flex justify-center">
+              <ButtonLink
+                href={config.instagramUrl}
+                external
+                variant="secondary"
+              >
+                {config.instagramHandle} auf Instagram
+              </ButtonLink>
             </div>
-          )}
+          </div>
         </>
       )}
     </PageShell>

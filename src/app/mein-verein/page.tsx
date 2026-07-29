@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-// lucide-react: ExternalLink für allgemeine Links (kein Brand-Glyph nötig)
-import { ExternalLink } from "lucide-react";
+// lucide-react: ExternalLink für allgemeine Links (kein Brand-Glyph nötig),
+// ShoppingBag für den Fanshop.
+import { ExternalLink, ShoppingBag } from "lucide-react";
 import { FacebookIcon, InstagramIcon, WhatsAppIcon } from "@/components/icons/BrandIcons";
 import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
 import { VEREINSLINKS, type VereinsLink, type VereinsLinkIcon } from "@/lib/vereinslinks";
+import { useTenant } from "@/components/tenant/TenantProvider";
 // PageShell/PageHeader/ZugriffsHinweis sind Default-Exporte
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
@@ -15,7 +17,7 @@ import ZugriffsHinweis from "@/components/ui/ZugriffsHinweis";
 
 // Icon-Komponente – wählt anhand des icon-Feldes das passende Icon aus.
 // BrandIcons für Facebook/Instagram (Lucide enthält keine Brand-Glyphen),
-// Lucide-Icons für WhatsApp-Stellvertreter und allgemeine Links.
+// Lucide-Icons für WhatsApp-Stellvertreter, Fanshop und allgemeine Links.
 function VereinsLinkIconComponent({ icon }: { icon: VereinsLinkIcon }) {
   switch (icon) {
     case "whatsapp":
@@ -24,7 +26,9 @@ function VereinsLinkIconComponent({ icon }: { icon: VereinsLinkIcon }) {
     case "instagram":
       return <InstagramIcon className="w-8 h-8 text-pink-500" aria-hidden="true" />;
     case "facebook":
-      return <FacebookIcon className="w-8 h-8 text-fcb-blue" aria-hidden="true" />;
+      return <FacebookIcon className="w-8 h-8 text-fcb-accent" aria-hidden="true" />;
+    case "shop":
+      return <ShoppingBag className="w-8 h-8 text-fcb-accent" aria-hidden="true" />;
     default:
       return <ExternalLink className="w-8 h-8 text-fcb-muted" aria-hidden="true" />;
   }
@@ -53,6 +57,7 @@ function VereinsLinkKarte({ link }: { link: VereinsLink }) {
 export default function MeinVereinPage() {
   const supabase = createClient();
   const router = useRouter();
+  const tenant = useTenant();
 
   const [laden, setLaden] = useState(true);
   const [rolle, setRolle] = useState<string | null>(null);
@@ -105,7 +110,7 @@ export default function MeinVereinPage() {
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {VEREINSLINKS.map((link) => (
+        {VEREINSLINKS[tenant.id].map((link) => (
           <VereinsLinkKarte key={link.url} link={link} />
         ))}
       </div>

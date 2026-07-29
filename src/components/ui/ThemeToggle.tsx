@@ -20,12 +20,12 @@ export default function ThemeToggle() {
       onClick={toggleTheme}
       aria-label={istDark ? "Zu hellem Design wechseln" : "Zu dunklem Design wechseln"}
       title={istDark ? "Hell" : "Dunkel"}
-      className={`relative inline-flex h-7 w-14 items-center rounded-full border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface ${
-        istDark ? "border-fcb-blue bg-fcb-blue" : "border-fcb-border bg-fcb-surface"
+      className={`relative inline-flex h-7 w-14 items-center rounded-full border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface ${
+        istDark ? "border-fcb-accent bg-fcb-accent" : "border-fcb-border bg-fcb-surface"
       }`}
     >
       {/* Icons an den Track-Enden */}
-      <Sun size={12} className={`absolute left-1.5 ${istDark ? "text-white/60" : "text-fcb-blue"}`} aria-hidden="true" />
+      <Sun size={12} className={`absolute left-1.5 ${istDark ? "text-white/60" : "text-fcb-accent"}`} aria-hidden="true" />
       <Moon size={12} className={`absolute right-1.5 ${istDark ? "text-white" : "text-fcb-muted"}`} aria-hidden="true" />
       {/* Gleitender Knopf */}
       <span

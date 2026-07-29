@@ -269,7 +269,7 @@ export default function PlatzbuchungSeite() {
             </p>
             <Link
               href="/login"
-              className="inline-block rounded-lg bg-fcb-blue px-4 py-2 font-semibold text-white transition hover:bg-fcb-blue/90"
+              className="inline-block rounded-lg bg-fcb-accent px-4 py-2 font-semibold text-white transition hover:bg-fcb-accent/90"
             >
               Zum Login / zur Registrierung
             </Link>
@@ -353,7 +353,7 @@ export default function PlatzbuchungSeite() {
                       <span
                         className={`flex h-7 w-7 items-center justify-center rounded-full font-inter text-sm font-semibold ${
                           arg.isToday
-                            ? "bg-fcb-blue text-white"
+                            ? "bg-fcb-accent text-white"
                             : "text-fcb-text"
                         }`}
                       >

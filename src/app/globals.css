@@ -3,6 +3,23 @@
 @tailwind utilities;
 
 /* ============================================================
+   Marken-Akzent (Multi-Tenant: FCB blau / JFG rot)
+   `data-tenant` setzt das Root-Layout aus dem x-tenant-Header
+   von src/proxy.ts – unabhängig vom Theme. Alles generische
+   Marken-Chrome (Buttons, Links, aktive States, Focus-Ringe)
+   nutzt `fcb-accent`; die feste Trägerfarbe einzelner
+   Mannschaften bleibt weiterhin fcb-blue/fcb-red.
+   Spezifität: html[data-tenant=…] (0,1,1) schlägt html (0,0,1).
+   ============================================================ */
+html,
+html[data-tenant="fcb"] {
+  --color-accent: 29 95 173; /* #1d5fad – FCB-Blau */
+}
+html[data-tenant="jfg"] {
+  --color-accent: 204 31 31; /* #cc1f1f – JFG-Rot */
+}
+
+/* ============================================================
    Semantische Theme-Tokens (Light/Dark)
    RGB-Kanäle space-separiert → ermöglicht Tailwind <alpha-value>
    (z. B. bg-fcb-surface/80). Brand-Akzente (blue/red) sind in
@@ -116,10 +133,10 @@ body {
   height: 2.6rem;
 }
 
-/* Heutiger Tag: sehr dezenter FCB-Blau-Schleier (der Kreis im Spaltenkopf
+/* Heutiger Tag: sehr dezenter Schleier im Marken-Akzent (der Kreis im Spaltenkopf
    trägt die eigentliche Heute-Markierung) */
 .fc .fc-day-today {
-  background-color: rgba(29, 95, 173, 0.06) !important;
+  background-color: rgb(var(--color-accent) / 0.06) !important;
 }
 
 /* Jetzt-Indikator (rote Linie) – Wert des fcb-red-Tokens */
@@ -173,7 +190,8 @@ body {
       CSS wird von mehreren Komponenten importiert und kann vor ODER
       nach globals.css landen). Das tief verschachtelte Zeit-Panel
       braucht zusätzlich !important.
-   Farben ausschließlich aus den Tokens + Brand-Blau #1d5fad (fcb-blue).
+   Farben ausschließlich aus den Tokens – inkl. Marken-Akzent
+   (--color-accent, tenant-abhängig blau/rot).
    ============================================================ */
 
 /* --- Grundflächen --- */
@@ -229,29 +247,29 @@ html .react-datepicker__year-text:not([aria-disabled=true]):hover {
 html .react-datepicker__day--selected,
 html .react-datepicker__day--in-selecting-range,
 html .react-datepicker__day--in-range {
-  background: #1d5fad;
+  background: rgb(var(--color-accent));
   color: #ffffff;
 }
 html .react-datepicker__day--selected:not([aria-disabled=true]):hover,
 html .react-datepicker__day--in-selecting-range:not([aria-disabled=true]):hover,
 html .react-datepicker__day--in-range:not([aria-disabled=true]):hover {
-  background: rgba(29, 95, 173, 0.9);
+  background: rgb(var(--color-accent) / 0.9);
   color: #ffffff;
 }
 
-/* Tastatur-Fokus (keyboard-selected): dezenter Blau-Tint statt Bibliotheks-Hellblau */
+/* Tastatur-Fokus (keyboard-selected): dezenter Akzent-Tint statt Bibliotheks-Hellblau */
 html .react-datepicker__day--keyboard-selected,
 html .react-datepicker__month-text--keyboard-selected,
 html .react-datepicker__quarter-text--keyboard-selected,
 html .react-datepicker__year-text--keyboard-selected {
-  background: rgba(29, 95, 173, 0.25);
+  background: rgb(var(--color-accent) / 0.25);
   color: rgb(var(--color-text));
 }
 html .react-datepicker__day--keyboard-selected:not([aria-disabled=true]):hover,
 html .react-datepicker__month-text--keyboard-selected:not([aria-disabled=true]):hover,
 html .react-datepicker__quarter-text--keyboard-selected:not([aria-disabled=true]):hover,
 html .react-datepicker__year-text--keyboard-selected:not([aria-disabled=true]):hover {
-  background: rgba(29, 95, 173, 0.4);
+  background: rgb(var(--color-accent) / 0.4);
   color: rgb(var(--color-text));
 }
 
@@ -268,7 +286,7 @@ html .react-datepicker__time-list-item:hover {
   background: rgb(var(--color-border)) !important;
 }
 html .react-datepicker__time-list-item--selected {
-  background: #1d5fad !important;
+  background: rgb(var(--color-accent)) !important;
   color: #ffffff !important;
 }
 
@@ -361,12 +379,12 @@ html .react-datepicker__navigation:hover *::before {
     transition: box-shadow 0.3s ease;
   }
   /* Zusätzlicher Außen-Glow, damit der Effekt deutlich spürbar ist.
-     #1d5fad = Wert des fcb-blue-Tokens. */
+     Farbe folgt dem Marken-Akzent (--color-accent). */
   .spotlight-card:hover {
-    box-shadow: 0 0 40px -4px rgba(29, 95, 173, 0.75);
+    box-shadow: 0 0 40px -4px rgb(var(--color-accent) / 0.75);
   }
 
-  /* Prominenter, FCB-blauer Rand-Glow (Gradient-Border via Masken-Trick).
+  /* Prominenter Rand-Glow im Marken-Akzent (Gradient-Border via Masken-Trick).
      Bewusst dick (Runde 3): kräftiger Kern + hohe Deckkraft. */
   .spotlight-border {
     position: absolute;
@@ -379,8 +397,8 @@ html .react-datepicker__navigation:hover *::before {
     transition: opacity 0.3s ease;
     background: radial-gradient(
       300px circle at var(--mx) var(--my),
-      #1d5fad 0%,
-      rgba(29, 95, 173, 0.85) 45%,
+      rgb(var(--color-accent)) 0%,
+      rgb(var(--color-accent) / 0.85) 45%,
       transparent 75%
     );
     -webkit-mask:
@@ -408,7 +426,7 @@ html .react-datepicker__navigation:hover *::before {
     mix-blend-mode: screen;
     background: radial-gradient(
       240px circle at var(--mx) var(--my),
-      rgba(29, 95, 173, 0.16) 0%,
+      rgb(var(--color-accent) / 0.16) 0%,
       transparent 65%
     );
   }

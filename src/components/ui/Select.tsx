@@ -32,7 +32,7 @@ export default function Select({ label, value, onChange, options, required }: Se
         required={required}
         // .ui-select: appearance-none + eigenes Chevron (globals.css), damit in
         // jedem Browser genau EIN Pfeil erscheint, theme-fähig.
-        className="ui-select w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
+        className="ui-select w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text transition-colors focus:border-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40"
       >
         {options.map((o) => (
           <option key={o.value} value={o.value} className="bg-fcb-surface text-fcb-text">

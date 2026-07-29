@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
-import { MANNSCHAFTEN } from "@/lib/mannschaften";
+import { getMannschaftenFuerTenant } from "@/lib/mannschaften";
+import { useTenant } from "@/components/tenant/TenantProvider";
 import Modal from "@/components/ui/Modal";
 import Banner from "@/components/ui/Banner";
 import Select from "@/components/ui/Select";
@@ -32,10 +33,16 @@ export default function MannschaftsAnfrageModal({
   onErfolg,
 }: MannschaftsAnfrageModalProps) {
   const supabase = createClient();
+  const tenant = useTenant();
 
+  // Auswahl passend zum Auftritt: auf der JFG-Domain nur A–D-Junioren, beim
+  // FCB weiterhin alle Mannschaften (er verwaltet die JFG-Jahrgänge mit).
+  // Bei 'entfernen' ist die Mannschaft vorgegeben – dann ist keine Liste nötig.
   const verfuegbareMannschaften =
     typ === "hinzufuegen"
-      ? MANNSCHAFTEN.filter((m) => !bereitsZugewiesen.includes(m))
+      ? getMannschaftenFuerTenant(tenant.id).filter(
+          (m) => !bereitsZugewiesen.includes(m)
+        )
       : [];
 
   const [mannschaft, setMannschaft] = useState(

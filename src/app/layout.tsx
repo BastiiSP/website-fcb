@@ -7,6 +7,8 @@ import { Analytics } from "@vercel/analytics/react";
 // ConditionalChrome rendert Header/Footer + main-Padding um alle Routen.
 // (Die früheren Design-Exploration-Routen wurden nach Runde 2 entfernt.)
 import ConditionalChrome from "@/components/ConditionalChrome";
+import { TenantProvider } from "@/components/tenant/TenantProvider";
+import { getTenantConfigServer } from "@/lib/tenant.server";
 
 // Marken-Schriften (Oswald = Headlines, Inter = Body) als CSS-Variablen.
 // Werden in modernen Komponenten via font-oswald / font-inter genutzt.
@@ -21,22 +23,31 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "1. FC 1911 Burgkunstadt",
-  description:
-    "Die offizielle Vereinswebsite der Schuhstädter – mit aktuellen Spielberichten, Feierlichkeiten, Platzbuchung und mehr.",
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
+// Titel/Beschreibung hängen an der aufgerufenen Marke – deshalb dynamisch
+// statt statischem metadata-Export.
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenantConfigServer();
+  return {
+    title: tenant.metaTitle,
+    description: tenant.metaDescription,
+    icons: {
+      icon: "/favicon.ico",
+    },
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Marke der laufenden Anfrage (src/proxy.ts → x-tenant-Header).
+  const tenant = await getTenantConfigServer();
+
   return (
-    <html lang="de" suppressHydrationWarning>
+    // data-tenant steuert die Akzentfarbe (--color-accent in globals.css),
+    // genau wie .dark/.light das Theme steuern.
+    <html lang="de" data-tenant={tenant.id} suppressHydrationWarning>
       <head>
         {/* FOUC-Schutz: setzt das Theme VOR dem ersten Paint aus localStorage,
             Fallback dunkel. Inline + blockierend, daher kein Aufblitzen. */}
@@ -52,8 +63,12 @@ export default function RootLayout({
         // bg/color kommen jetzt aus globals.css (body-Regel mit semantischen Tokens).
         className={`${oswald.variable} ${inter.variable} antialiased`}
       >
-        {/* ConditionalChrome rendert Header/Footer und das Main-Padding. */}
-        <ConditionalChrome>{children}</ConditionalChrome>
+        {/* TenantProvider gibt die Marken-Konfiguration an die Client
+            Components weiter (Header, Vereins-Switcher, Footer). */}
+        <TenantProvider config={tenant}>
+          {/* ConditionalChrome rendert Header/Footer und das Main-Padding. */}
+          <ConditionalChrome>{children}</ConditionalChrome>
+        </TenantProvider>
 
         {/* Vercel Monitoring */}
         <SpeedInsights />

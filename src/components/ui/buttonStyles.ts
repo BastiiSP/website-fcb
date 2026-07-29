@@ -7,13 +7,13 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 export type ButtonSize = "sm" | "md" | "lg";
 
 const BASE =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-oswald font-semibold uppercase tracking-wide transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-bg disabled:cursor-not-allowed disabled:opacity-50";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-oswald font-semibold uppercase tracking-wide transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-bg disabled:cursor-not-allowed disabled:opacity-50";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: "bg-fcb-blue text-white hover:bg-fcb-blue/90",
+  primary: "bg-fcb-accent text-white hover:bg-fcb-accent/90",
   secondary:
-    "border border-fcb-border bg-fcb-surface text-fcb-text hover:border-fcb-blue",
-  ghost: "text-fcb-text hover:text-fcb-blue",
+    "border border-fcb-border bg-fcb-surface text-fcb-text hover:border-fcb-accent",
+  ghost: "text-fcb-text hover:text-fcb-accent",
   danger: "bg-fcb-red text-white hover:bg-fcb-red/90",
 };
 

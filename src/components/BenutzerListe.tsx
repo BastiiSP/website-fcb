@@ -165,7 +165,7 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                     <select
                       value={n.rolle}
                       onChange={(e) => rolleAendern(n.id, e.target.value)}
-                      className="w-36 rounded-lg border border-fcb-border bg-fcb-bg px-2 py-1.5 font-inter text-sm text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40 focus:border-fcb-blue"
+                      className="w-36 rounded-lg border border-fcb-border bg-fcb-bg px-2 py-1.5 font-inter text-sm text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40 focus:border-fcb-accent"
                     >
                       {erlaubteRollen.map((r) => (
                         <option key={r} value={r}>
@@ -200,7 +200,7 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
           placeholder="Nutzer suchen …"
           value={suche}
           onChange={(e) => setSuche(e.target.value)}
-          className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40 focus:border-fcb-blue mb-4"
+          className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40 focus:border-fcb-accent mb-4"
         />
 
         <div className="space-y-3">
@@ -249,7 +249,7 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
                       <select
                         value={n.rolle}
                         onChange={(e) => rolleAendern(n.id, e.target.value)}
-                        className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-2 py-1.5 font-inter text-sm text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40 focus:border-fcb-blue"
+                        className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-2 py-1.5 font-inter text-sm text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40 focus:border-fcb-accent"
                       >
                         {erlaubteRollen.map((r) => (
                           <option key={r} value={r}>

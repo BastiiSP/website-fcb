@@ -3,14 +3,21 @@ import {
   RechtstextLayout,
   RechtstextSektion,
 } from "@/components/rechtstexte/RechtstextLayout";
+import { getTenantConfigServer } from "@/lib/tenant.server";
+import { RECHTSTEXTE } from "@/lib/rechtstexte";
 
-export const metadata: Metadata = {
-  title: "Datenschutzerklärung – 1. FC 1911 Burgkunstadt",
-  description:
-    "Informationen zur Verarbeitung personenbezogener Daten in der Vereins-WebApp des 1. FC 1911 Burgkunstadt.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenantConfigServer();
+  return {
+    title: `Datenschutzerklärung – ${tenant.name}`,
+    description: `Informationen zur Verarbeitung personenbezogener Daten in der Vereins-WebApp des ${tenant.vereinsname}.`,
+  };
+}
 
-export default function DatenschutzPage() {
+export default async function DatenschutzPage() {
+  const tenant = await getTenantConfigServer();
+  const angaben = RECHTSTEXTE[tenant.id];
+
   return (
     <RechtstextLayout titel="Datenschutzerklärung" stand="Juli 2026">
       <p className="font-inter leading-relaxed text-fcb-text/80">
@@ -22,19 +29,19 @@ export default function DatenschutzPage() {
 
       <RechtstextSektion titel="Verantwortlicher">
         <p>
-          1. FC 1911 Burgkunstadt e.V.
+          {angaben.vollerName}
           <br />
-          Wolfgang Strassgürtel (1. Vorsitzender)
+          {angaben.vertreterName} ({angaben.vertreterFunktion})
           <br />
-          Alter Postweg 10
+          {angaben.strasse}
           <br />
-          96224 Burgkunstadt
+          {angaben.ort}
           <br />
           <a
-            href="mailto:info@fcburgkunstadt.de"
-            className="text-fcb-blue hover:underline"
+            href={`mailto:${angaben.email}`}
+            className="text-fcb-accent hover:underline"
           >
-            info@fcburgkunstadt.de
+            {angaben.email}
           </a>
         </p>
       </RechtstextSektion>
@@ -151,20 +158,25 @@ export default function DatenschutzPage() {
         </p>
       </RechtstextSektion>
 
-      <RechtstextSektion titel="Sportheim-Anfrage (öffentliches Formular)">
-        <p>
-          Über unsere Sportheim-Seite kann jede Person – auch ohne Nutzerkonto
-          und ohne Login – unverbindlich eine Nutzung des Sportheims anfragen.
-          Dabei verarbeiten wir Vorname, Nachname, E-Mail-Adresse, Telefonnummer,
-          den gewünschten Zeitraum, den Anlass sowie eine optionale Nachricht.
-          Die Anfrage wird dem Vorstand zur Prüfung vorgelegt; eine automatische
-          Bestätigungs-E-Mail wird nicht versendet.
-        </p>
-        <p>
-          Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche
-          Maßnahme zur Anbahnung einer Sportheim-Nutzung auf deine Anfrage hin).
-        </p>
-      </RechtstextSektion>
+      {/* Sportheim-Anfrage ist FCB-Anlagenverwaltung, existiert auf der
+          JFG-Domain nicht (404, siehe /sportheim) – Sektion entsprechend nur
+          dort zeigen, wo die Funktion tatsächlich erreichbar ist. */}
+      {tenant.id === "fcb" && (
+        <RechtstextSektion titel="Sportheim-Anfrage (öffentliches Formular)">
+          <p>
+            Über unsere Sportheim-Seite kann jede Person – auch ohne Nutzerkonto
+            und ohne Login – unverbindlich eine Nutzung des Sportheims anfragen.
+            Dabei verarbeiten wir Vorname, Nachname, E-Mail-Adresse, Telefonnummer,
+            den gewünschten Zeitraum, den Anlass sowie eine optionale Nachricht.
+            Die Anfrage wird dem Vorstand zur Prüfung vorgelegt; eine automatische
+            Bestätigungs-E-Mail wird nicht versendet.
+          </p>
+          <p>
+            Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche
+            Maßnahme zur Anbahnung einer Sportheim-Nutzung auf deine Anfrage hin).
+          </p>
+        </RechtstextSektion>
+      )}
 
       <RechtstextSektion titel="Zweck der Datenverarbeitung">
         <p>
@@ -258,10 +270,10 @@ export default function DatenschutzPage() {
           Eine erteilte Einwilligung kannst du jederzeit mit Wirkung für die
           Zukunft widerrufen. Wende dich dazu bitte an{" "}
           <a
-            href="mailto:info@fcburgkunstadt.de"
-            className="text-fcb-blue hover:underline"
+            href={`mailto:${angaben.email}`}
+            className="text-fcb-accent hover:underline"
           >
-            info@fcburgkunstadt.de
+            {angaben.email}
           </a>
           .
         </p>

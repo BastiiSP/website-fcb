@@ -4,7 +4,7 @@ type Variant = "error" | "info" | "success" | "warning";
 
 const STYLES: Record<Variant, { box: string; icon: string; Icon: typeof Info }> = {
   error:   { box: "border-fcb-red/40 bg-fcb-red/10",   icon: "text-fcb-red",   Icon: AlertCircle },
-  info:    { box: "border-fcb-blue/40 bg-fcb-blue/10",  icon: "text-fcb-blue",  Icon: Info },
+  info:    { box: "border-fcb-accent/40 bg-fcb-accent/10",  icon: "text-fcb-accent",  Icon: Info },
   // dark:-Split für die Status-Icons: das 500er-Icon ist auf dem hellen /10-Tint
   // im Light-Theme zu kontrastarm → Light = dunkleres 600er, Dark = helleres 500er.
   success: { box: "border-green-500/40 bg-green-500/10", icon: "text-green-600 dark:text-green-500", Icon: CheckCircle2 },

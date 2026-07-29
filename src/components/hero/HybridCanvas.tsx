@@ -23,6 +23,14 @@ export default function HybridCanvas() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Marken-Akzent aus der CSS-Variable lesen (Multi-Tenant: FCB blau / JFG rot).
+    // Canvas kennt keine CSS-Variablen, deshalb der Umweg über getComputedStyle.
+    // Format der Variable: "29 95 173" (space-separierte RGB-Kanäle).
+    const akzentRGB =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue("--color-accent")
+        .trim() || "29 95 173";
+
     interface Dot {
       ox: number;
       oy: number;
@@ -110,7 +118,7 @@ export default function HybridCanvas() {
         const mouseBoost = (1 - Math.min(dist, RADIUS) / RADIUS) * 0.55;
         const alpha = Math.min(0.95, baseAlpha + mouseBoost);
 
-        ctx.fillStyle = `rgba(29, 95, 173, ${alpha})`;
+        ctx.fillStyle = `rgb(${akzentRGB} / ${alpha})`;
         ctx.beginPath();
         ctx.arc(d.x, d.y, dotRadius, 0, Math.PI * 2);
         ctx.fill();

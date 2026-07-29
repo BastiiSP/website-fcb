@@ -107,7 +107,7 @@ export default function TrainerVerzeichnis() {
                   <Phone size={16} aria-hidden className="shrink-0 text-fcb-muted" />
                   <a
                     href={`tel:${p.telefonnummer}`}
-                    className="hover:text-fcb-blue hover:underline"
+                    className="hover:text-fcb-accent hover:underline"
                   >
                     {p.telefonnummer}
                   </a>

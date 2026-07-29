@@ -1,39 +1,54 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, MapPin, Phone } from "lucide-react";
+import { Mail, MapPin, Phone, ShoppingBag } from "lucide-react";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
 import IconBadge from "@/components/ui/IconBadge";
 import ButtonLink from "@/components/ui/ButtonLink";
+import Banner from "@/components/ui/Banner";
 import {
   FacebookIcon,
   InstagramIcon,
   WhatsAppIcon,
 } from "@/components/icons/BrandIcons";
 import { VEREINSLINKS } from "@/lib/vereinslinks";
+import { getTenantConfigServer } from "@/lib/tenant.server";
+import { KONTAKT_TEXTE } from "@/lib/vereinstexte";
+import { RECHTSTEXTE } from "@/lib/rechtstexte";
 
-export const metadata: Metadata = {
-  title: "Kontakt – 1. FC 1911 Burgkunstadt",
-  description:
-    "So erreichst du den 1. FC 1911 Burgkunstadt: Telefon, E-Mail, WhatsApp, Social Media und der Weg zum Sportgelände am Alten Postweg.",
-};
+// Titel und Beschreibung nennen den Verein namentlich – deshalb markenabhängig
+// über generateMetadata() statt statischem metadata-Export.
+export async function generateMetadata(): Promise<Metadata> {
+  const tenant = await getTenantConfigServer();
+  return {
+    title: `Kontakt – ${tenant.name}`,
+    description: KONTAKT_TEXTE[tenant.id].metaBeschreibung,
+  };
+}
 
 // Öffentliche Kontaktseite – Server Component, kein Formular (keine Backend-
-// Anbindung nötig): stattdessen direkte Kanäle als klickbare Cards.
+// Anbindung nötig): stattdessen direkte Kanäle als klickbare Cards. Telefon/
+// E-Mail/Ansprechpartner kommen aus rechtstexte.ts (jede Marke ihre eigenen,
+// echten Daten) – nur die Trainingsanlage bleibt bewusst gemeinsam (die JFG
+// trainiert mit auf der Sportanlage des FCB, siehe vereinstexte.ts).
 
 const ADRESSE = "Alter Postweg 10, 96224 Burgkunstadt";
-// Google-Maps-Suche wie im Footer (api=1 öffnet zuverlässig die Karte)
+// Google-Maps-Suche wie im Footer (api=1 öffnet zuverlässig die Karte).
+// Bewusst mit dem FCB-Namen, auch auf dem JFG-Auftritt: die Sportanlage ist
+// unter diesem Namen in der Karte hinterlegt, eine JFG-Suche würde ins Leere gehen.
 const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
   `1. FC 1911 Burgkunstadt, ${ADRESSE}`,
 )}`;
 
-// Social-Links aus der zentralen Datei – hier nur um die Optik ergänzt.
-// Icon-Zuordnung über das icon-Feld von VEREINSLINKS (Brand-SVGs, kein Lucide).
+// Social-Links aus der zentralen, tenant-eigenen Datei – hier nur um die
+// Optik ergänzt. Icon-Zuordnung über das icon-Feld von VEREINSLINKS
+// (Brand-SVGs für Plattformen, ShoppingBag für den Fanshop).
 const SOCIAL_ICONS = {
   whatsapp: WhatsAppIcon,
   instagram: InstagramIcon,
   facebook: FacebookIcon,
+  shop: ShoppingBag,
 } as const;
 
 /** Klickbare Kontakt-Card: komplette Fläche ist der Link. */
@@ -54,7 +69,7 @@ function KontaktCard({
     <Link
       href={href}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+      className="block rounded-2xl focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
     >
       <Card interactive className="flex h-full items-center gap-4">
         {icon}
@@ -69,33 +84,42 @@ function KontaktCard({
   );
 }
 
-export default function KontaktPage() {
-  const socialLinks = VEREINSLINKS.filter((l) => l.icon !== "link");
+export default async function KontaktPage() {
+  const tenant = await getTenantConfigServer();
+  const texte = KONTAKT_TEXTE[tenant.id];
+  const angaben = RECHTSTEXTE[tenant.id];
+  // "link" (Vereinswebseite) bewusst ausgeblendet – auf der eigenen Seite ist
+  // ein Link auf sich selbst redundant. Alle anderen Icon-Typen (inkl. "shop")
+  // werden gezeigt, jede Marke hat nur ihre eigenen, echten Kanäle in der Liste.
+  const socialLinks = VEREINSLINKS[tenant.id].filter((l) => l.icon !== "link");
 
   return (
     <PageShell maxWidth="xl">
-      <PageHeader
-        title="Kontakt"
-        subtitle="Meld dich einfach, irgendwer vom FCB hat immer das Handy dabei."
-      />
+      <PageHeader title="Kontakt" subtitle={texte.untertitel} />
 
-      {/* Direkte Kanäle */}
+      {texte.hinweis && (
+        <div className="mb-6 max-w-2xl">
+          <Banner variant="info" message={texte.hinweis} />
+        </div>
+      )}
+
       <div className="grid gap-4 sm:grid-cols-2">
+        {angaben.telefon && (
+          <KontaktCard
+            href={angaben.telefonHref ?? `tel:${angaben.telefon}`}
+            icon={<IconBadge icon={Phone} accent="brand" size="lg" />}
+            label="Telefon"
+            wert={angaben.telefon}
+          />
+        )}
         <KontaktCard
-          href="tel:095722090152"
-          icon={<IconBadge icon={Phone} accent="blue" size="lg" />}
-          label="Telefon"
-          wert="09572 2090152"
-        />
-        <KontaktCard
-          href="mailto:info@fcburgkunstadt.de"
-          icon={<IconBadge icon={Mail} accent="blue" size="lg" />}
+          href={`mailto:${angaben.email}`}
+          icon={<IconBadge icon={Mail} accent="brand" size="lg" />}
           label="E-Mail"
-          wert="info@fcburgkunstadt.de"
+          wert={angaben.email}
         />
         {socialLinks.map((link) => {
-          const BrandIcon =
-            SOCIAL_ICONS[link.icon as keyof typeof SOCIAL_ICONS];
+          const BrandIcon = SOCIAL_ICONS[link.icon as keyof typeof SOCIAL_ICONS];
           if (!BrandIcon) return null;
           return (
             <KontaktCard
@@ -105,7 +129,7 @@ export default function KontaktPage() {
               icon={
                 <span
                   aria-hidden
-                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-fcb-blue/40 bg-fcb-blue/10 text-fcb-blue"
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-fcb-accent/40 bg-fcb-accent/10 text-fcb-accent"
                 >
                   <BrandIcon className="h-6 w-6" />
                 </span>
@@ -117,13 +141,15 @@ export default function KontaktPage() {
         })}
       </div>
 
-      {/* Anfahrt */}
+      {/* Anfahrt – bewusst gemeinsam: die JFG trainiert mit auf der
+          Sportanlage des FCB (siehe vereinstexte.ts), das ist keine
+          Platzhalter-Angabe, sondern die tatsächliche Trainingsstätte. */}
       <h2 className="mb-4 mt-12 font-oswald text-2xl font-semibold uppercase tracking-wide text-fcb-text">
         So findest du uns
       </h2>
       <Card className="max-w-2xl">
         <div className="flex items-start gap-4">
-          <IconBadge icon={MapPin} accent="blue" size="lg" label="Adresse" />
+          <IconBadge icon={MapPin} accent="brand" size="lg" label="Adresse" />
           <div>
             <p className="font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text">
               Sportgelände am Alten Postweg
@@ -142,19 +168,21 @@ export default function KontaktPage() {
         </div>
       </Card>
 
-      {/* Ansprechpartner */}
+      {/* Ansprechpartner – jede Marke ihr eigener Vorstand/Jugendleitung. */}
       <h2 className="mb-4 mt-12 font-oswald text-2xl font-semibold uppercase tracking-wide text-fcb-text">
         Ansprechpartner
       </h2>
       <Card className="max-w-2xl">
         <p className="font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text">
-          Wolfgang Strassgürtel
+          {angaben.vertreterName}
         </p>
-        <p className="mt-1 font-inter text-sm text-fcb-muted">1. Vorsitzender</p>
+        <p className="mt-1 font-inter text-sm text-fcb-muted">
+          {angaben.vertreterFunktion}
+        </p>
         <p className="mt-4 font-inter text-sm leading-relaxed text-fcb-text/80">
-          Für alles rund um eine Mannschaft erreichst du die Trainer am
-          schnellsten über die WhatsApp-Gruppe oder direkt am Platz. Für alles
-          andere: anrufen oder eine Mail schreiben.
+          {tenant.id === "jfg"
+            ? "Für alles rund um eine Jugendmannschaft erreichst du die Trainer am schnellsten direkt am Platz. Für alles andere (Organisation: André Petratschek, Sport: Marko Linß): anrufen oder eine Mail schreiben."
+            : "Für alles rund um eine Mannschaft erreichst du die Trainer am schnellsten über die WhatsApp-Gruppe oder direkt am Platz. Für alles andere: anrufen oder eine Mail schreiben."}
         </p>
       </Card>
 

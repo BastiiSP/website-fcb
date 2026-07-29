@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabaseClient";
 import { LIZENZEN } from "@/lib/lizenzen";
-import { MANNSCHAFTEN } from "@/lib/mannschaften";
+import { getMannschaftenFuerTenant } from "@/lib/mannschaften";
+import { useTenant } from "@/components/tenant/TenantProvider";
 import MannschaftsAnfrageModal from "./MannschaftsAnfrageModal";
 import Banner from "@/components/ui/Banner";
 import Button from "@/components/ui/Button";
@@ -29,6 +30,7 @@ export default function MannschaftLizenzen({
   initialLizenzen,
 }: MannschaftLizenzenProps) {
   const supabase = createClient();
+  const tenant = useTenant();
 
   // Mannschaft wird nur initial aus Props gelesen; Änderungen laufen über Anfragen (kein lokales Update)
   const [mannschaft] = useState<string[]>(initialMannschaft);
@@ -132,8 +134,12 @@ export default function MannschaftLizenzen({
   const hatOffeneAnfrageFuer = (m: string, t: "hinzufuegen" | "entfernen") =>
     offeneAnfragen.some((a) => a.mannschaft === m && a.typ === t);
 
-  // Verfügbare Mannschaften zum Hinzufügen: nicht zugewiesen UND keine offene Anfrage
-  const hinzufuegenMoeglich = MANNSCHAFTEN.filter(
+  // Verfügbare Mannschaften zum Hinzufügen: zum Auftritt passend (JFG nur
+  // A–D-Junioren, FCB alle), nicht zugewiesen UND keine offene Anfrage.
+  // Bereits zugewiesene Mannschaften werden weiter unten ungefiltert angezeigt –
+  // eine bestehende Zuweisung darf durch die Marken-Filterung nicht verschwinden,
+  // sonst könnte sie auf diesem Auftritt nicht mehr abgewählt werden.
+  const hinzufuegenMoeglich = getMannschaftenFuerTenant(tenant.id).filter(
     (m) => !mannschaft.includes(m) && !hatOffeneAnfrageFuer(m, "hinzufuegen")
   );
 
@@ -255,7 +261,7 @@ export default function MannschaftLizenzen({
                 type="checkbox"
                 checked={lizenzen.includes(lizenz)}
                 onChange={() => toggleLizenz(lizenz)}
-                className="w-4 h-4 accent-fcb-blue"
+                className="w-4 h-4 accent-fcb-accent"
               />
               <span className="font-inter text-sm text-fcb-text">{lizenz}</span>
             </label>
