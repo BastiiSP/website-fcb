@@ -156,13 +156,13 @@ test.describe("Mannschaften je Marke", () => {
     await expect(main).not.toContainText("G-Junioren");
   });
 
-  test("FCB zeigt weiterhin eigene Teams und den JFG-Block", async ({ page }) => {
+  test("FCB zeigt nur eigene Teams, keine JFG-Infos mehr (JFG hat eigene Domain)", async ({ page }) => {
     await seedConsent(page);
     await page.goto("/mannschaften");
 
     const main = page.locator("main");
     await expect(main).toContainText("1. Mannschaft");
-    await expect(main).toContainText("A-Junioren");
+    await expect(main).not.toContainText("A-Junioren");
   });
 });
 

@@ -4,10 +4,11 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import { motion, AnimatePresence, useMotionValueEvent, useScroll } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, ShoppingBag, X } from "lucide-react";
 import UserDropdown from "@/components/UserDropdown";
 import VereinsSwitcher from "@/components/VereinsSwitcher";
 import { useTenant } from "@/components/tenant/TenantProvider";
+import { VEREINSLINKS } from "@/lib/vereinslinks";
 
 /**
  * Globaler Header – Smart-Sticky, fcb-Design-Tokens, Marken-Wappen, öffentliche Nav-Links.
@@ -27,6 +28,9 @@ import { useTenant } from "@/components/tenant/TenantProvider";
  */
 export default function Header() {
   const tenant = useTenant();
+  // Fanshop prominent im Header verlinken (auf Bastis Wunsch) – jede Marke
+  // ihr eigener Shop, aus derselben Datenquelle wie der Kontakt-Link.
+  const fanshopLink = VEREINSLINKS[tenant.id].find((l) => l.icon === "shop");
   const { scrollY } = useScroll();
   const [hidden, setHidden] = useState(false);
   const [lastY, setLastY] = useState(0);
@@ -116,8 +120,21 @@ export default function Header() {
           ))}
         </div>
 
-        {/* Rechte Seite: Auth (Buttons ausgeloggt / Avatar eingeloggt) */}
-        <div className="flex items-center">
+        {/* Rechte Seite: Fanshop (prominent, gefüllter Akzent-Button) + Auth */}
+        <div className="flex items-center gap-3">
+          {fanshopLink && (
+            <Link
+              href={fanshopLink.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-full bg-fcb-accent px-3 py-1.5 font-inter text-xs font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90 sm:px-3.5 sm:text-sm"
+            >
+              <ShoppingBag size={16} aria-hidden />
+              {/* Auf sehr kleinen Screens nur das Icon, Platz ist knapp neben Hamburger/Wappen.
+                  Kein "xs"-Breakpoint im Projekt konfiguriert – "sm" ist die kleinste Stufe. */}
+              <span className="hidden sm:inline">Fanshop</span>
+            </Link>
+          )}
           <UserDropdown />
         </div>
       </div>

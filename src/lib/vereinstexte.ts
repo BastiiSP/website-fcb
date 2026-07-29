@@ -158,7 +158,7 @@ const VEREIN_JFG: VereinsSeitenTexte = {
     {
       icon: Handshake,
       wert: "3 Vereine",
-      text: "FCB, SG Roth-Main Mainroth & 1. FC Redwitz a. d. Rodach",
+      text: "FC Burgkunstadt, SG Roth-Main Mainroth & 1. FC Redwitz a. d. Rodach",
     },
     {
       icon: MapPin,

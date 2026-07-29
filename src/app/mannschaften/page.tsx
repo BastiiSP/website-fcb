@@ -4,16 +4,18 @@ import PageHeader from "@/components/ui/PageHeader";
 import TeamCard from "@/components/ui/TeamCard";
 import ButtonLink from "@/components/ui/ButtonLink";
 import SpielbetriebSection from "@/components/spielbetrieb/SpielbetriebSection";
-import { getTeamsFuerTraeger, TRAEGER_INFO, type Team, type Traeger } from "@/lib/teams";
+import { getTeamsFuerTraeger, type Team } from "@/lib/teams";
 import type { TenantId } from "@/lib/tenant";
 import { getTenantConfigServer } from "@/lib/tenant.server";
 
 // Öffentliche Mannschaftsübersicht – kein Auth-Check, Server Component.
 // Die TeamCards (Client, Framer Motion) kommen fertig aus dem Design-System.
 //
-// Multi-Tenant: Jeder Auftritt zeigt die Mannschaften seines Trägers. Der FCB
-// zeigt zusätzlich die JFG-Jahrgänge, weil er Mitträger der Fördergemeinschaft
-// ist und diese Kooperation hier erklärt (Bestandsinhalt).
+// Multi-Tenant: Jeder Auftritt zeigt AUSSCHLIESSLICH die Mannschaften seines
+// eigenen Trägers. Der FCB zeigte die JFG-Jahrgänge früher zusätzlich mit an
+// (als Erklärung der Kooperation) – seit die JFG eine eigene Domain hat,
+// gehören diese Infos ausschließlich dorthin (2026-07-29, auf Bastis
+// Wunsch entfernt).
 
 /** Markenabhängige Fließtexte der Seite. */
 interface SeitenTexte {
@@ -25,49 +27,29 @@ interface SeitenTexte {
 }
 
 const TEXTE: Record<TenantId, SeitenTexte> = {
-  // FCB: Bestandstexte, unverändert.
+  // FCB: JFG-Erwähnung entfernt (2026-07-29) – die JFG hat jetzt ihre eigene
+  // Domain, entsprechende Infos gehören dort hin, nicht mehr auf fcbuku.de.
   fcb: {
     metaDescription:
-      "Alle Mannschaften des 1. FC 1911 Burgkunstadt: von den Bambini über die leistungsorientierte JFG-Jugend bis zur Ersten.",
+      "Alle Mannschaften des 1. FC 1911 Burgkunstadt: von den Bambini bis zur Ersten.",
     subtitle: "Von den Bambini bis zur Ersten: Hier spielt ganz Burgkunstadt.",
     intro:
-      "Beim FCB kann jeder kicken: die Kleinsten fangen bei den Bambini an und die Herren spielen sonntags um Punkte. Für die älteren Jugendjahrgänge haben wir mit den Nachbarvereinen die JFG Kunstadt-Obermain gegründet, unser Leistungsprojekt für den Nachwuchs.",
+      "Beim FCB kann jeder kicken: die Kleinsten fangen bei den Bambini an und die Herren spielen sonntags um Punkte.",
     ctaTitel: "Du willst mitspielen?",
     ctaText:
       "Komm einfach zum Training vorbei oder meld dich kurz. Wir sagen dir, wann deine Altersklasse auf dem Platz steht.",
   },
-  // JFG: PLATZHALTER – kurz und sachlich formuliert, damit die Seite live
-  // gehen kann. Die endgültigen Texte liefert Basti nach (Anzahl/Namen der
-  // Trägervereine, Selbstbeschreibung, Ansprache).
   jfg: {
     metaDescription:
-      "PLATZHALTER: Die Mannschaften der JFG Kunstadt-Obermain – A- bis D-Junioren aus drei Trägervereinen.",
+      "Die Mannschaften der JFG Kunstadt-Obermain: A- bis D-Junioren, leistungsorientiert gefördert von drei Trägervereinen.",
     subtitle: "A- bis D-Junioren: leistungsorientierter Nachwuchsfußball.",
     intro:
-      "PLATZHALTER: In der JFG Kunstadt-Obermain bündeln drei Trägervereine ihre älteren Jugendjahrgänge. Die Teams werden leistungsgerecht eingeteilt, damit jeder Spieler genau dort gefördert wird, wo er steht.",
+      "In der JFG Kunstadt-Obermain bündeln der 1. FC 1911 Burgkunstadt, die SG Roth-Main Mainroth und der 1. FC 1916 Redwitz a. d. Rodach ihre älteren Jugendjahrgänge. Die Teams werden leistungsgerecht eingeteilt, damit jeder Spieler genau dort gefördert wird, wo er steht.",
     ctaTitel: "Du willst bei uns spielen?",
     ctaText:
-      "PLATZHALTER: Melde dich kurz bei uns – wir sagen dir, wann dein Jahrgang trainiert, und laden dich zum Probetraining ein.",
+      "Melde dich kurz bei uns – wir sagen dir, wann dein Jahrgang trainiert, und laden dich zum Probetraining ein.",
   },
 };
-
-/** Zwischenüberschrift je Träger – Akzentstrich in der Trägerfarbe. */
-function TraegerHeading({ traeger, sub }: { traeger: Traeger; sub: string }) {
-  const info = TRAEGER_INFO[traeger];
-  // Akzentklassen bewusst als volle Literale (Tailwind-Scanner)
-  const bar = traeger === "fcb" ? "bg-fcb-blue" : "bg-fcb-red";
-  return (
-    <div className="mb-5 mt-12 first:mt-0">
-      <div className="flex items-center gap-3">
-        <span aria-hidden className={`h-6 w-1 rounded-full ${bar}`} />
-        <h2 className="font-oswald text-2xl font-semibold uppercase tracking-wide text-fcb-text">
-          {info.name}
-        </h2>
-      </div>
-      <p className="mt-1 pl-4 font-inter text-sm text-fcb-muted">{sub}</p>
-    </div>
-  );
-}
 
 /** Team-Grid im Muster der Design-Spec (mobile-first, ab sm im Raster). */
 function TeamGrid({ teams, className = "" }: { teams: Team[]; className?: string }) {
@@ -101,36 +83,10 @@ export default async function MannschaftenPage() {
         {texte.intro}
       </p>
 
-      {tenant.id === "fcb" ? (
-        // FCB-Auftritt: beide Träger-Blöcke inkl. Erklärung der JFG-Kooperation.
-        <>
-          <TraegerHeading
-            traeger="fcb"
-            sub="Die Herren und die jüngsten Jahrgänge, direkt beim FCB."
-          />
-          <TeamGrid teams={eigeneTeams} />
-
-          <TraegerHeading
-            traeger="jfg"
-            sub="A- bis D-Junioren: leistungsorientierte Jugendarbeit in der Jugendfördergemeinschaft."
-          />
-          <p className="mb-5 max-w-2xl font-inter text-sm leading-relaxed text-fcb-text/70">
-            Warum eine JFG? Weil wir aus unseren Talenten das Maximum herausholen
-            wollen. In der JFG Kunstadt-Obermain bündeln wir mit den Nachbarvereinen
-            die Jahrgänge und teilen die Teams leistungsgerecht ein. So wird jeder
-            Nachwuchskicker genau da gefördert, wo er steht. Das Konzept geht auf:
-            Unsere JFG-Teams messen sich regelmäßig mit den
-            Nachwuchsleistungszentren der Region und lassen sie teilweise hinter
-            sich.
-          </p>
-          <TeamGrid teams={getTeamsFuerTraeger("jfg")} />
-        </>
-      ) : (
-        // JFG-Auftritt: nur die eigenen Teams. Eine Träger-Zwischenüberschrift
-        // wäre hier redundant (der ganze Auftritt ist die JFG), deshalb folgt
-        // das Grid direkt auf den Einleitungstext.
-        <TeamGrid teams={eigeneTeams} className="mt-8" />
-      )}
+      {/* Jede Marke zeigt ausschließlich ihre eigenen Teams – keine
+          Träger-Zwischenüberschrift nötig, da der ganze Auftritt schon die
+          jeweilige Marke ist. */}
+      <TeamGrid teams={eigeneTeams} className="mt-8" />
 
       {/* Tabelle & Spiele: Auswahl Verein → Mannschaft; Teams ohne BFV-Daten
           (aktuell die Jugend) zeigen einen Hinweis statt einer Daten-Card.

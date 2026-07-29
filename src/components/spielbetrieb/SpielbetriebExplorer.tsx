@@ -34,8 +34,17 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
   const erstesTeam = (traeger: Traeger): string =>
     eintraege.find((e) => e.team.traeger === traeger)?.team.id ?? "";
 
-  const [traeger, setTraeger] = useState<Traeger>("fcb");
-  const [teamId, setTeamId] = useState<string>(() => erstesTeam("fcb"));
+  // Welche Träger tatsächlich in den übergebenen Einträgen vorkommen. Seit
+  // jede Marken-Domain nur noch ihre eigenen Teams übergibt (kein
+  // trägerübergreifender Explorer mehr, siehe SpielbetriebSection), ist das
+  // in der Praxis genau einer – Stufe 1 (Vereinswahl) macht dann keinen Sinn
+  // und wird übersprungen. Der Code bleibt trotzdem mehrträgerfähig, falls
+  // sich das später wieder ändert.
+  const vorhandeneTraeger = Array.from(new Set(eintraege.map((e) => e.team.traeger)));
+  const startTraeger = vorhandeneTraeger[0] ?? "fcb";
+
+  const [traeger, setTraeger] = useState<Traeger>(startTraeger);
+  const [teamId, setTeamId] = useState<string>(() => erstesTeam(startTraeger));
 
   const teamsDesTraegers = eintraege.filter((e) => e.team.traeger === traeger);
   const auswahl = eintraege.find((e) => e.team.id === teamId);
@@ -51,9 +60,11 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Stufe 1: Verein wählen – zwei gleichwertige Flächen, mobile untereinander */}
+      {/* Stufe 1: Verein wählen – nur bei mehr als einem Träger relevant.
+          Zwei gleichwertige Flächen, mobile untereinander. */}
+      {vorhandeneTraeger.length > 1 && (
       <div role="group" aria-label="Verein wählen" className="grid gap-3 sm:grid-cols-2">
-        {(Object.keys(TRAEGER_INFO) as Traeger[]).map((t) => {
+        {vorhandeneTraeger.map((t) => {
           const info = TRAEGER_INFO[t];
           const aktiv = t === traeger;
           const a = getTeamAccent(t);
@@ -84,6 +95,7 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
           );
         })}
       </div>
+      )}
 
       {/* Stufe 2: Mannschaft des gewählten Vereins – Pill-Leiste, umbruchfähig */}
       <div role="group" aria-label="Mannschaft wählen" className="flex flex-wrap gap-2">

@@ -1,41 +1,61 @@
 import SpielbetriebExplorer, {
   type SpielbetriebEintrag,
 } from "@/components/spielbetrieb/SpielbetriebExplorer";
-import { TEAMS } from "@/lib/teams";
+import Banner from "@/components/ui/Banner";
+import { getTeamsFuerTraeger } from "@/lib/teams";
 import { getSpielbetrieb } from "@/lib/bfv";
 import { getTenant } from "@/lib/tenant.server";
 
 // Spielbetriebs-Abschnitt für /mannschaften (Server Component):
 // lädt die BFV-Daten aller Mannschaften (null für unkonfigurierte/fehlende)
-// und übergibt sie dem Explorer, in dem Besucher erst Verein (FCB/JFG) und
-// dann Mannschaft wählen. Datengetrieben über TEAMS × BFV_TEAMS
-// (src/lib/bfv.ts) – ein Jugend-Team bekommt seine Daten automatisch,
-// sobald dort ein Konfig-Eintrag existiert; bis dahin zeigt die Auswahl
-// einen dezenten Hinweis statt eines leeren Bereichs.
+// und übergibt sie dem Explorer, in dem FCB-Besucher erst Mannschaft wählen.
+// Datengetrieben über TEAMS × BFV_TEAMS (src/lib/bfv.ts) – ein Jugend-Team
+// bekommt seine Daten automatisch, sobald dort ein Konfig-Eintrag existiert.
 //
-// Multi-Tenant: Der Abschnitt gehört zum FCB-Auftritt. Auf dem JFG-Auftritt
-// wird er gar nicht gerendert – zwei Gründe:
-//   1. Der Explorer beginnt mit der Vereinsauswahl FCB/JFG und würde dort die
-//      FCB-Herren samt Tabelle anbieten, also fremde Inhalte auf der
-//      JFG-Domain zeigen (Default-Auswahl ist sogar die 1. Mannschaft).
-//   2. Für die JFG-Jugendteams ist in BFV_TEAMS keine Mannschaft konfiguriert,
-//      es gäbe also ausschließlich „keine Daten"-Hinweise.
-// Sobald BFV_TEAMS Jugend-Einträge enthält, kann hier ein eigener
-// JFG-Zweig ergänzt werden (dann ohne Vereinsauswahl).
+// Multi-Tenant: Auf der JFG-Domain zeigen wir bewusst KEINEN Explorer (der
+// würde ohnehin nur "keine Daten"-Hinweise anzeigen, da für die A-D-Junioren
+// aktuell kein BFV_TEAMS-Eintrag existiert), sondern einen transparenten
+// Hinweis, dass die Tabellen noch fehlen – statt den Abschnitt kommentarlos
+// verschwinden zu lassen. Sobald BFV_TEAMS JFG-Einträge bekommt, kann hier
+// wieder der volle Explorer laufen.
 
 export default async function SpielbetriebSection() {
   const tenant = await getTenant();
-  if (tenant !== "fcb") return null;
+
+  if (tenant === "jfg") {
+    return (
+      <section aria-labelledby="spielbetrieb-heading" className="mt-12">
+        <div className="mb-5">
+          <div className="flex items-center gap-3">
+            <span aria-hidden className="h-6 w-1 rounded-full bg-fcb-accent" />
+            <h2
+              id="spielbetrieb-heading"
+              className="font-oswald text-2xl font-semibold uppercase tracking-wide text-fcb-text"
+            >
+              Tabelle &amp; Spiele
+            </h2>
+          </div>
+        </div>
+        <Banner
+          variant="info"
+          message="Der Bayerische Fußball-Verband stellt für unsere Jugendmannschaften noch keine öffentlichen Tabellendaten bereit. Sobald das der Fall ist, siehst du hier Tabelle und Spielplan – wie schon beim FCB."
+        />
+      </section>
+    );
+  }
 
   // Alle Teams parallel anfragen – getSpielbetrieb liefert null für
-  // unkonfigurierte Teams und bei Abruf-Fehlern (wirft nie).
+  // unkonfigurierte Teams und bei Abruf-Fehlern (wirft nie). Nur die
+  // eigenen (FCB-)Teams, keine fremden Trägerdaten mehr auf dieser Domain.
   const eintraege: SpielbetriebEintrag[] = await Promise.all(
-    TEAMS.map(async (team) => ({ team, daten: await getSpielbetrieb(team.id) })),
+    getTeamsFuerTraeger("fcb").map(async (team) => ({
+      team,
+      daten: await getSpielbetrieb(team.id),
+    })),
   );
 
   return (
     <section aria-labelledby="spielbetrieb-heading">
-      {/* Zwischenüberschrift im Muster der Träger-Headings der Seite */}
       <div className="mb-5 mt-12">
         <div className="flex items-center gap-3">
           <span aria-hidden className="h-6 w-1 rounded-full bg-fcb-accent" />
@@ -47,7 +67,7 @@ export default async function SpielbetriebSection() {
           </h2>
         </div>
         <p className="mt-1 pl-4 font-inter text-sm text-fcb-muted">
-          Verein und Mannschaft wählen – offizielle Daten des Bayerischen
+          Mannschaft wählen – offizielle Daten des Bayerischen
           Fußball-Verbands, stündlich aktualisiert.
         </p>
       </div>
