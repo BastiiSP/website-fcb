@@ -172,8 +172,13 @@ export function anderenTenant(id: TenantId): TenantId {
  */
 const PRODUKTIONS_HOSTS: Record<TenantId, string[]> = {
   fcb: ["fcbuku.de", "www.fcbuku.de"],
-  // VORLÄUFIG bis zur Registrierung – beide Schreibweisen vorbereitet.
-  jfg: ["jfg-kunstadt-obermain.de", "www.jfg-kunstadt-obermain.de"],
+  // VORLÄUFIG bis zur Registrierung – beide Schreibweisen plus die
+  // Subdomain-Variante als Rückfalloption vorbereitet.
+  jfg: [
+    "jfg-kunstadt-obermain.de",
+    "www.jfg-kunstadt-obermain.de",
+    "jfg.fcbuku.de",
+  ],
 };
 
 /** True, wenn der Host eine echte Produktionsdomain ist (kein Preview/localhost). */
@@ -188,13 +193,16 @@ function normalisiereHost(hostname: string): string {
 }
 
 /**
- * Tenant aus dem Hostnamen ableiten.
+ * Tenant aus dem Hostnamen ableiten – ausschließlich per exaktem Abgleich
+ * gegen PRODUKTIONS_HOSTS, alles andere fällt auf den FCB zurück
+ * (localhost, Vercel-Previews, unbekannte Hosts).
  *
- * Reihenfolge:
- *   1. exakte Produktionsdomain (fcbuku.de → fcb, JFG-Domain → jfg)
- *   2. Hostname enthält „jfg" → jfg. Deckt Subdomains (`jfg.fcbuku.de`) und
- *      Vercel-Preview-Aliase (`website-fcb-jfg-*.vercel.app`) mit ab.
- *   3. Fallback: fcb (localhost, normale Previews, unbekannte Hosts)
+ * Bewusst KEINE Heuristik à la „Hostname enthält jfg": Vercel leitet
+ * Preview-Aliase aus dem Branchnamen ab, und ein Branch wie
+ * `feature/jfg-multi-tenant` ergibt `…-git-feature-jfg-multi-tenant-….vercel.app`.
+ * Eine Substring-Prüfung hätte damit die komplette Preview auf den JFG-Auftritt
+ * geschaltet, obwohl dort der FCB-Stand geprüft werden soll (genau so passiert
+ * und deshalb entfernt). Auf Previews schaltet stattdessen `?tenant=jfg`.
  */
 export function tenantAusHostname(hostname: string | null | undefined): TenantId {
   if (!hostname) return DEFAULT_TENANT;
@@ -203,8 +211,6 @@ export function tenantAusHostname(hostname: string | null | undefined): TenantId
   for (const [id, hosts] of Object.entries(PRODUKTIONS_HOSTS)) {
     if (hosts.includes(host)) return id as TenantId;
   }
-
-  if (host.includes("jfg")) return "jfg";
 
   return DEFAULT_TENANT;
 }

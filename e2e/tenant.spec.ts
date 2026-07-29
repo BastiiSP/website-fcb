@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { tenantAusHostname, istProduktionsHost } from "../src/lib/tenant";
 
 // ──────────────────────────────────────────────
 // Multi-Tenant-Smoke: derselbe Code, zwei Auftritte (FCB + JFG)
@@ -35,6 +36,34 @@ async function akzentVariable(page: Page): Promise<string> {
       .trim()
   );
 }
+
+// Reine Funktionsprüfung der Hostname-Zuordnung – braucht keinen Browser,
+// deckt aber die Fälle ab, die man über localhost nicht testen kann.
+test.describe("Hostname-Zuordnung", () => {
+  test("Produktionsdomains werden exakt zugeordnet", () => {
+    expect(tenantAusHostname("www.fcbuku.de")).toBe("fcb");
+    expect(tenantAusHostname("fcbuku.de")).toBe("fcb");
+    expect(tenantAusHostname("FCBUKU.DE:443")).toBe("fcb");
+    expect(tenantAusHostname("www.jfg-kunstadt-obermain.de")).toBe("jfg");
+    expect(tenantAusHostname("jfg.fcbuku.de")).toBe("jfg");
+
+    expect(istProduktionsHost("www.fcbuku.de")).toBe(true);
+    expect(istProduktionsHost("localhost:3000")).toBe(false);
+  });
+
+  test("Preview-Hosts sind immer FCB – auch mit 'jfg' im Branchnamen", () => {
+    // Regression: Vercel bildet Preview-Aliase aus dem Branchnamen. Eine
+    // Substring-Heuristik hatte die komplette Preview des Branches
+    // `feature/jfg-multi-tenant` auf den JFG-Auftritt geschaltet.
+    expect(
+      tenantAusHostname(
+        "website-fcb-git-feature-jfg-multi-tenant-sptech-projects.vercel.app"
+      )
+    ).toBe("fcb");
+    expect(tenantAusHostname("localhost:3000")).toBe("fcb");
+    expect(tenantAusHostname(null)).toBe("fcb");
+  });
+});
 
 test.describe("Tenant-Erkennung & Marken-Akzent", () => {
   test("ohne Override läuft der Auftritt als FCB", async ({ page }) => {

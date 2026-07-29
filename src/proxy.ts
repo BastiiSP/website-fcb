@@ -18,6 +18,10 @@
 // bleibt; `?tenant=fcb` schaltet zurück. Auf echten Produktionsdomains wird der
 // Override bewusst IGNORIERT – dort entscheidet allein der Hostname, damit ein
 // altes Cookie den Live-Auftritt niemals umfärben kann.
+//
+// Der Hostname-Abgleich läuft ausschließlich exakt gegen die bekannten
+// Produktionsdomains (siehe tenantAusHostname) – Preview-Hosts sind deshalb
+// immer FCB, unabhängig davon, wie der Branch heißt.
 
 import { NextResponse, type NextRequest } from "next/server";
 import {
