@@ -32,8 +32,9 @@ export const RECHTSTEXTE: Record<TenantId, RechtstextAngaben> = {
     vollerName: "1. FC 1911 Burgkunstadt e.V.",
     strasse: "Alter Postweg 10",
     ort: "96224 Burgkunstadt",
-    vertreterName: "Wolfgang Strassgürtel",
-    vertreterFunktion: "1. Vorsitzender",
+    // Co-Vorsitz (von Basti bestätigt, 2026-07-29) – beide gemeinsam vertretungsberechtigt.
+    vertreterName: "Wolfgang Strassgürtel und Elke Wudi",
+    vertreterFunktion: "Vorsitzende",
     registergericht: "Amtsgericht Coburg",
     registerNummer: "VR 20074",
     telefon: "09572 2090152",

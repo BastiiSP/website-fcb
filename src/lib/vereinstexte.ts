@@ -209,10 +209,10 @@ export const KONTAKT_TEXTE: Record<TenantId, KontaktSeitenTexte> = {
   jfg: {
     untertitel: "Meld dich einfach, irgendwer ist immer erreichbar.",
     metaBeschreibung:
-      "So erreichst du die JFG Kunstadt-Obermain: Telefon, E-Mail, WhatsApp, Social Media und der Weg zum Sportgelände am Alten Postweg.",
-    // PLATZHALTER: eigene JFG-Ansprechpartner werden nachgeliefert. Bis dahin
-    // wird offen kommuniziert, dass hier FCB-Kontaktdaten stehen.
-    hinweis:
-      "Die Geschäftsstelle des 1. FC 1911 Burgkunstadt betreut die JFG mit – die folgenden Kontaktdaten gelten deshalb für beide. Eigene Ansprechpartner der JFG werden hier ergänzt.",
+      "So erreichst du die JFG Kunstadt-Obermain: Telefon, E-Mail, Social Media und der Weg zum Sportgelände am Alten Postweg.",
+    // Kein hinweis mehr nötig: Telefon/E-Mail/Ansprechpartner sind seit
+    // 2026-07-29 echte, eigene JFG-Daten (siehe rechtstexte.ts) – nur die
+    // Trainingsanlage bleibt bewusst gemeinsam mit dem FCB (siehe Anfahrt
+    // auf der Seite selbst, braucht keine Erklärung mehr).
   },
 };
