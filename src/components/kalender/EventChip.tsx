@@ -4,14 +4,7 @@ import { format } from "date-fns";
 import { de } from "date-fns/locale";
 import type { Buchung } from "@/components/BearbeitenModal";
 import { getEventColor, hexZuRgba } from "@/utils/getEventColor";
-
-// Anzeige-Labels für die enum-artigen DB-Werte
-const ANLASS_LABEL: Record<string, string> = {
-  training: "Training",
-  freundschaftsspiel: "Freundschaftsspiel",
-  punktspiel: "Punktspiel",
-  platzpflege: "Platzpflege",
-};
+import { ANLASS_LABEL } from "@/lib/buchungsOptionen";
 
 interface Props {
   buchung: Buchung;

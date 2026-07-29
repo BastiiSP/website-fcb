@@ -30,8 +30,8 @@ import { fetchEvents } from "@/utils/fetchEvents";
 import { PLATZ_FARBEN } from "@/utils/getEventColor";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
-import Banner from "@/components/ui/Banner";
 import ZugriffsHinweis from "@/components/ui/ZugriffsHinweis";
+import { checkSession } from "@/utils/checkSession";
 
 const supabase = createClient();
 
@@ -57,51 +57,29 @@ export default function PlatzbuchungSeite() {
     string | null
   >(null);
 
-  // Fehler beim Profil-Laden (z. B. Netzwerkfehler) – vom Rollen-Zugriff getrennt,
-  // damit ein Ladefehler nicht mit "Rolle reicht nicht" verwechselt wird
-  const [profilFehler, setProfilFehler] = useState<string | null>(null);
-
   // Eigene Toolbar (Outlook-Muster) statt der FullCalendar-headerToolbar:
   // Ref steuert die Kalender-API, Titel/Ansicht kommen aus datesSet zurück.
   const kalenderRef = useRef<FullCalendar | null>(null);
   const [kalenderTitel, setKalenderTitel] = useState("");
   const [ansicht, setAnsicht] = useState<KalenderAnsicht>("timeGridWeek");
 
-  // Session prüfen und Rolle laden
+  // Session prüfen und Rolle laden – checkSession() nutzt getUser() statt
+  // getSession(), damit die Rolle nach z. B. einer E-Mail-Änderung stets aktuell ist.
   useEffect(() => {
     const pruefeZugang = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      const { userId: geprueftUserId, rolle: geprueftRolle } = await checkSession(supabase);
 
-      if (!session?.user) {
+      if (!geprueftUserId) {
         window.location.href = "/login";
         return;
       }
 
-      setUserId(session.user.id);
-
-      const { data: profile, error: profileError } = await supabase
-        .from("profiles")
-        .select("rolle")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profileError) {
-        console.error("Fehler beim Laden des Profils:", profileError.message);
-        setProfilFehler(
-          "Dein Profil konnte nicht geladen werden. Bitte versuch es erneut."
-        );
-        setIsLoggedIn(true);
-        return;
-      }
-
-      const nutzerRolle = profile?.rolle ?? null;
-      setRolle(nutzerRolle);
+      setUserId(geprueftUserId);
+      setRolle(geprueftRolle);
       setIsLoggedIn(true);
 
       // Kalenderdaten nur laden, wenn die Rolle auch Zugriff hat
-      if (ERLAUBTE_ROLLEN.includes(nutzerRolle ?? "")) {
+      if (ERLAUBTE_ROLLEN.includes(geprueftRolle ?? "")) {
         fetchEvents(supabase, setEvents);
       }
     };
@@ -296,8 +274,6 @@ export default function PlatzbuchungSeite() {
               Zum Login / zur Registrierung
             </Link>
           </div>
-        ) : profilFehler ? (
-          <Banner variant="error" message={profilFehler} />
         ) : !ERLAUBTE_ROLLEN.includes(rolle ?? "") ? (
           <ZugriffsHinweis rolle={rolle} erlaubteRollen={ERLAUBTE_ROLLEN} />
         ) : (

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function DatenschutzPage() {
   return (
-    <RechtstextLayout titel="Datenschutzerklärung" stand="Juni 2026">
+    <RechtstextLayout titel="Datenschutzerklärung" stand="Juli 2026">
       <p className="font-inter leading-relaxed text-fcb-text/80">
         Der Schutz deiner persönlichen Daten ist uns wichtig. Nachfolgend
         erklären wir, welche Daten beim Besuch und bei der Nutzung dieser
@@ -55,6 +55,31 @@ export default function DatenschutzPage() {
         </p>
       </RechtstextSektion>
 
+      <RechtstextSektion titel="Reichweiten- und Performance-Messung (Vercel Analytics & Speed Insights)">
+        <p>
+          Auf allen Seiten dieser WebApp setzen wir Vercel Analytics und Vercel
+          Speed Insights ein, um zu erfassen, wie die Seite genutzt wird und wie
+          schnell sie lädt (z. B. aufgerufene Seiten, grobe Herkunft der Zugriffe,
+          Core-Web-Vitals-Messwerte wie Ladezeit und Interaktionsverzögerung).
+          Dies ist eine eigenständige Verarbeitung durch Vercel, die über die
+          reinen Hosting-Zugriffsdaten hinausgeht.
+        </p>
+        <p>
+          Beide Dienste sind bewusst datensparsam ausgelegt: Es werden keine
+          Cookies gesetzt und keine dauerhaften Kennungen gespeichert, mit denen
+          du über mehrere Besuche hinweg wiedererkannt werden könntest. Die
+          erhobenen Nutzungs- und Performance-Daten werden aggregiert und dienen
+          ausschließlich der Analyse und Verbesserung der Website – ein
+          individuelles Nutzerprofil wird nicht gebildet.
+        </p>
+        <p>
+          Die Verarbeitung erfolgt auf Grundlage unseres berechtigten Interesses
+          an der Optimierung und Fehlerfreiheit unserer WebApp (Art. 6 Abs. 1
+          lit. f DSGVO). Da keine Cookies zum Einsatz kommen, ist hierfür keine
+          gesonderte Einwilligung nach § 25 TDDDG erforderlich.
+        </p>
+      </RechtstextSektion>
+
       <RechtstextSektion titel="Datenbank und Nutzerkonten (Supabase)">
         <p>
           Für Nutzerkonten, Anmeldung, Platzbuchungen und die Mitgliederverwaltung
@@ -65,9 +90,79 @@ export default function DatenschutzPage() {
           Processing Addendum) wurde im Juni 2026 abgeschlossen.
         </p>
         <p>
-          Verarbeitet werden je nach Funktion z. B. Name, E-Mail-Adresse,
-          Telefonnummer, Vereinsrolle, Mannschaftszugehörigkeit sowie Buchungs-
-          und Mitgliederdaten.
+          Für dein Nutzerkonto verarbeiten wir je nach Funktion: Vorname,
+          Nachname, E-Mail-Adresse, Telefonnummer, Geburtsdatum, Anschrift
+          (Straße, PLZ, Ort), Vereinsrolle, Mannschaftszugehörigkeit,
+          Trainerlizenzen sowie dein optionales Profilbild. Stellst du über dein
+          Profil eine Anfrage zum Wechsel der Mannschaft (Beitritt oder Austritt),
+          speichern wir zusätzlich die betroffene Mannschaft, den Anfragetyp,
+          eine optionale Begründung sowie den Bearbeitungsstatus dieser Anfrage.
+        </p>
+      </RechtstextSektion>
+
+      <RechtstextSektion titel="Anmeldung mit Google (OAuth)">
+        <p>
+          Alternativ zur klassischen Registrierung kannst du dich mit deinem
+          Google-Konto anmelden. Dabei fragt Supabase über den Anmeldedialog von
+          Google (Google Ireland Limited bzw. Google LLC) deinen Namen und deine
+          E-Mail-Adresse ab, um daraus dein Nutzerkonto anzulegen; weitere
+          Berechtigungen (z. B. für Werbung oder sonstige Google-Dienste) werden
+          nicht angefragt. Google verarbeitet dabei als eigenständig
+          Verantwortlicher Daten nach seinen eigenen Datenschutzbestimmungen; die
+          Anmeldung selbst bestätigst du im Consent-Bildschirm von Google.
+        </p>
+        <p>
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Erfüllung des
+          Nutzungsverhältnisses durch Anlage deines Kontos) in Verbindung mit
+          deiner im Google-Anmeldedialog erteilten Einwilligung (Art. 6 Abs. 1
+          lit. a DSGVO).
+        </p>
+      </RechtstextSektion>
+
+      <RechtstextSektion titel="Profilbild (Avatar-Upload)">
+        <p>
+          Lädst du in deinem Profil ein Profilbild hoch, speichern wir es in
+          einem Supabase-Storage-Bucket. Aus technischen Gründen ist die
+          Bild-URL öffentlich abrufbar (nicht durch einen Login geschützt) – sie
+          enthält jedoch eine nicht erratbare, zufällige Kennung und wird nicht
+          von Suchmaschinen indexiert oder an anderer Stelle verlinkt. Das
+          Hochladen ist freiwillig; die Verarbeitung erfolgt auf Grundlage deiner
+          Einwilligung durch den aktiven Upload (Art. 6 Abs. 1 lit. a DSGVO). Du
+          kannst dein Profilbild jederzeit über dein Profil ersetzen oder den
+          Vorstand um Löschung bitten.
+        </p>
+      </RechtstextSektion>
+
+      <RechtstextSektion titel="Mitgliederverwaltung (Vereinsmitglieder ohne eigenes Nutzerkonto)">
+        <p>
+          Für Vereinsmitglieder, die keinen eigenen Account in dieser WebApp
+          nutzen, pflegt der Vorstand Mitgliedsdaten in einer separaten
+          Verwaltungsansicht: Vorname, Nachname, E-Mail-Adresse und
+          Telefonnummer (jeweils optional), Geburtsdatum, Eintrittsdatum,
+          Mitgliedsstatus (aktiv/passiv/Ehrenamt/gekündigt), Mannschaftszugehörigkeit
+          sowie interne Notizen. Zugriff auf diese Daten haben ausschließlich
+          Vorstand und Admin.
+        </p>
+        <p>
+          Rechtsgrundlage ist die Erfüllung des Mitgliedschaftsverhältnisses nach
+          der Vereinssatzung (Art. 6 Abs. 1 lit. b DSGVO) sowie unser berechtigtes
+          Interesse an einer funktionierenden Vereins- und Mannschaftsorganisation
+          (Art. 6 Abs. 1 lit. f DSGVO).
+        </p>
+      </RechtstextSektion>
+
+      <RechtstextSektion titel="Sportheim-Anfrage (öffentliches Formular)">
+        <p>
+          Über unsere Sportheim-Seite kann jede Person – auch ohne Nutzerkonto
+          und ohne Login – unverbindlich eine Nutzung des Sportheims anfragen.
+          Dabei verarbeiten wir Vorname, Nachname, E-Mail-Adresse, Telefonnummer,
+          den gewünschten Zeitraum, den Anlass sowie eine optionale Nachricht.
+          Die Anfrage wird dem Vorstand zur Prüfung vorgelegt; eine automatische
+          Bestätigungs-E-Mail wird nicht versendet.
+        </p>
+        <p>
+          Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (vorvertragliche
+          Maßnahme zur Anbahnung einer Sportheim-Nutzung auf deine Anfrage hin).
         </p>
       </RechtstextSektion>
 
@@ -75,7 +170,8 @@ export default function DatenschutzPage() {
         <p>
           Die Datenverarbeitung dient der Organisation des Vereins- und
           Spielbetriebs: Verwaltung von Nutzerkonten und Rollen, Buchung und
-          Belegung der Plätze sowie der Mitgliederverwaltung.
+          Belegung der Plätze, der Mitgliederverwaltung sowie der Bearbeitung von
+          Sportheim-Anfragen.
         </p>
       </RechtstextSektion>
 
@@ -83,10 +179,12 @@ export default function DatenschutzPage() {
         <p>
           Die Verarbeitung erfolgt je nach Funktion auf Grundlage von Art. 6
           Abs. 1 lit. b DSGVO (Erfüllung des Mitgliedschafts- bzw.
-          Nutzungsverhältnisses), Art. 6 Abs. 1 lit. f DSGVO (berechtigtes
-          Interesse am Vereinsbetrieb und an der IT-Sicherheit) sowie – wo eine
-          Einwilligung erforderlich ist (siehe „Cookies und Einwilligung“) –
-          Art. 6 Abs. 1 lit. a DSGVO.
+          Nutzungsverhältnisses, vorvertragliche Maßnahmen wie die
+          Sportheim-Anfrage), Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse
+          am Vereinsbetrieb, an der IT-Sicherheit und an der
+          Website-Optimierung) sowie – wo eine Einwilligung erforderlich ist
+          (siehe „Cookies und Einwilligung“, „Anmeldung mit Google“ und
+          „Profilbild“) – Art. 6 Abs. 1 lit. a DSGVO.
         </p>
       </RechtstextSektion>
 
@@ -147,7 +245,9 @@ export default function DatenschutzPage() {
           Wir speichern personenbezogene Daten nur so lange, wie es für die
           genannten Zwecke erforderlich ist oder gesetzliche Aufbewahrungsfristen
           es vorschreiben. Nutzerkonto- und Mitgliederdaten werden auf Wunsch oder
-          nach Wegfall des Zwecks gelöscht.
+          nach Wegfall des Zwecks gelöscht. Sportheim-Anfragen werden gelöscht,
+          sobald sie abschließend bearbeitet sind und keine Aufbewahrungspflicht
+          entgegensteht.
         </p>
       </RechtstextSektion>
 

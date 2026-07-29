@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabaseClient";
 import MeineBuchungen from "@/components/MeineBuchungen";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
+import { checkSession } from "@/utils/checkSession";
 
 const supabase = createClient();
 
@@ -20,16 +21,16 @@ export default function MeineBuchungenSeite() {
 
   useEffect(() => {
     const pruefeSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      // checkSession() nutzt getUser() statt getSession() (serverseitig validiert) –
+      // Rolle wird hier nicht benötigt, RLS regelt die Sichtbarkeit der Buchungen.
+      const { userId: geprueftUserId } = await checkSession(supabase);
 
-      if (!session?.user) {
+      if (!geprueftUserId) {
         window.location.href = "/login";
         return;
       }
 
-      setUserId(session.user.id);
+      setUserId(geprueftUserId);
       setGeprueft(true);
     };
 
