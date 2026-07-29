@@ -11,6 +11,26 @@
 
 import type { TenantId } from "@/lib/tenant";
 
+/** Ein einzelner Ansprechpartner (Name + optional Telefon als klickbarer Link). */
+export interface Ansprechpartner {
+  name: string;
+  telefon?: string;
+  telefonHref?: string;
+}
+
+/**
+ * Kinderschutz-Ansprechpartner nach DFB-Merkblatt "Erstellung eines
+ * Kinderschutzkonzepts" (Punkt 02: Ansprechpartner innerhalb des Vereins als
+ * Anlaufstelle, mit Weitervermittlung an externe Stellen) – Kommunikation
+ * "in Form eines Berichts auf der Homepage" ist im Merkblatt ausdrücklich als
+ * zulässiger Weg genannt. Nur gesetzt, wenn der Verein ein eigenes Konzept
+ * hat (aktuell nur JFG).
+ */
+export interface KinderschutzAngaben {
+  intern: Ansprechpartner;
+  extern: Ansprechpartner;
+}
+
 export interface RechtstextAngaben {
   /** Rechtlich vollständiger Name, wie er im Vereinsregister steht. */
   vollerName: string;
@@ -25,6 +45,7 @@ export interface RechtstextAngaben {
   telefon?: string;
   telefonHref?: string;
   email: string;
+  kinderschutz?: KinderschutzAngaben;
 }
 
 export const RECHTSTEXTE: Record<TenantId, RechtstextAngaben> = {
@@ -57,5 +78,16 @@ export const RECHTSTEXTE: Record<TenantId, RechtstextAngaben> = {
     telefon: "0172 2804003",
     telefonHref: "tel:+491722804003",
     email: "jfg-kunstadt-obermain@pm.me",
+    // Von André Petratschek an Basti kommuniziert (2026-07-29): eigenes
+    // Kinderschutzkonzept nach BFV/DFB-Vorgabe, intern + extern benannter
+    // Ansprechpartner. Externe Telefonnummer von Basti bestätigt.
+    kinderschutz: {
+      intern: { name: "André Petratschek" },
+      extern: {
+        name: "Yannic Geißler",
+        telefon: "0151 70107458",
+        telefonHref: "tel:+4915170107458",
+      },
+    },
   },
 };

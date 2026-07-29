@@ -6,6 +6,10 @@
 // 3. "url"          = die vollständige Web-Adresse (mit https://)
 // 4. "icon"         = einer der Werte: "whatsapp" | "instagram" | "facebook" | "shop" | "link"
 // 5. "beschreibung" = kurzer Untertitel (optional, kannst du weglassen)
+// 6. "nurMeinVerein"= true nur für Links, die ausschließlich im internen
+//                     Mitgliederbereich (/mein-verein) stehen sollen, nicht
+//                     auf der öffentlichen Kontakt-Seite (z.B. weil sie auf
+//                     die eigene Seite selbst verweisen – dort redundant).
 //
 // Beispiel für einen neuen Eintrag:
 //   { label: "YouTube", url: "https://www.youtube.com/@fcbuku", icon: "link", beschreibung: "Highlights und Videos" },
@@ -22,6 +26,8 @@ export interface VereinsLink {
   url: string;
   icon: VereinsLinkIcon;
   beschreibung?: string;
+  /** true = nur im internen Bereich (/mein-verein) zeigen, nicht auf /kontakt. */
+  nurMeinVerein?: boolean;
 }
 
 export const VEREINSLINKS: Record<TenantId, VereinsLink[]> = {
@@ -55,6 +61,7 @@ export const VEREINSLINKS: Record<TenantId, VereinsLink[]> = {
       url: "https://www.fcbuku.de",
       icon: "link",
       beschreibung: "Offizielle Homepage",
+      nurMeinVerein: true,
     },
   ],
   jfg: [
@@ -69,6 +76,12 @@ export const VEREINSLINKS: Record<TenantId, VereinsLink[]> = {
       url: "https://www.dein-sportshop.de/vereine/jfg-kunstadt-obermain",
       icon: "shop",
       beschreibung: "Trikots und Fanartikel",
+    },
+    {
+      label: "Anpfiff.info",
+      url: "https://www.anpfiff.info/sites/vereine/start.aspx?SK=7&Ver=1014",
+      icon: "link",
+      beschreibung: "Vereinsprofil, Termine und Ergebnisse",
     },
   ],
 };

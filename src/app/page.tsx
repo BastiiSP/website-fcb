@@ -1,12 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
+import { Phone, ShieldCheck } from "lucide-react";
 import HybridCanvas from "@/components/hero/HybridCanvas";
 import HybridPitch from "@/components/hero/HybridPitch";
 import RotatingText from "@/components/hero/RotatingText";
 import InstagramSection from "@/components/instagram/InstagramSection";
 import { useTenant } from "@/components/tenant/TenantProvider";
+import { RECHTSTEXTE } from "@/lib/rechtstexte";
 
 /**
  * Die drei Trägervereine der JFG – nur für den JFG-Hero relevant (siehe unten).
@@ -43,6 +46,11 @@ export default function HomePage() {
   const tenant = useTenant();
   const HEADLINE_LINES = tenant.heroLines;
   const ROTATING_WORDS = tenant.heroWords;
+  // Kinderschutz-Ansprechpartner (nach DFB-Merkblatt "Erstellung eines
+  // Kinderschutzkonzepts") – nur gesetzt, wenn die Marke ein eigenes Konzept
+  // hat (aktuell nur JFG). Homepage-Veröffentlichung ist im Merkblatt
+  // ausdrücklich als zulässiger Kommunikationsweg genannt.
+  const kinderschutz = RECHTSTEXTE[tenant.id].kinderschutz;
 
   return (
     <main className="min-h-screen bg-fcb-bg text-fcb-text">
@@ -242,6 +250,66 @@ export default function HomePage() {
 
         </div>
       </section>
+
+      {/* Kinderschutz-Ansprechpartner – Pflichtangabe nach DFB-Merkblatt zur
+          Erstellung eines Kinderschutzkonzepts (Punkt 02: Ansprechpartner im
+          Verein als Anlaufstelle; Homepage-Bericht ist dort ausdrücklich als
+          zulässiger Kommunikationsweg genannt). Nur sichtbar, wenn die Marke
+          ein eigenes Konzept hat. */}
+      {kinderschutz && (
+        <section className="border-t border-fcb-border bg-fcb-surface px-4 py-14">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="mb-3 flex items-center justify-center gap-2">
+              <ShieldCheck className="h-6 w-6 text-fcb-accent" aria-hidden />
+              <h2 className="font-oswald text-2xl font-semibold uppercase tracking-wide text-fcb-text">
+                Kinderschutz
+              </h2>
+            </div>
+            <p className="mx-auto max-w-xl font-inter text-sm leading-relaxed text-fcb-text/80">
+              Die {tenant.name} hat im Rahmen der DFB/BFV-Vorgaben ein eigenes
+              Kinderschutzkonzept erarbeitet. Bei Fragen, Anliegen oder im
+              Ernstfall erreichst du diese Ansprechpartner – vertraulich und
+              jederzeit:
+            </p>
+            <div className="mx-auto mt-6 grid max-w-xl gap-4 sm:grid-cols-2">
+              <div className="rounded-2xl border border-fcb-border bg-fcb-bg p-5 text-left">
+                <p className="font-inter text-xs font-medium uppercase tracking-wide text-fcb-muted">
+                  Interner Ansprechpartner
+                </p>
+                <p className="mt-1 font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text">
+                  {kinderschutz.intern.name}
+                </p>
+                {kinderschutz.intern.telefonHref && (
+                  <Link
+                    href={kinderschutz.intern.telefonHref}
+                    className="mt-2 inline-flex items-center gap-1.5 font-inter text-sm text-fcb-accent hover:underline"
+                  >
+                    <Phone size={14} aria-hidden />
+                    {kinderschutz.intern.telefon}
+                  </Link>
+                )}
+              </div>
+              <div className="rounded-2xl border border-fcb-border bg-fcb-bg p-5 text-left">
+                <p className="font-inter text-xs font-medium uppercase tracking-wide text-fcb-muted">
+                  Externer Ansprechpartner
+                </p>
+                <p className="mt-1 font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text">
+                  {kinderschutz.extern.name}
+                </p>
+                {kinderschutz.extern.telefonHref && (
+                  <Link
+                    href={kinderschutz.extern.telefonHref}
+                    className="mt-2 inline-flex items-center gap-1.5 font-inter text-sm text-fcb-accent hover:underline"
+                  >
+                    <Phone size={14} aria-hidden />
+                    {kinderschutz.extern.telefon}
+                  </Link>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Vereins-News – Instagram-Carousel (ersetzt den früheren LightWidget-Feed) */}
       <InstagramSection />

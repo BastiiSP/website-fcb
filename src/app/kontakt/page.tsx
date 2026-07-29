@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Mail, MapPin, Phone, ShoppingBag } from "lucide-react";
+import { ExternalLink, Mail, MapPin, Phone, ShoppingBag } from "lucide-react";
 import PageShell from "@/components/ui/PageShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
@@ -43,12 +43,14 @@ const MAPS_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURICom
 
 // Social-Links aus der zentralen, tenant-eigenen Datei – hier nur um die
 // Optik ergänzt. Icon-Zuordnung über das icon-Feld von VEREINSLINKS
-// (Brand-SVGs für Plattformen, ShoppingBag für den Fanshop).
+// (Brand-SVGs für Plattformen, ShoppingBag für den Fanshop, ExternalLink als
+// generisches Icon für sonstige Links wie Anpfiff.info).
 const SOCIAL_ICONS = {
   whatsapp: WhatsAppIcon,
   instagram: InstagramIcon,
   facebook: FacebookIcon,
   shop: ShoppingBag,
+  link: ExternalLink,
 } as const;
 
 /** Klickbare Kontakt-Card: komplette Fläche ist der Link. */
@@ -88,10 +90,10 @@ export default async function KontaktPage() {
   const tenant = await getTenantConfigServer();
   const texte = KONTAKT_TEXTE[tenant.id];
   const angaben = RECHTSTEXTE[tenant.id];
-  // "link" (Vereinswebseite) bewusst ausgeblendet – auf der eigenen Seite ist
-  // ein Link auf sich selbst redundant. Alle anderen Icon-Typen (inkl. "shop")
-  // werden gezeigt, jede Marke hat nur ihre eigenen, echten Kanäle in der Liste.
-  const socialLinks = VEREINSLINKS[tenant.id].filter((l) => l.icon !== "link");
+  // Nur "nurMeinVerein"-Links ausblenden (z.B. der FCB-Link auf die eigene
+  // Seite – auf der eigenen Kontaktseite redundant). Alles andere zeigen,
+  // inkl. generischer "link"-Einträge wie Anpfiff.info.
+  const socialLinks = VEREINSLINKS[tenant.id].filter((l) => !l.nurMeinVerein);
 
   return (
     <PageShell maxWidth="xl">
