@@ -118,9 +118,11 @@ const VEREIN_FCB: VereinsSeitenTexte = {
   },
 };
 
-// Alle JFG-Texte sind PLATZHALTER: Basti liefert Geschichte, Struktur, Träger-
-// vereine, Gründungsjahr und Ansprechpartner nach. Bewusst keine erfundenen
-// Fakten – wo eine Angabe fehlt, steht das auch so in der Kachel bzw. im Text.
+// JFG-Texte: Trägervereine, Gründungsjahr und Jugendleitung sind echte
+// Angaben (von Basti bestätigt bzw. recherchiert, siehe Verlauf in
+// 02 Projekte/Website FCB.md). Exakte Amtsbezeichnungen der Jugendleitung
+// waren nicht bekannt – bewusst allgemein gehalten ("Organisation"/"Sport")
+// statt eine falsche offizielle Bezeichnung zu erfinden.
 const VEREIN_JFG: VereinsSeitenTexte = {
   titel: "Die JFG",
   untertitel: "JFG Kunstadt-Obermain, Leistungsjugend der A- bis D-Junioren.",
@@ -129,30 +131,24 @@ const VEREIN_JFG: VereinsSeitenTexte = {
     "Die Jugendfördergemeinschaft Kunstadt-Obermain: Trägervereine, Struktur und leistungsorientierte Nachwuchsförderung der A- bis D-Junioren.",
   werWirSind: {
     heading: "Wer wir sind",
-    platzhalterHinweis:
-      "Platzhalter: Dieser Text wird noch ergänzt – die Selbstbeschreibung der JFG liefert der Verein nach.",
     absaetze: [
-      "Die JFG Kunstadt-Obermain ist eine Jugendfördergemeinschaft von drei Trägervereinen. Hier spielen die A-, B-, C- und D-Junioren zusammen – leistungsorientiert, damit jeder Jahrgang auf dem passenden Niveau Fußball spielen kann.",
-      "Welche Vereine die JFG tragen, wie die Zusammenarbeit organisiert ist und was die Nachwuchsförderung ausmacht, steht hier, sobald der ausformulierte Text vorliegt.",
+      "Die JFG Kunstadt-Obermain ist die gemeinsame Jugendfördergemeinschaft von drei Vereinen: dem 1. FC 1911 Burgkunstadt, der SG Roth-Main Mainroth und dem 1. FC 1916 Redwitz a. d. Rodach. Bei uns spielen die A-, B-, C- und D-Junioren zusammen – leistungsorientiert, damit jeder Jahrgang auf dem Niveau spielt, das zu ihm passt.",
+      "Der Anspruch dahinter: eine Jugend aufbauen, die es mit den Leistungszentren der großen Vereine aufnehmen kann. Trotzdem bleibt bei uns Platz für jeden, der einfach kicken will – Leistungssport und Spaß am Ball schließen sich bei uns nicht aus.",
     ],
   },
   geschichte: {
     heading: "Geschichte",
-    platzhalterHinweis:
-      "Platzhalter: Gründungsjahr und Entstehungsgeschichte der JFG werden noch ergänzt.",
     absaetze: [
-      "Wann die JFG Kunstadt-Obermain gegründet wurde und wie aus den Jugendabteilungen der Trägervereine eine gemeinsame Fördergemeinschaft geworden ist, ergänzen wir an dieser Stelle.",
-      "Wer etwas dazu beitragen kann – Daten, Fotos, Erinnerungen –, darf sich gerne melden.",
+      "2004 haben der 1. FC 1911 Burgkunstadt, die SG Roth-Main Mainroth und der 1. FC 1916 Redwitz a. d. Rodach ihre Jugendabteilungen in der JFG Kunstadt-Obermain zusammengelegt. Ziel war eine leistungsorientierte Jugendarbeit in der Region, die mit den Leistungszentren größerer Vereine mithalten kann.",
+      "Über die Jahre ist aus der Fördergemeinschaft eine feste Größe im Jugendfußball der Region geworden. Heute kommen rund 90 % der Spieler vom FCB, getragen wird die JFG aber weiterhin von drei Vereinen – ein gemeinsames Projekt, keine Nebensache eines einzelnen Clubs.",
     ],
   },
   faktenHeading: "Zahlen & Fakten",
-  faktenPlatzhalterHinweis:
-    "Platzhalter: Gründungsjahr, Trägervereine und Spielorte werden noch ergänzt.",
   fakten: [
     {
       icon: CalendarDays,
-      wert: "Jahr folgt",
-      text: "Gründungsjahr der JFG wird noch ergänzt",
+      wert: "2004",
+      text: "gegründet als gemeinsame Jugendförderung dreier Vereine",
     },
     {
       icon: Users,
@@ -162,19 +158,17 @@ const VEREIN_JFG: VereinsSeitenTexte = {
     {
       icon: Handshake,
       wert: "3 Vereine",
-      text: "Trägervereine der Fördergemeinschaft, Namen folgen",
+      text: "FCB, SG Roth-Main Mainroth & 1. FC Redwitz a. d. Rodach",
     },
     {
       icon: MapPin,
-      wert: "Spielorte",
-      text: "Sportanlagen der Trägervereine, Details folgen",
+      wert: "Sportanlagen",
+      text: "der drei Trägervereine in der Region",
     },
   ],
   ansprechpartner: {
     heading: "Struktur & Ansprechpartner",
-    platzhalterHinweis:
-      "Platzhalter: Jugendleitung und Ansprechpartner der JFG werden noch ergänzt.",
-    text: "Wer die JFG leitet und wie sich die Jugendleitung zusammensetzt, steht hier, sobald die Angaben vorliegen. Bis dahin läuft der Kontakt über die Geschäftsstelle des 1. FC 1911 Burgkunstadt.",
+    text: "Die Jugendleitung der JFG liegt bei André Petraschek (Organisation) und Marko Linß (Sport). Bei Fragen rund um die JFG meldest du dich am besten direkt bei den beiden oder über die Geschäftsstelle des 1. FC 1911 Burgkunstadt.",
   },
   cta: {
     heading: "Lust mitzumachen?",
