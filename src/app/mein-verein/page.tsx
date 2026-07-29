@@ -24,7 +24,7 @@ function VereinsLinkIconComponent({ icon }: { icon: VereinsLinkIcon }) {
     case "instagram":
       return <InstagramIcon className="w-8 h-8 text-pink-500" aria-hidden="true" />;
     case "facebook":
-      return <FacebookIcon className="w-8 h-8 text-fcb-blue" aria-hidden="true" />;
+      return <FacebookIcon className="w-8 h-8 text-fcb-accent" aria-hidden="true" />;
     default:
       return <ExternalLink className="w-8 h-8 text-fcb-muted" aria-hidden="true" />;
   }

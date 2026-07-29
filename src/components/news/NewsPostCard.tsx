@@ -98,7 +98,7 @@ export default function NewsPostCard({ post }: NewsPostCardProps) {
                   type="button"
                   onClick={zurueck}
                   aria-label="Vorheriges Bild"
-                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-fcb-bg/60 p-2 text-fcb-text backdrop-blur-sm transition-colors hover:bg-fcb-bg/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+                  className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-fcb-bg/60 p-2 text-fcb-text backdrop-blur-sm transition-colors hover:bg-fcb-bg/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
                 >
                   <ChevronLeft size={20} aria-hidden />
                 </button>
@@ -106,7 +106,7 @@ export default function NewsPostCard({ post }: NewsPostCardProps) {
                   type="button"
                   onClick={weiter}
                   aria-label="Nächstes Bild"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-fcb-bg/60 p-2 text-fcb-text backdrop-blur-sm transition-colors hover:bg-fcb-bg/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-fcb-bg/60 p-2 text-fcb-text backdrop-blur-sm transition-colors hover:bg-fcb-bg/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
                 >
                   <ChevronRight size={20} aria-hidden />
                 </button>
@@ -163,7 +163,7 @@ export default function NewsPostCard({ post }: NewsPostCardProps) {
               <button
                 type="button"
                 onClick={() => setAusgeklappt((v) => !v)}
-                className="font-inter text-sm font-medium text-fcb-blue hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+                className="font-inter text-sm font-medium text-fcb-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
               >
                 {ausgeklappt ? "Weniger anzeigen" : "Mehr lesen"}
               </button>
@@ -173,7 +173,7 @@ export default function NewsPostCard({ post }: NewsPostCardProps) {
               href={post.permalink}
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-auto inline-flex items-center gap-2 font-inter text-sm font-medium text-fcb-muted transition-colors hover:text-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+              className="ml-auto inline-flex items-center gap-2 font-inter text-sm font-medium text-fcb-muted transition-colors hover:text-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
             >
               <InstagramIcon className="h-4 w-4" aria-hidden />
               Auf Instagram ansehen

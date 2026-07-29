@@ -30,7 +30,7 @@ const PLATZ_FILTER_OPTIONEN = [{ value: "", label: "Alle Plätze" }, ...PLATZ_OP
 // Einheitliche Styles für die nativen <input type="date">-Felder (fcb-Tokens,
 // gleiches Muster wie die datetime-local-Felder in BearbeitenModal).
 const DATUM_INPUT_KLASSEN =
-  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40";
+  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text focus:border-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40";
 
 // YYYY-MM-DD aus LOKALEN Datumsfeldern bauen – nicht über toISOString(),
 // das würde in UTC umrechnen und je nach Zeitzone den Tag verschieben.
@@ -84,7 +84,7 @@ function AktionsButtons({ onEdit, onDelete }: { onEdit: () => void; onDelete: ()
     <div className="flex justify-end gap-2">
       <button
         onClick={onEdit}
-        className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+        className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
         title="Bearbeiten"
         aria-label="Buchung bearbeiten"
       >

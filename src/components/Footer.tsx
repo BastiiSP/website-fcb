@@ -7,6 +7,7 @@ import { MapPin } from "lucide-react";
 import { FacebookIcon, InstagramIcon } from "@/components/icons/BrandIcons";
 import { useConsent } from "@/components/consent/ConsentProvider";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useTenant } from "@/components/tenant/TenantProvider";
 
 /**
  * Vereins-Footer (Design-Runde 2, dreispaltig).
@@ -17,11 +18,15 @@ import ThemeToggle from "@/components/ui/ThemeToggle";
  *   restlichen animierten Site. Daher "use client".
  */
 
-// Vereins- und Social-Daten (zuvor footer-preview/_data.ts; inline übernommen,
+// Standort- und Social-Daten (zuvor footer-preview/_data.ts; inline übernommen,
 // da die Preview-Routen mit Abschluss von Design-Runde 2 entfernt wurden).
 // Adresse aus dem Impressum (Stand 2025).
+//
+// Multi-Tenant: Vereinsname, Wappen und Instagram-Kanal kommen aus der
+// Marken-Konfiguration (useTenant). Anschrift und Facebook-Seite bleiben
+// vorerst FCB-Daten – die Sportanlage am Alten Postweg ist der gemeinsame
+// Standort, eigene JFG-Kontaktdaten (Impressum) liefert Basti nach. PLATZHALTER.
 const FCB_FOOTER = {
-  vereinsname: "1. FC 1911 Burgkunstadt e.V.",
   strasse: "Alter Postweg 10",
   ort: "96224 Burgkunstadt",
   facebookUrl: "https://www.facebook.com/fc1911?locale=de_DE",
@@ -37,6 +42,8 @@ const JAHR = new Date().getFullYear();
 export default function Footer() {
   // Öffnet das Cookie-Banner erneut – ohne Reload oder Cookie-Löschen.
   const { openSettings } = useConsent();
+  // Marke des aufgerufenen Auftritts (Wappen, Name, Instagram-Kanal).
+  const tenant = useTenant();
   return (
     <motion.footer
       initial={{ opacity: 0, y: 24 }}
@@ -66,14 +73,14 @@ export default function Footer() {
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <Image
-              src="/logo.svg"
-              alt="Vereinslogo 1. FC 1911 Burgkunstadt"
+              src={tenant.logoSrc}
+              alt={tenant.logoAlt}
               width={36}
               height={36}
               className="drop-shadow-lg"
             />
             <span className="font-oswald text-base font-semibold uppercase tracking-wide">
-              {FCB_FOOTER.vereinsname}
+              {tenant.vereinsname}
             </span>
           </div>
           {/* Icon + Adresse als direkter Google-Maps-Link */}
@@ -82,12 +89,12 @@ export default function Footer() {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Vereinsadresse in Google Maps öffnen"
-            className="flex w-fit items-center gap-2 font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
+            className="flex w-fit items-center gap-2 font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent"
           >
             {/* Icon-Slot in Wappenbreite (w-9 = 36px), damit der Adresstext exakt
                 unter dem Vereinsnamen beginnt (Logo ist ebenfalls 36px breit). */}
             <span className="flex w-9 shrink-0 justify-center">
-              <MapPin className="h-7 w-7 text-fcb-blue" />
+              <MapPin className="h-7 w-7 text-fcb-accent" />
             </span>
             <span>
               {FCB_FOOTER.strasse}
@@ -104,13 +111,13 @@ export default function Footer() {
           </h3>
           <Link
             href="/impressum"
-            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
+            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent"
           >
             Impressum
           </Link>
           <Link
             href="/datenschutz"
-            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue"
+            className="font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent"
           >
             Datenschutz
           </Link>
@@ -119,7 +126,7 @@ export default function Footer() {
           <button
             type="button"
             onClick={openSettings}
-            className="w-fit text-left font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-blue focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+            className="w-fit text-left font-inter text-sm text-fcb-muted transition-colors hover:text-fcb-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
           >
             Cookie-Einstellungen
           </button>
@@ -136,12 +143,12 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
-              className="text-fcb-muted transition-colors hover:text-fcb-blue"
+              className="text-fcb-muted transition-colors hover:text-fcb-accent"
             >
               <FacebookIcon className="h-6 w-6" />
             </Link>
             <Link
-              href={FCB_FOOTER.instagramUrl}
+              href={tenant.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -156,7 +163,7 @@ export default function Footer() {
           <span className="font-inter text-xs text-fcb-muted sm:text-right">
             © {JAHR}
             <br />
-            {FCB_FOOTER.vereinsname}
+            {tenant.vereinsname}
           </span>
         </div>
       </div>

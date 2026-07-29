@@ -23,7 +23,7 @@ const KRITERIEN: { key: keyof PasswortFeedback; label: string }[] = [
 function balken(staerke: number): { breite: string; farbe: string } {
   if (staerke <= 2) return { breite: "w-1/5", farbe: "bg-fcb-red" };
   if (staerke === 3) return { breite: "w-3/5", farbe: "bg-yellow-500" };
-  if (staerke === 4) return { breite: "w-4/5", farbe: "bg-fcb-blue" };
+  if (staerke === 4) return { breite: "w-4/5", farbe: "bg-fcb-accent" };
   return { breite: "w-full", farbe: "bg-green-500" };
 }
 

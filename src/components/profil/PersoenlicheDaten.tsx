@@ -85,7 +85,7 @@ export default function PersoenlicheDaten({
         <button
           type="button"
           onClick={onAvatarClick}
-          className="w-24 h-24 rounded-full overflow-hidden bg-fcb-surface border border-fcb-border text-fcb-text flex items-center justify-center font-oswald font-bold text-2xl hover:border-fcb-blue transition-colors flex-shrink-0"
+          className="w-24 h-24 rounded-full overflow-hidden bg-fcb-surface border border-fcb-border text-fcb-text flex items-center justify-center font-oswald font-bold text-2xl hover:border-fcb-accent transition-colors flex-shrink-0"
           title="Profilbild ändern"
         >
           {avatarUrl ? (
@@ -102,7 +102,7 @@ export default function PersoenlicheDaten({
           <button
             type="button"
             onClick={onAvatarClick}
-            className="font-inter text-sm text-fcb-blue underline hover:text-fcb-blue/80 transition-colors"
+            className="font-inter text-sm text-fcb-accent underline hover:text-fcb-accent/80 transition-colors"
           >
             Bild ändern
           </button>

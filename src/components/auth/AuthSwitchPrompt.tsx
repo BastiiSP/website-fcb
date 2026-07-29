@@ -14,7 +14,7 @@ export default function AuthSwitchPrompt({ frage, aktion, href }: AuthSwitchProm
       {frage}{" "}
       <Link
         href={href}
-        className="font-medium text-fcb-blue underline-offset-2 transition-colors hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+        className="font-medium text-fcb-accent underline-offset-2 transition-colors hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
       >
         {aktion}
       </Link>

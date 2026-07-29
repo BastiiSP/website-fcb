@@ -67,7 +67,7 @@ export default function Modal({
                 type="button"
                 onClick={onClose}
                 aria-label="Schließen"
-                className="rounded p-1 text-fcb-muted transition-colors hover:text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+                className="rounded p-1 text-fcb-muted transition-colors hover:text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
               >
                 <X size={20} />
               </button>

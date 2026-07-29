@@ -122,7 +122,7 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
               </span>
               <span
                 className={`flex h-7 w-7 items-center justify-center rounded-full font-inter text-sm font-semibold ${
-                  arg.isToday ? "bg-fcb-blue text-white" : "text-fcb-text"
+                  arg.isToday ? "bg-fcb-accent text-white" : "text-fcb-text"
                 }`}
               >
                 {format(arg.date, "d")}

@@ -41,7 +41,9 @@ export default function HybridPitch() {
   return (
     <svg
       aria-hidden
-      className="absolute inset-0 h-full w-full"
+      // text-fcb-accent + currentColor: die Spielfeldlinien folgen dem
+      // Marken-Akzent (FCB blau / JFG rot) statt einem festen Hex-Wert.
+      className="absolute inset-0 h-full w-full text-fcb-accent"
       viewBox="0 0 1600 900"
       preserveAspectRatio="xMidYMid meet"
       style={{ opacity: 0.55, pointerEvents: "none" }}
@@ -49,7 +51,7 @@ export default function HybridPitch() {
       {/* Feldumrandung */}
       <motion.rect
         x="60" y="60" width="1480" height="780"
-        fill="none" stroke="#1d5fad" strokeWidth="2.7"
+        fill="none" stroke="currentColor" strokeWidth="2.7"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={0}
       />
@@ -57,7 +59,7 @@ export default function HybridPitch() {
       {/* Mittellinie */}
       <motion.line
         x1="800" y1="60" x2="800" y2="840"
-        stroke="#1d5fad" strokeWidth="2.7"
+        stroke="currentColor" strokeWidth="2.7"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={1}
       />
@@ -65,7 +67,7 @@ export default function HybridPitch() {
       {/* Mittelkreis */}
       <motion.circle
         cx="800" cy="450" r="120"
-        fill="none" stroke="#1d5fad" strokeWidth="2.7"
+        fill="none" stroke="currentColor" strokeWidth="2.7"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={2}
       />
@@ -73,7 +75,7 @@ export default function HybridPitch() {
       {/* Anstoßpunkt */}
       <motion.circle
         cx="800" cy="450" r="4"
-        fill="#1d5fad"
+        fill="currentColor"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.2, duration: 0.4 }}
@@ -82,14 +84,14 @@ export default function HybridPitch() {
       {/* Strafraum links */}
       <motion.rect
         x="60" y="240" width="220" height="420"
-        fill="none" stroke="#1d5fad" strokeWidth="2.7"
+        fill="none" stroke="currentColor" strokeWidth="2.7"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={3}
       />
       {/* 5er-Raum links */}
       <motion.rect
         x="60" y="340" width="90" height="220"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3"
+        fill="none" stroke="currentColor" strokeWidth="2.3"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={4}
       />
@@ -97,14 +99,14 @@ export default function HybridPitch() {
       {/* Strafraum rechts */}
       <motion.rect
         x="1320" y="240" width="220" height="420"
-        fill="none" stroke="#1d5fad" strokeWidth="2.7"
+        fill="none" stroke="currentColor" strokeWidth="2.7"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={5}
       />
       {/* 5er-Raum rechts */}
       <motion.rect
         x="1450" y="340" width="90" height="220"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3"
+        fill="none" stroke="currentColor" strokeWidth="2.3"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={6}
       />
@@ -119,28 +121,28 @@ export default function HybridPitch() {
       {/* oben links */}
       <motion.path
         d="M 60 75 A 15 15 0 0 0 75 60"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
+        fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       {/* oben rechts */}
       <motion.path
         d="M 1525 60 A 15 15 0 0 0 1540 75"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
+        fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       {/* unten links */}
       <motion.path
         d="M 75 840 A 15 15 0 0 0 60 825"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
+        fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />
       {/* unten rechts */}
       <motion.path
         d="M 1540 825 A 15 15 0 0 0 1525 840"
-        fill="none" stroke="#1d5fad" strokeWidth="2.3" strokeLinecap="round"
+        fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round"
         vectorEffect="non-scaling-stroke"
         variants={lineVariants} initial="hidden" animate="visible" custom={7}
       />

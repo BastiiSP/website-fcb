@@ -46,7 +46,7 @@ export default function KalenderToolbar({
           type="button"
           onClick={onZurueck}
           aria-label="Vorheriger Zeitraum"
-          className="p-1.5 rounded-lg text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+          className="p-1.5 rounded-lg text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
         >
           <ChevronLeft size={20} />
         </button>
@@ -54,7 +54,7 @@ export default function KalenderToolbar({
           type="button"
           onClick={onWeiter}
           aria-label="Nächster Zeitraum"
-          className="p-1.5 rounded-lg text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+          className="p-1.5 rounded-lg text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
         >
           <ChevronRight size={20} />
         </button>
@@ -80,9 +80,9 @@ export default function KalenderToolbar({
               role="radio"
               aria-checked={aktiv}
               onClick={() => onAnsichtWechsel(id)}
-              className={`px-3 py-1.5 font-inter text-sm font-medium transition-colors border-r last:border-r-0 border-fcb-border focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fcb-blue ${
+              className={`px-3 py-1.5 font-inter text-sm font-medium transition-colors border-r last:border-r-0 border-fcb-border focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-fcb-accent ${
                 aktiv
-                  ? "bg-fcb-blue text-white"
+                  ? "bg-fcb-accent text-white"
                   : "bg-fcb-bg text-fcb-text hover:bg-fcb-surface"
               }`}
             >

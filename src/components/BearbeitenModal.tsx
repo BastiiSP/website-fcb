@@ -57,7 +57,7 @@ registerLocale("de", de);
 // Gemeinsamer Input-Stil für die DatePicker – identisch zum Buchungsformular,
 // damit Anlegen und Bearbeiten denselben Picker mit derselben Optik nutzen
 const DATEPICKER_INPUT_KLASSEN =
-  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none";
+  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-accent focus:outline-none";
 
 export default function BearbeitenModal({
   show,
@@ -242,7 +242,7 @@ export default function BearbeitenModal({
                 name="serien-bereich"
                 checked={bereich === "einzeln"}
                 onChange={() => setBereich("einzeln")}
-                className="h-4 w-4 accent-fcb-blue"
+                className="h-4 w-4 accent-fcb-accent"
               />
               Nur diesen Termin bearbeiten
             </label>
@@ -252,7 +252,7 @@ export default function BearbeitenModal({
                 name="serien-bereich"
                 checked={bereich === "abDiesem"}
                 onChange={() => setBereich("abDiesem")}
-                className="h-4 w-4 accent-fcb-blue"
+                className="h-4 w-4 accent-fcb-accent"
               />
               Diesen und alle folgenden Termine bearbeiten
             </label>
@@ -262,7 +262,7 @@ export default function BearbeitenModal({
                 name="serien-bereich"
                 checked={bereich === "alle"}
                 onChange={() => setBereich("alle")}
-                className="h-4 w-4 accent-fcb-blue"
+                className="h-4 w-4 accent-fcb-accent"
               />
               Alle Termine der Serie bearbeiten (auch vergangene)
             </label>

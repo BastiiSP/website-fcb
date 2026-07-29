@@ -56,7 +56,7 @@ const TYP_FILTER_OPTIONEN = [
 
 // Gleicher DatePicker-Input-Stil wie Buchungs- und Anfrageformular
 const DATEPICKER_INPUT_KLASSEN =
-  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none";
+  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-accent focus:outline-none";
 
 // Zeitspanne lesbar formatieren (Muster aus BuchungenVerwaltung)
 function zeitspanne(startISO: string, endISO: string): string {
@@ -85,7 +85,7 @@ function StatusAktionen({
       {anfrage.status !== "angenommen" && (
         <button
           onClick={() => onStatus("angenommen")}
-          className="p-1.5 rounded text-fcb-muted hover:text-green-500 hover:bg-green-500/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+          className="p-1.5 rounded text-fcb-muted hover:text-green-500 hover:bg-green-500/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
           title="Anfrage annehmen"
           aria-label="Anfrage annehmen"
         >
@@ -105,7 +105,7 @@ function StatusAktionen({
       {anfrage.status !== "offen" && (
         <button
           onClick={() => onStatus("offen")}
-          className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+          className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
           title="Zurück auf offen setzen"
           aria-label="Zurück auf offen setzen"
         >

@@ -41,7 +41,7 @@ export const SPORTHEIM_NUTZUNGSVORGABEN: string[] = [
  * Farbzuordnung der Sportheim-Kalender-Events – gleiche Rolle wie PLATZ_FARBEN
  * im Buchungskalender. Echte Hex-Werte statt Tokens, weil die Event-Chips
  * daraus rgba-Tints berechnen (hexZuRgba); die Werte spiegeln die Brand-Akzente
- * fcb-red (belegt/gesperrt) und fcb-blue (Heimspiel).
+ * fcb-red (belegt/gesperrt) und fcb-accent (Heimspiel).
  */
 export const SPORTHEIM_FARBEN: Record<"belegt" | "heimspiel", string> = {
   belegt: "#cc1f1f",

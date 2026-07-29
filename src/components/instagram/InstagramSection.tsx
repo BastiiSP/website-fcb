@@ -5,6 +5,7 @@ import { ImageOff } from "lucide-react";
 import type { InstaPost } from "@/lib/beholdFeed";
 import InstagramCarousel from "./InstagramCarousel";
 import ButtonLink from "@/components/ui/ButtonLink";
+import { useTenant } from "@/components/tenant/TenantProvider";
 
 /**
  * „Vereins-News"-Sektion der Startseite: das finale Instagram-Carousel.
@@ -15,8 +16,17 @@ import ButtonLink from "@/components/ui/ButtonLink";
  * Behold-Free-Tier-Kontingent. Kurzer Ladezustand, dann das Carousel.
  */
 export default function InstagramSection() {
+  const config = useTenant();
   // null = lädt noch, [] = geladen aber leer, [...] = Posts
   const [posts, setPosts] = useState<InstaPost[] | null>(null);
+
+  // Der FCB behält seine bisherige Betextung; die JFG spricht als eigener
+  // Auftritt gezielt ihre Jugendfördergemeinschaft an.
+  const eyebrow =
+    config.id === "fcb"
+      ? "Aus dem Vereinsleben"
+      : "Aus der Jugendfördergemeinschaft";
+  const title = config.id === "fcb" ? "Vereins-News" : "JFG-News";
 
   useEffect(() => {
     let active = true;
@@ -36,18 +46,18 @@ export default function InstagramSection() {
   return (
     <section className="bg-fcb-bg px-4 py-12 md:py-16">
       <header className="mx-auto mb-10 max-w-5xl text-center">
-        <p className="font-oswald text-xs font-bold uppercase tracking-[0.3em] text-fcb-blue">
-          Aus dem Vereinsleben
+        <p className="font-oswald text-xs font-bold uppercase tracking-[0.3em] text-fcb-accent">
+          {eyebrow}
         </p>
         <h2 className="mt-2 font-oswald text-3xl font-bold uppercase tracking-tight sm:text-4xl">
-          Vereins-News
+          {title}
         </h2>
       </header>
 
       {posts === null ? (
         // Ladezustand – reserviert ungefähr die Carousel-Höhe gegen Layout-Shift.
         <div className="flex h-[420px] items-center justify-center md:h-[480px]">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-fcb-border border-t-fcb-blue" />
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-fcb-border border-t-fcb-accent" />
         </div>
       ) : posts.length === 0 ? (
         <div className="mx-auto flex max-w-md flex-col items-center gap-3 rounded-2xl border border-fcb-border bg-fcb-surface px-6 py-12 text-center">

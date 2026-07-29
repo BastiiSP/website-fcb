@@ -209,7 +209,7 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
               onChange={(e) => setAktuellesPasswort(e.target.value)}
               required
               autoComplete="current-password"
-              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40"
             />
           </div>
 
@@ -223,7 +223,7 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
               onChange={(e) => handleNeuesPasswortChange(e.target.value)}
               required
               autoComplete="new-password"
-              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40"
             />
             {/* Passwort-Stärke-Anzeige */}
             {neuesPasswort && (
@@ -285,7 +285,7 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
               onChange={(e) => setPasswortBestaetigung(e.target.value)}
               required
               autoComplete="new-password"
-              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 pr-10 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-blue focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue/40"
+              className="w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 pr-10 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 transition-colors focus:border-fcb-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent/40"
             />
             {/* Icon am Input ausrichten – bottom-2.5 entspricht der vertikalen Mitte des py-2.5-Inputs */}
             {passwortBestaetigung && (
@@ -304,7 +304,7 @@ export default function AccountSicherheit({ aktuelleEmail }: AccountSicherheitPr
               type="checkbox"
               checked={passwortAnzeigen}
               onChange={() => setPasswortAnzeigen((prev) => !prev)}
-              className="accent-fcb-blue"
+              className="accent-fcb-accent"
             />
             Passwörter anzeigen
           </label>

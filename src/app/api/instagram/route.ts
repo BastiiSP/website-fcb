@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getInstagramPosts } from "@/lib/beholdFeed";
+import { getTenant } from "@/lib/tenant.server";
 
 /**
  * Gemeinsamer API-Endpoint für die Instagram-Carousel-Varianten.
@@ -13,6 +14,7 @@ import { getInstagramPosts } from "@/lib/beholdFeed";
 export const revalidate = 3600;
 
 export async function GET() {
-  const posts = await getInstagramPosts();
+  const tenant = await getTenant();
+  const posts = await getInstagramPosts(tenant);
   return NextResponse.json(posts);
 }

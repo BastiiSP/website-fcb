@@ -19,7 +19,7 @@ registerLocale("de", de);
 
 // Gleicher Input-Stil wie die DatePicker im Buchungsformular
 const DATEPICKER_INPUT_KLASSEN =
-  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-blue focus:outline-none";
+  "w-full rounded-lg border border-fcb-border bg-fcb-bg px-3 py-2.5 font-inter text-sm text-fcb-text placeholder:text-fcb-muted/60 focus:border-fcb-accent focus:outline-none";
 
 /** Ein bereits belegtes Zeitfenster – Grundlage der Überschneidungsprüfung. */
 export interface BelegtesZeitfenster {

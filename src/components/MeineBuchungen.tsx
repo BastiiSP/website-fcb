@@ -59,7 +59,7 @@ function AktionsButtons({ onEdit, onDelete }: { onEdit: () => void; onDelete: ()
     <div className="flex justify-end gap-2">
       <button
         onClick={onEdit}
-        className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+        className="p-1.5 rounded text-fcb-muted hover:text-fcb-text hover:bg-fcb-border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
         title="Bearbeiten"
         aria-label="Buchung bearbeiten"
       >

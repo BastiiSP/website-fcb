@@ -6,6 +6,7 @@ import HybridCanvas from "@/components/hero/HybridCanvas";
 import HybridPitch from "@/components/hero/HybridPitch";
 import RotatingText from "@/components/hero/RotatingText";
 import InstagramSection from "@/components/instagram/InstagramSection";
+import { useTenant } from "@/components/tenant/TenantProvider";
 
 /**
  * Homepage – Hybrid-Hero als Startseite.
@@ -18,11 +19,16 @@ import InstagramSection from "@/components/instagram/InstagramSection";
  *
  * Unterhalb des Heroes: „Vereins-News" – das Instagram-Carousel
  * (InstagramSection lädt den Behold-Feed über /api/instagram).
+ *
+ * Multi-Tenant: Wappen, Headline, Schlagworte und Zierelement kommen aus der
+ * Marken-Konfiguration – dieselbe Hero-Mechanik für FCB und JFG.
  */
-const HEADLINE_LINES = ["FUSSBALL.", "CHARAKTER.", "BURGKUNSTADT."];
-const ROTATING_WORDS = ["Leidenschaft", "Heimat", "Gemeinschaft", "Tradition"];
 
 export default function HomePage() {
+  const tenant = useTenant();
+  const HEADLINE_LINES = tenant.heroLines;
+  const ROTATING_WORDS = tenant.heroWords;
+
   return (
     <main className="min-h-screen bg-fcb-bg text-fcb-text">
 
@@ -67,16 +73,16 @@ export default function HomePage() {
               className="absolute inset-0 -z-10 scale-150 blur-3xl"
               style={{
                 background:
-                  "radial-gradient(circle, rgba(29,95,173,0.55) 0%, rgba(29,95,173,0) 70%)",
+                  "radial-gradient(circle, rgb(var(--color-accent) / 0.55) 0%, rgb(var(--color-accent) / 0) 70%)",
               }}
             />
             <Image
-              src="/logo.svg"
-              alt="1. FC 1911 Burgkunstadt"
+              src={tenant.logoSrc}
+              alt={tenant.name}
               width={220}
               height={220}
               priority
-              className="drop-shadow-[0_0_24px_rgba(29,95,173,0.6)]"
+              className="drop-shadow-[0_0_24px_rgb(var(--color-accent)/0.6)]"
             />
           </motion.div>
 
@@ -92,8 +98,8 @@ export default function HomePage() {
            * Browser Justify nur zwischen Wörtern verteilen, nicht zwischen
            * Buchstaben innerhalb eines einzelnen Worts.
            *
-           * FCB-Akzent: Alle drei Wörter in der Theme-Textfarbe (hell/dunkel),
-           * nur der jeweils ERSTE Buchstabe (F, C, B) in Burgkunstadt-Blau.
+           * Marken-Akzent: Alle drei Wörter in der Theme-Textfarbe (hell/dunkel),
+           * nur der jeweils ERSTE Buchstabe im Marken-Akzent (FCB blau / JFG rot).
            * Keine Umrandung/kein Text-Stroke.
            */}
           <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-fcb-text">
@@ -119,8 +125,8 @@ export default function HomePage() {
                     {...motionProps}
                     className="block text-[clamp(2.25rem,5vw,5rem)]"
                   >
-                    {/* Anfangsbuchstabe in FCB-Blau, Rest erbt die Theme-Textfarbe */}
-                    <span className="text-fcb-blue">{line[0]}</span>
+                    {/* Anfangsbuchstabe im Marken-Akzent, Rest erbt die Theme-Textfarbe */}
+                    <span className="text-fcb-accent">{line[0]}</span>
                     {line.slice(1)}
                   </motion.span>
                 );
@@ -133,7 +139,7 @@ export default function HomePage() {
                   className="flex justify-between text-[clamp(2.25rem,5vw,5rem)]"
                 >
                   {Array.from(line).map((char, idx) => (
-                    <span key={idx} className={idx === 0 ? "text-fcb-blue" : undefined}>
+                    <span key={idx} className={idx === 0 ? "text-fcb-accent" : undefined}>
                       {char}
                     </span>
                   ))}
@@ -153,7 +159,7 @@ export default function HomePage() {
             <RotatingText
               words={ROTATING_WORDS}
               interval={2400}
-              className="text-fcb-blue font-semibold"
+              className="text-fcb-accent font-semibold"
             />
           </motion.p>
 
@@ -169,11 +175,11 @@ export default function HomePage() {
           >
             {/* Linke Zierlinie */}
             <span aria-hidden className="h-0.5 w-8 bg-fcb-text/20 sm:w-12" />
-            <span className="font-oswald text-base font-bold uppercase tracking-[0.2em] text-fcb-blue sm:text-xl">
-              1911
+            <span className="font-oswald text-base font-bold uppercase tracking-[0.2em] text-fcb-accent sm:text-xl">
+              {tenant.heroBadge.links}
             </span>
             <span className="font-oswald text-base font-medium uppercase tracking-[0.2em] text-fcb-text/85 sm:text-xl">
-              Schuhstädter
+              {tenant.heroBadge.rechts}
             </span>
             {/* Rechte Zierlinie */}
             <span aria-hidden className="h-0.5 w-8 bg-fcb-text/20 sm:w-12" />

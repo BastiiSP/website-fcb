@@ -44,7 +44,7 @@ export default function ConsentGate({
       <button
         type="button"
         onClick={openSettings}
-        className="rounded-lg bg-fcb-blue px-4 py-2 font-inter text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface"
+        className="rounded-lg bg-fcb-accent px-4 py-2 font-inter text-sm font-semibold text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface"
       >
         Externe Inhalte erlauben
       </button>

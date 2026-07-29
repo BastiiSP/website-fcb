@@ -42,7 +42,7 @@ export default function ImpressumPage() {
           E-Mail:{" "}
           <a
             href="mailto:info@fcburgkunstadt.de"
-            className="text-fcb-blue hover:underline"
+            className="text-fcb-accent hover:underline"
           >
             info@fcburgkunstadt.de
           </a>

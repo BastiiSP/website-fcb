@@ -76,7 +76,7 @@ export default function LoeschenModal({
               name="loesch-bereich"
               checked={bereich === "einzeln"}
               onChange={() => setBereich("einzeln")}
-              className="h-4 w-4 accent-fcb-blue"
+              className="h-4 w-4 accent-fcb-accent"
             />
             Nur diesen Termin löschen
           </label>
@@ -86,7 +86,7 @@ export default function LoeschenModal({
               name="loesch-bereich"
               checked={bereich === "abDiesem"}
               onChange={() => setBereich("abDiesem")}
-              className="h-4 w-4 accent-fcb-blue"
+              className="h-4 w-4 accent-fcb-accent"
             />
             Diesen und alle folgenden Termine löschen
           </label>
@@ -96,7 +96,7 @@ export default function LoeschenModal({
               name="loesch-bereich"
               checked={bereich === "alle"}
               onChange={() => setBereich("alle")}
-              className="h-4 w-4 accent-fcb-blue"
+              className="h-4 w-4 accent-fcb-accent"
             />
             Alle Termine der Serie löschen (auch vergangene)
           </label>

@@ -32,7 +32,7 @@ export default function DatenschutzPage() {
           <br />
           <a
             href="mailto:info@fcburgkunstadt.de"
-            className="text-fcb-blue hover:underline"
+            className="text-fcb-accent hover:underline"
           >
             info@fcburgkunstadt.de
           </a>
@@ -259,7 +259,7 @@ export default function DatenschutzPage() {
           Zukunft widerrufen. Wende dich dazu bitte an{" "}
           <a
             href="mailto:info@fcburgkunstadt.de"
-            className="text-fcb-blue hover:underline"
+            className="text-fcb-accent hover:underline"
           >
             info@fcburgkunstadt.de
           </a>
