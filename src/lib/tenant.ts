@@ -52,10 +52,7 @@ export interface TenantConfig {
   logoSrc: string;
   /** Alt-Text des Wappens (Screenreader). */
   logoAlt: string;
-  /**
-   * Produktionsdomain ohne Protokoll. Für den Vereins-Switcher.
-   * VORLÄUFIG bei der JFG: Domain ist noch nicht registriert (siehe Spec).
-   */
+  /** Produktionsdomain ohne Protokoll. Für den Vereins-Switcher. */
   domain: string;
   /** Träger, dessen Mannschaften dieser Auftritt zeigt. */
   traeger: Traeger;
@@ -78,8 +75,8 @@ export interface TenantConfig {
   instagramUrl: string;
   /**
    * Name der Environment-Variable mit der Behold-Feed-URL dieser Marke.
-   * FCB: bestehende `BEHOLD_FEED_URL`. JFG: `BEHOLD_FEED_URL_JFG` –
-   * VORLÄUFIG noch nicht gesetzt, Basti liefert die Feed-URL nach.
+   * FCB: `BEHOLD_FEED_URL`. JFG: `BEHOLD_FEED_URL_JFG` – beide in Vercel
+   * gesetzt (Production + Preview).
    */
   beholdFeedEnvVar: string;
 }
@@ -121,11 +118,15 @@ const JFG: TenantConfig = {
   id: "jfg",
   name: "JFG Kunstadt-Obermain",
   kurzname: "JFG",
-  vereinsname: "JFG Kunstadt-Obermain",
+  // Rechtlich vollständiger Name laut Registerauskunft (handelsregister.de,
+  // Amtsgericht Coburg, VR 20394) – im Alltag/auf der Seite immer
+  // "JFG Kunstadt-Obermain" (siehe vereinstexte.ts), volle Schreibweise nur
+  // hier für Footer/Impressum-Zwecke.
+  vereinsname: "Junioren-Förder-Gemeinschaft Kunstadt-Obermain e.V.",
   untertitel: "Jugendförderung · A- bis D-Junioren",
   logoSrc: "/logo-jfg.png",
   logoAlt: "Wappen JFG Kunstadt-Obermain",
-  // VORLÄUFIG: Arbeitstitel aus der Spec, Domain noch nicht registriert.
+  // Domain registriert und live (2026-07-29): DNS, Redirect und HTTPS geprüft.
   domain: "www.jfg-kunstadt-obermain.de",
   traeger: "jfg",
   navLinks: [
@@ -136,16 +137,15 @@ const JFG: TenantConfig = {
   ],
   heroLines: ["FUSSBALL.", "CHARAKTER.", "NACHWUCHS."],
   heroWords: ["Leistung", "Förderung", "Zusammenhalt", "Perspektive"],
-  // VORLÄUFIG: Gründungsjahr der JFG noch nicht bekannt – bis dahin die
-  // Altersspanne als Zierelement. Basti liefert Jahr/Claim nach.
-  heroBadge: { links: "A–D", rechts: "Junioren" },
+  // Gründungsjahr 2004 bestätigt (siehe vereinstexte.ts) – gleiches Muster
+  // wie beim FCB (Jahr + Kurzform).
+  heroBadge: { links: "2004", rechts: "Kunstadt-Obermain" },
   metaTitle: "JFG Kunstadt-Obermain",
   metaDescription:
     "Die Jugendfördergemeinschaft Kunstadt-Obermain: leistungsorientierte Nachwuchsförderung der A- bis D-Junioren aus drei Trägervereinen.",
-  // VORLÄUFIG: JFG-Instagram-Kanal noch nicht bekannt – bis dahin zeigt der
-  // Link auf den FCB-Kanal, damit keine tote Verlinkung entsteht.
-  instagramHandle: "@schuhstaedter1911",
-  instagramUrl: "https://www.instagram.com/schuhstaedter1911",
+  // Echter JFG-Instagram-Kanal (2026-07-29 eingerichtet, siehe Behold-Feed).
+  instagramHandle: "@jfgkunstadtobermain",
+  instagramUrl: "https://www.instagram.com/jfgkunstadtobermain",
   beholdFeedEnvVar: "BEHOLD_FEED_URL_JFG",
 };
 
@@ -172,8 +172,8 @@ export function anderenTenant(id: TenantId): TenantId {
  */
 const PRODUKTIONS_HOSTS: Record<TenantId, string[]> = {
   fcb: ["fcbuku.de", "www.fcbuku.de"],
-  // VORLÄUFIG bis zur Registrierung – beide Schreibweisen plus die
-  // Subdomain-Variante als Rückfalloption vorbereitet.
+  // Domain registriert und live (2026-07-29) – beide Schreibweisen plus die
+  // Subdomain-Variante als Rückfalloption.
   jfg: [
     "jfg-kunstadt-obermain.de",
     "www.jfg-kunstadt-obermain.de",
