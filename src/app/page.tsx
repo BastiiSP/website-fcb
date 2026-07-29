@@ -9,6 +9,21 @@ import InstagramSection from "@/components/instagram/InstagramSection";
 import { useTenant } from "@/components/tenant/TenantProvider";
 
 /**
+ * Die drei Trägervereine der JFG – nur für den JFG-Hero relevant (siehe unten).
+ * Ersetzt dort die Text-Headline: "FUSSBALL. CHARAKTER. NACHWUCHS." spellte in
+ * den Anfangsbuchstaben zufällig "FCN" (Assoziation zum 1. FC Nürnberg) und
+ * musste raus (2026-07-29, auf Bastis Wunsch). Wappen von SG Roth-Main und
+ * 1. FC Redwitz per KI-Bildgenerierung aus niedrig aufgelösten BFV-Vorlagen
+ * hochskaliert (1:1-Vorgabe), von Basti UND Claudian gegen die Originale
+ * gegengeprüft (Text/Symbole/Farben stimmen), dann per rembg freigestellt.
+ */
+const JFG_TRAEGERVEREINE = [
+  { name: "1. FC 1911 Burgkunstadt", kurz: "FCB", logo: "/logo.svg" },
+  { name: "SG Roth-Main Mainroth", kurz: "Roth-Main", logo: "/logo-sg-roth-main.png" },
+  { name: "1. FC 1916 Redwitz a. d. Rodach", kurz: "Redwitz", logo: "/logo-fc-redwitz.png" },
+];
+
+/**
  * Homepage – Hybrid-Hero als Startseite.
  *
  * Layering (DOM-Order = Stack-Order bei absolute inset-0):
@@ -102,51 +117,91 @@ export default function HomePage() {
            * nur der jeweils ERSTE Buchstabe im Marken-Akzent (FCB blau / JFG rot).
            * Keine Umrandung/kein Text-Stroke.
            */}
-          <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-fcb-text">
-            {HEADLINE_LINES.map((line, i) => {
-              // Längste Zeile bestimmt die Container-Breite (siehe Justify-Hinweis oben).
-              const longestLength = Math.max(...HEADLINE_LINES.map((l) => l.length));
-              const isLongest = line.length === longestLength;
+          {tenant.id === "jfg" ? (
+            <>
+              {/* Sichtbarer Ersatz für die Text-Headline: die drei Trägervereine.
+                  <h1> bleibt für SEO/Screenreader erhalten, aber sr-only – der
+                  eigentliche Markenname steht schon größer im Wappen-Alt-Text
+                  und im heroBadge darunter. */}
+              <h1 className="sr-only">JFG Kunstadt-Obermain</h1>
+              <div
+                role="group"
+                aria-label="Die drei Trägervereine der JFG Kunstadt-Obermain"
+                className="flex flex-wrap items-end justify-center gap-6 sm:gap-10"
+              >
+                {JFG_TRAEGERVEREINE.map((verein, i) => (
+                  <motion.div
+                    key={verein.name}
+                    initial={{ y: 40, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{
+                      delay: 0.3 + i * 0.18,
+                      duration: 0.55,
+                      ease: [0.22, 1, 0.36, 1],
+                    }}
+                    className="flex flex-col items-center gap-2"
+                  >
+                    <Image
+                      src={verein.logo}
+                      alt={verein.name}
+                      width={88}
+                      height={88}
+                      className="h-16 w-16 object-contain drop-shadow-lg sm:h-[88px] sm:w-[88px]"
+                    />
+                    <span className="font-inter text-xs uppercase tracking-wide text-fcb-muted">
+                      {verein.kurz}
+                    </span>
+                  </motion.div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-fcb-text">
+              {HEADLINE_LINES.map((line, i) => {
+                // Längste Zeile bestimmt die Container-Breite (siehe Justify-Hinweis oben).
+                const longestLength = Math.max(...HEADLINE_LINES.map((l) => l.length));
+                const isLongest = line.length === longestLength;
 
-              const motionProps = {
-                initial: { y: 40, opacity: 0 },
-                animate: { y: 0, opacity: 1 },
-                transition: {
-                  delay: 0.3 + i * 0.18,
-                  duration: 0.55,
-                  ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-                },
-              };
+                const motionProps = {
+                  initial: { y: 40, opacity: 0 },
+                  animate: { y: 0, opacity: 1 },
+                  transition: {
+                    delay: 0.3 + i * 0.18,
+                    duration: 0.55,
+                    ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
+                  },
+                };
 
-              if (isLongest) {
+                if (isLongest) {
+                  return (
+                    <motion.span
+                      key={line}
+                      {...motionProps}
+                      className="block text-[clamp(2.25rem,5vw,5rem)]"
+                    >
+                      {/* Anfangsbuchstabe im Marken-Akzent, Rest erbt die Theme-Textfarbe */}
+                      <span className="text-fcb-accent">{line[0]}</span>
+                      {line.slice(1)}
+                    </motion.span>
+                  );
+                }
+
                 return (
                   <motion.span
                     key={line}
                     {...motionProps}
-                    className="block text-[clamp(2.25rem,5vw,5rem)]"
+                    className="flex justify-between text-[clamp(2.25rem,5vw,5rem)]"
                   >
-                    {/* Anfangsbuchstabe im Marken-Akzent, Rest erbt die Theme-Textfarbe */}
-                    <span className="text-fcb-accent">{line[0]}</span>
-                    {line.slice(1)}
+                    {Array.from(line).map((char, idx) => (
+                      <span key={idx} className={idx === 0 ? "text-fcb-accent" : undefined}>
+                        {char}
+                      </span>
+                    ))}
                   </motion.span>
                 );
-              }
-
-              return (
-                <motion.span
-                  key={line}
-                  {...motionProps}
-                  className="flex justify-between text-[clamp(2.25rem,5vw,5rem)]"
-                >
-                  {Array.from(line).map((char, idx) => (
-                    <span key={idx} className={idx === 0 ? "text-fcb-accent" : undefined}>
-                      {char}
-                    </span>
-                  ))}
-                </motion.span>
-              );
-            })}
-          </h1>
+              })}
+            </h1>
+          )}
 
           {/* Subheadline mit rotierendem Begriff */}
           <motion.p
