@@ -47,7 +47,20 @@ export default function RotatingText({
       };
 
   return (
-    <span className={`relative inline-block align-baseline${clip ? " overflow-hidden" : ""}`}>
+    // shrink-0 + whitespace-nowrap sind für die Korrektheit nötig, nicht Kosmetik:
+    // `overflow-hidden` (für die Slide-Animation) setzt die automatische
+    // Mindestbreite eines Flex-Items auf 0. Ohne shrink-0 schrumpft die Box in
+    // einer engen Flex-Zeile deshalb unter die Wortbreite und schneidet das Wort
+    // ab – auf Mobile wurde aus „ZUSAMMENHALT" ein „ZUSAMMENHA" (Live-Fund
+    // 2026-07-30, betraf unter 480 px fast alle Wörter beider Marken).
+    // whitespace-nowrap hält das Wort zusätzlich zusammen; ein rotierendes
+    // Einzelwort soll nie umbrechen. Außerhalb von Flex sind beide Klassen
+    // wirkungslos (z. B. der Inline-Einsatz auf /login).
+    <span
+      className={`relative inline-block shrink-0 whitespace-nowrap align-baseline${
+        clip ? " overflow-hidden" : ""
+      }`}
+    >
       <AnimatePresence mode="wait">
         <motion.span
           key={words[index]}

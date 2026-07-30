@@ -216,9 +216,23 @@ export default function HomePage() {
             initial={{ y: 16, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1.1, duration: 0.5 }}
-            className="mt-6 font-inter text-sm uppercase tracking-[0.4em] text-fcb-muted flex items-center justify-center gap-2"
+            /*
+             * Unter `sm` stehen Vorspann und rotierendes Wort untereinander, ab `sm`
+             * nebeneinander wie bisher. Zusammen sind beide bei 320–480 px breiter
+             * als der Viewport – vorher wurde das Wort deshalb rechts abgeschnitten
+             * („ZUSAMMENHA…", Live-Fund 2026-07-30).
+             *
+             * Bewusst zwei fixe Zeilen statt `flex-wrap`: Beim Umbrechen nach Bedarf
+             * hätte die Zeilenzahl je nach Wortlänge zwischen 1 und 2 gewechselt
+             * (z. B. bei 360 px passt „Leidenschaft", „Gemeinschaft" nicht) – der
+             * Hero wäre bei jedem Wortwechsel vertikal gesprungen. Die Typografie
+             * bleibt dadurch unangetastet: das weite 0.4em-Tracking gilt weiter auf
+             * allen Breiten, jede Zeile passt einzeln auch bei 320 px.
+             */
+            className="mt-6 flex flex-col items-center justify-center gap-x-2 gap-y-1 font-inter text-sm uppercase tracking-[0.4em] text-fcb-muted sm:flex-row"
           >
-            <span>Dein Verein für</span>
+            {/* Der Vorspann bricht nicht mitten im Satz um – entweder ganz oder gar nicht */}
+            <span className="whitespace-nowrap">Dein Verein für</span>
             <RotatingText
               words={ROTATING_WORDS}
               interval={2400}

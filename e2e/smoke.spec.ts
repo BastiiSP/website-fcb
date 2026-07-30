@@ -1,4 +1,5 @@
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
+import { TENANTS } from "../src/lib/tenant";
 
 // Consent-Cookie setzen, damit der Banner nicht Klicks abfängt
 const CONSENT_KEY = "fcb_consent_v1";
@@ -588,3 +589,83 @@ test.describe("Hero-Canvas bei reduzierter Bewegung", () => {
     expect(a, "Trotz prefers-reduced-motion animiert").toBe(b);
   });
 });
+
+// ──────────────────────────────────────────────
+// 12. Rotierendes Hero-Wort bleibt auf Mobile vollständig lesbar
+//
+// Live-Fund 2026-07-30: Bei ~375 px wurde das Wort rechts abgeschnitten
+// ("ZUSAMMENHALT" → "ZUSAMMENHA"). Ursache: Die Slide-Animation braucht
+// overflow-hidden, und das setzt die automatische Mindestbreite eines
+// Flex-Items auf 0 – die Box schrumpfte unter die Wortbreite.
+//
+// Der Test läuft datengetrieben über die echten Wortlisten aus tenant.ts,
+// damit ein künftig ergänztes (längeres) Wort automatisch mitgeprüft wird.
+// Geprüft wird dreifach: nicht geclippt, nicht über den Viewport hinaus, und
+// gleiche Zeilenhöhe für alle Wörter (sonst springt der Hero beim Wechsel).
+// ──────────────────────────────────────────────
+test.describe("Hero – rotierendes Wort auf Mobile", () => {
+  const BREITEN = [320, 360, 375, 390, 414];
+
+  for (const tenant of [TENANTS.fcb, TENANTS.jfg]) {
+    test(`${tenant.kurzname}: jedes Wort vollständig sichtbar`, async ({ page }) => {
+      await seedStorage(page);
+
+      for (const breite of BREITEN) {
+        await page.setViewportSize({ width: breite, height: 820 });
+        await page.goto(`/?tenant=${tenant.id}`, { waitUntil: "load" });
+
+        const hoehen: number[] = [];
+        for (const wort of tenant.heroWords) {
+          const m = await page.evaluate((w) => {
+            const p = [...document.querySelectorAll("p")].find((el) =>
+              el.textContent?.includes("Dein Verein für")
+            ) as HTMLElement | undefined;
+            if (!p) return null;
+            // Letztes Kind ist die clippende Box des RotatingText
+            const box = p.querySelector("span:last-child") as HTMLElement;
+            const wortSpan = box.querySelector("span") as HTMLElement;
+            // Wort setzen statt auf die Rotation zu warten (deterministisch)
+            wortSpan.textContent = w;
+            const br = box.getBoundingClientRect();
+            const wr = wortSpan.getBoundingClientRect();
+            return {
+              geclippt: wr.width > br.width + 1 || wortSpan.scrollWidth > br.width + 1,
+              rechterRand: Math.round(wr.right),
+              linkerRand: Math.round(wr.left),
+              hoehe: Math.round(p.getBoundingClientRect().height),
+              viewport: window.innerWidth,
+            };
+          }, wort);
+
+          expect(m, "Subheadline nicht gefunden").not.toBeNull();
+          if (!m) continue;
+
+          expect(m.geclippt, `${tenant.kurzname} @ ${breite}px: "${w(wort)}" abgeschnitten`).toBe(
+            false
+          );
+          expect(
+            m.rechterRand,
+            `${tenant.kurzname} @ ${breite}px: "${w(wort)}" ragt über den Viewport`
+          ).toBeLessThanOrEqual(m.viewport);
+          expect(
+            m.linkerRand,
+            `${tenant.kurzname} @ ${breite}px: "${w(wort)}" ragt links raus`
+          ).toBeGreaterThanOrEqual(0);
+          hoehen.push(m.hoehe);
+        }
+
+        // Alle Wörter derselben Breite müssen gleich hoch bauen – sonst springt
+        // der Hero bei jedem Wortwechsel vertikal.
+        expect(
+          new Set(hoehen).size,
+          `${tenant.kurzname} @ ${breite}px: Zeilenhöhe wechselt je Wort (${hoehen.join("/")})`
+        ).toBe(1);
+      }
+    });
+  }
+});
+
+/** Nur zur Lesbarkeit der Fehlermeldungen (Wort in Großbuchstaben wie gerendert). */
+function w(wort: string): string {
+  return wort.toUpperCase();
+}
