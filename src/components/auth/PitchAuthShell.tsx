@@ -5,16 +5,22 @@ import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import PitchAuthBackground from "./PitchAuthBackground";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useTenant } from "@/components/tenant/TenantProvider";
 
 /**
  * Gemeinsame Hülle für alle echten Auth-Seiten im Pitch-Look:
  *   - ruhiger Spielfeld-Hintergrund (PitchAuthBackground)
  *   - zentrierte Glas-Card mit DÜNNEM Border-Glow (border-fcb-accent/30 + weicher
  *     blauer Außenschatten)
- *   - Wappen-Glow-Header (verlinkt auf "/") + "1911 Schuhstädter"-Motiv
+ *   - Wappen-Glow-Header (verlinkt auf "/") + Marken-Badge darunter
  *   - sanfter Card-Eintritt; bei reduzierter Bewegung neutralisiert
+ *
+ * Wappen, Alt-Text und Badge kommen aus der Marken-Konfiguration (`useTenant()`),
+ * damit Login/Registrieren/Confirm auf der JFG-Domain nicht mehr das FCB-Wappen
+ * und „1911 Schuhstädter" zeigen (Live-Fund 2026-07-30).
  */
 export default function PitchAuthShell({ children }: { children: React.ReactNode }) {
+  const tenant = useTenant();
   const reduzierteBewegung = useReducedMotion();
   const cardMotion = reduzierteBewegung
     ? {}
@@ -54,19 +60,22 @@ export default function PitchAuthShell({ children }: { children: React.ReactNode
                 }}
               />
               <Image
-                src="/logo.svg"
-                alt="1. FC 1911 Burgkunstadt"
+                src={tenant.logoSrc}
+                alt={tenant.logoAlt}
                 width={72}
                 height={72}
                 priority
-                className="h-16 w-16 drop-shadow-[0_0_24px_rgb(var(--color-accent)/0.6)] sm:h-20 sm:w-20"
+                // object-contain wie im Header: das JFG-Wappen ist ein PNG, das
+                // in der quadratischen Box nicht verzerrt werden darf.
+                className="h-16 w-16 object-contain drop-shadow-[0_0_24px_rgb(var(--color-accent)/0.6)] sm:h-20 sm:w-20"
               />
             </Link>
 
             <div className="mt-4 flex items-center gap-3">
               <span className="h-0.5 w-12 bg-fcb-text/20" aria-hidden="true" />
               <span className="font-oswald text-xs uppercase tracking-[0.2em] text-fcb-muted">
-                <span className="text-fcb-accent">1911</span> Schuhstädter
+                <span className="text-fcb-accent">{tenant.heroBadge.links}</span>{" "}
+                {tenant.heroBadge.rechts}
               </span>
               <span className="h-0.5 w-12 bg-fcb-text/20" aria-hidden="true" />
             </div>
