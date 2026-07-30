@@ -76,6 +76,13 @@ export interface TenantConfig {
    * links im Akzent, rechts in Textfarbe) – beim FCB „1911 Schuhstädter".
    */
   heroBadge: { links: string; rechts: string };
+  /**
+   * Rotierende Schlagworte im Login-Untertitel („Dein Verein, deine …").
+   * Bewusst eigenes Feld statt `heroWords`: Der Satzbau ist ein anderer
+   * (Possessiv, Einzahl) und beim FCB gehört „1911" dazu – die Hero-Worte
+   * würden dort inhaltlich nicht passen.
+   */
+  authWords: string[];
   /** `<title>`-Suffix und Default-Metadaten. */
   metaTitle: string;
   metaDescription: string;
@@ -117,6 +124,8 @@ const FCB: TenantConfig = {
   heroLines: ["FUSSBALL.", "CHARAKTER.", "BURGKUNSTADT."],
   heroWords: ["Leidenschaft", "Heimat", "Gemeinschaft", "Tradition"],
   heroBadge: { links: "1911", rechts: "Schuhstädter" },
+  // Unveränderte Bestandsformulierung der FCB-Loginseite.
+  authWords: ["Tradition", "Heimat", "Mannschaft", "1911"],
   metaTitle: "1. FC 1911 Burgkunstadt",
   metaDescription:
     "Die offizielle Vereinswebsite der Schuhstädter – mit aktuellen Spielberichten, Feierlichkeiten, Platzbuchung und mehr.",
@@ -154,6 +163,8 @@ const JFG: TenantConfig = {
   // Gründungsjahr 2004 bestätigt (siehe vereinstexte.ts) – gleiches Muster
   // wie beim FCB (Jahr + Kurzform).
   heroBadge: { links: "2004", rechts: "Kunstadt-Obermain" },
+  // JFG-Pendant zum FCB-Satz: Nachwuchs-/Förder-Motive statt Gründungsjahr.
+  authWords: ["Förderung", "Perspektive", "Mannschaft", "Zukunft"],
   metaTitle: "JFG Kunstadt-Obermain",
   metaDescription:
     "Die Jugendfördergemeinschaft Kunstadt-Obermain: leistungsorientierte Nachwuchsförderung der A- bis D-Junioren aus drei Trägervereinen.",

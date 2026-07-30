@@ -13,9 +13,12 @@ import AuthErrorBanner from "@/components/auth/AuthErrorBanner";
 import AuthInfoBanner from "@/components/auth/AuthInfoBanner";
 import AuthSwitchPrompt from "@/components/auth/AuthSwitchPrompt";
 import RotatingText from "@/components/hero/RotatingText";
+import { useTenant } from "@/components/tenant/TenantProvider";
 
 export default function LoginPage() {
   const supabase = createClient();
+  // Rotierende Schlagworte pro Marke – „1911" gilt nur für den FCB.
+  const tenant = useTenant();
   const [email, setEmail] = useState("");
   const [passwort, setPasswort] = useState("");
   const [fehler, setFehler] = useState("");
@@ -53,7 +56,7 @@ export default function LoginPage() {
           <p className="mt-1 font-inter text-sm text-fcb-muted">
             Dein Verein, deine{" "}
             <RotatingText
-              words={["Tradition", "Heimat", "Mannschaft", "1911"]}
+              words={tenant.authWords}
               clip={false}
               className="font-oswald font-semibold uppercase tracking-wide text-fcb-accent"
             />

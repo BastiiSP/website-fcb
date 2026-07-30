@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { createClient } from "@/lib/supabaseClient";
 import { checkSession } from "@/utils/checkSession";
+import { useTenant } from "@/components/tenant/TenantProvider";
 
 /**
  * OAuth-Callback. Der Supabase-Client parst Token/Code beim Initialisieren
@@ -15,6 +16,9 @@ import { checkSession } from "@/utils/checkSession";
  */
 export default function AuthCallbackPage() {
   const router = useRouter();
+  // Wappen pro Marke – der Callback ist die erste Seite nach dem Google-Login
+  // und zeigte auf der JFG-Domain sonst das FCB-Wappen.
+  const tenant = useTenant();
 
   useEffect(() => {
     const supabase = createClient();
@@ -41,12 +45,12 @@ export default function AuthCallbackPage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-fcb-bg">
       <Image
-        src="/logo.svg"
-        alt="1. FC 1911 Burgkunstadt"
+        src={tenant.logoSrc}
+        alt={tenant.logoAlt}
         width={64}
         height={64}
         priority
-        className="h-16 w-16 animate-pulse"
+        className="h-16 w-16 animate-pulse object-contain"
       />
       <p className="font-inter text-sm text-fcb-muted">Anmeldung wird abgeschlossen…</p>
     </main>
