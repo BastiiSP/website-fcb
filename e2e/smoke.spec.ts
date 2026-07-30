@@ -374,3 +374,217 @@ test("UserDropdown zeigt ausstehenden Nutzern alle Bereichslinks", async ({
     await expect(menu.getByRole("menuitem", { name: label })).toBeVisible();
   }
 });
+
+// ──────────────────────────────────────────────
+// 8. Vereins-Switcher ist auf Mobile bedienbar
+//
+// Regressionstest zum Live-Fund vom 2026-07-30: Die rechte Header-Gruppe
+// (Fanshop + Anmelden + Registrieren) drückte die linke Gruppe so weit
+// zusammen, dass das Stadtwappen über dem Switcher-Chevron lag – der Wechsel
+// FCB ↔ JFG war auf dem Handy nicht mehr möglich. Geprüft wird deshalb nicht
+// nur „sichtbar", sondern dass der Chevron-Mittelpunkt tatsächlich den Trigger
+// trifft (elementFromPoint) und ein echter Klick das Flyout öffnet.
+// ──────────────────────────────────────────────
+test.describe("Vereins-Switcher – Mobile", () => {
+  // Gängige Gerätebreiten inkl. der schmalsten realistischen (iPhone SE 1. Gen)
+  const breiten = [320, 375, 390, 414];
+
+  for (const breite of breiten) {
+    test(`bei ${breite} px klickbar und öffnet das Flyout`, async ({ page }) => {
+      await seedStorage(page);
+      await page.setViewportSize({ width: breite, height: 780 });
+      await page.goto("/", { waitUntil: "load" });
+
+      const trigger = page.getByRole("button", { name: /Verein wechseln/ });
+      await expect(trigger).toBeVisible();
+
+      // Kein anderes Element überlagert den Trigger-Mittelpunkt
+      const frei = await trigger.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const oben = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+        return el === oben || el.contains(oben);
+      });
+      expect(frei, `Trigger bei ${breite} px überlagert`).toBe(true);
+
+      // Header-Leiste läuft nicht über (Auslöser der Überlagerung)
+      const overflow = await page
+        .locator("header > div")
+        .first()
+        .evaluate((el) => el.scrollWidth - el.clientWidth);
+      expect(overflow, `Header-Overflow bei ${breite} px`).toBeLessThanOrEqual(0);
+
+      // Echter Klick öffnet das Flyout mit beiden Marken
+      await trigger.click();
+      await expect(page.getByText("Vereinsfamilie")).toBeVisible();
+      await expect(
+        page.getByRole("link", { name: /Zu JFG Kunstadt-Obermain wechseln/ })
+      ).toBeVisible();
+    });
+  }
+});
+
+// ──────────────────────────────────────────────
+// 9. Fanshop bleibt erreichbar (aus dem Header in die Navigation gewandert)
+// ──────────────────────────────────────────────
+test("Fanshop steckt auf Mobile im Menü, auf Desktop in der Nav", async ({ page }) => {
+  await seedStorage(page);
+
+  // Mobile: nicht in der Header-Leiste, aber im Hamburger-Menü
+  await page.setViewportSize({ width: 375, height: 780 });
+  await page.goto("/", { waitUntil: "load" });
+  await expect(page.getByRole("link", { name: "Fanshop" })).toBeHidden();
+  await page.getByRole("button", { name: "Menü öffnen" }).click();
+  await expect(page.getByRole("link", { name: "Fanshop" })).toBeVisible();
+
+  // Desktop: direkt in der Navigationsleiste sichtbar
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/", { waitUntil: "load" });
+  await expect(page.getByRole("link", { name: "Fanshop" })).toBeVisible();
+});
+
+// ──────────────────────────────────────────────
+// 10. Favicon ist markenabhängig (JFG-Tab zeigte das FCB-Wappen)
+// ──────────────────────────────────────────────
+test.describe("Favicon pro Marke", () => {
+  const faelle: { name: string; url: string; icon: string }[] = [
+    { name: "FCB", url: "/", icon: "/favicon.ico" },
+    // ?tenant=jfg ist der Test-Override des Proxys (nur Preview/localhost)
+    { name: "JFG", url: "/?tenant=jfg", icon: "/favicon-jfg.ico" },
+  ];
+
+  for (const { name, url, icon } of faelle) {
+    test(`${name}-Auftritt deklariert ${icon}`, async ({ page }) => {
+      await seedStorage(page);
+      await page.goto(url, { waitUntil: "load" });
+
+      const iconHrefs = await page
+        .locator('link[rel="icon"], link[rel="shortcut icon"]')
+        .evaluateAll((els) => els.map((el) => el.getAttribute("href")));
+
+      expect(iconHrefs.length).toBeGreaterThan(0);
+      for (const href of iconHrefs) {
+        expect(href, `${name}: falsches Favicon deklariert`).toContain(icon);
+      }
+
+      // Datei existiert auch wirklich
+      const antwort = await page.request.get(icon);
+      expect(antwort.status()).toBe(200);
+    });
+  }
+});
+
+// ──────────────────────────────────────────────
+// 11. Hero-Animation reagiert auf Touch (nicht nur auf die Maus)
+//
+// Fix zum Live-Fund vom 2026-07-30: Der Dot-Grid im Hero hing an `mousemove`
+// und war auf Touch-Geräten damit komplett tot. Geprüft wird über eine
+// Pixel-Signatur des Canvas: bewegt sich das Bild überhaupt?
+// ──────────────────────────────────────────────
+/** Signatur des Canvas-Inhalts (Alpha-Summe in Stichproben) – vergleichbar über Frames. */
+function signatur() {
+  const c = document.querySelector("section canvas") as HTMLCanvasElement | null;
+  if (!c) return -1;
+  const ctx = c.getContext("2d");
+  if (!ctx) return -1;
+  const d = ctx.getImageData(0, 0, c.width, c.height).data;
+  let s = 0;
+  for (let i = 3; i < d.length; i += 4 * 97) s += d[i];
+  return s;
+}
+
+test.describe("Hero-Canvas auf Touch", () => {
+  // Nur die Emulationsfelder – der komplette Device-Descriptor würde webkit erzwingen
+  test.use({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true, deviceScaleFactor: 3 });
+
+  test("reagiert auf Touch-Gesten und lebt auch ohne Berührung", async ({ page }) => {
+    await seedStorage(page);
+    await page.goto("/", { waitUntil: "load" });
+
+    // Gerät wird als Touch-Gerät erkannt (Grundlage für Ambient + Perf-Stufe)
+    const grob = await page.evaluate(
+      () => !window.matchMedia("(hover: hover) and (pointer: fine)").matches
+    );
+    expect(grob, "Emulation liefert kein Touch-Profil").toBe(true);
+
+    // 1. Ambient-Bewegung: ohne jede Eingabe verändert sich das Bild
+    const a1 = await page.evaluate(signatur);
+    await page.waitForTimeout(600);
+    const a2 = await page.evaluate(signatur);
+    expect(a1, "Ambient-Bewegung fehlt (Bild statisch)").not.toBe(a2);
+
+    // 2. Touch-Reaktion: Tap + Wisch verschiebt die Dots messbar stärker
+    const box = await page.locator("section canvas").boundingBox();
+    if (!box) throw new Error("Canvas nicht gefunden");
+    const mx = box.x + box.width / 2;
+    const my = box.y + box.height / 2;
+
+    const vorTouch = await page.evaluate(signatur);
+    await page.evaluate(
+      ({ x, y }) => {
+        const opts = (cx: number, cy: number) => ({
+          bubbles: true,
+          clientX: cx,
+          clientY: cy,
+          pointerType: "touch",
+          isPrimary: true,
+        });
+        window.dispatchEvent(new PointerEvent("pointerdown", opts(x, y)));
+        for (let i = 0; i < 10; i++) {
+          window.dispatchEvent(new PointerEvent("pointermove", opts(x + i * 6, y + i * 3)));
+        }
+      },
+      { x: mx, y: my }
+    );
+    await page.waitForTimeout(120);
+    const nachTouch = await page.evaluate(signatur);
+    expect(nachTouch, "Touch bewegt die Dots nicht").not.toBe(vorTouch);
+
+    // 3. Scrollen bleibt möglich (Listener sind passiv, kein preventDefault)
+    await page.evaluate(() => window.scrollBy(0, 400));
+    await page.waitForTimeout(100);
+    expect(await page.evaluate(() => window.scrollY)).toBeGreaterThan(100);
+
+    // 4. Loop stoppt, wenn der Hero aus dem Viewport ist (Akkuschutz):
+    //    zwei Messungen im Abstand müssen identisch sein
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(400);
+    const w1 = await page.evaluate(signatur);
+    await page.waitForTimeout(500);
+    const w2 = await page.evaluate(signatur);
+    expect(w1, "Loop läuft weiter, obwohl der Hero nicht sichtbar ist").toBe(w2);
+  });
+});
+
+test.describe("Hero-Canvas mit Maus", () => {
+  test("reagiert weiterhin auf Mausbewegung", async ({ page }) => {
+    await seedStorage(page);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/", { waitUntil: "load" });
+
+    const vor = await page.evaluate(signatur);
+    await page.mouse.move(640, 400);
+    await page.mouse.move(700, 430);
+    await page.waitForTimeout(120);
+    const nach = await page.evaluate(signatur);
+    expect(nach, "Maus bewegt die Dots nicht mehr").not.toBe(vor);
+  });
+});
+
+test.describe("Hero-Canvas bei reduzierter Bewegung", () => {
+  test("bleibt statisch", async ({ page }) => {
+    await seedStorage(page);
+    // page.emulateMedia statt test.use({ reducedMotion }) – letzteres ist in der
+    // installierten Playwright-Typversion auf Describe-Ebene nicht typisiert.
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.goto("/", { waitUntil: "load" });
+
+    // Erst warten, bis der einmalige Frame gezeichnet ist (Effekt läuft nach der
+    // Hydration, direkt nach 'load' ist der Canvas noch leer).
+    await expect.poll(() => page.evaluate(signatur)).toBeGreaterThan(0);
+    const a = await page.evaluate(signatur);
+    await page.waitForTimeout(600);
+    const b = await page.evaluate(signatur);
+    expect(a, "Trotz prefers-reduced-motion animiert").toBe(b);
+  });
+});

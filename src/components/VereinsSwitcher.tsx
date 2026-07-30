@@ -87,15 +87,20 @@ export default function VereinsSwitcher() {
     "relative flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left transition-colors hover:bg-fcb-accent/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent";
 
   return (
-    <div ref={wrapperRef} className="sm:relative">
-      {/* Trigger: nur ein Chevron – bewusst leise, der Vereinsname bleibt der Star */}
+    // shrink-0: Der Switcher darf im Header nie zusammengedrückt werden. Ohne
+    // das wurde er auf Mobile von der Nachbargruppe überlagert und war nicht
+    // mehr klickbar (Live-Fund 2026-07-30, Gegenstück zum min-w-0 im Header).
+    <div ref={wrapperRef} className="shrink-0 sm:relative">
+      {/* Trigger: nur ein Chevron – bewusst leise, der Vereinsname bleibt der Star.
+          36-px-Box statt nur Icon+Padding: auf Touch war die alte 24-px-Fläche
+          selbst ohne Überlagerung kaum treffsicher. */}
       <button
         ref={triggerRef}
         onClick={() => setOpen((v) => !v)}
         aria-label={`Verein wechseln – aktuell ${tenant.kurzname}`}
         aria-expanded={open}
         aria-haspopup="true"
-        className="flex items-center rounded p-1 text-fcb-muted transition-colors hover:text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
+        className="flex h-9 w-9 items-center justify-center rounded text-fcb-muted transition-colors hover:text-fcb-text focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent"
       >
         <motion.span
           animate={{ rotate: open ? 180 : 0 }}

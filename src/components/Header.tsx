@@ -23,8 +23,32 @@ import { VEREINSLINKS } from "@/lib/vereinslinks";
  *
  * Struktur:
  *   Links  – Vereinswappen (+ Stadtwappen nur FCB) + Vereinsname (Oswald) + Vereins-Switcher
- *   Mitte  – Öffentliche Links (Desktop) – rollenbasierte Bereiche liegen im Account-Menü
+ *   Mitte  – Öffentliche Links + Fanshop-Pill (Desktop) – rollenbasierte Bereiche liegen im Account-Menü
  *   Rechts – UserDropdown + Hamburger (Mobile)
+ *
+ * Platzverteilung auf Mobile (Fix 2026-07-30): Vorher saß der Fanshop-Button in
+ * der rechten Gruppe. Zusammen mit „Anmelden" + „Registrieren" belegte die
+ * rechte Seite bei 375 px Breite 251 von 343 nutzbaren Pixeln – die linke Gruppe
+ * wurde von 196 auf 109 px zusammengedrückt, wodurch das Stadtwappen über den
+ * Chevron des Vereins-Switchers rutschte und ihn unklickbar machte (gemessen).
+ * Zwei Gegenmaßnahmen, beide nötig:
+ *   1. Der Fanshop wandert in die Navigation (Desktop-Pill + eigener Block im
+ *      Mobile-Menü) und der „Registrieren"-Button erscheint erst ab `sm`
+ *      (UserDropdown) – auf ganz kleinen Screens führt „Anmelden" zur
+ *      Login-Seite, die selbst zur Registrierung verlinkt.
+ *   2. Die linke Gruppe darf nicht mehr beliebig schrumpfen: `min-w-0` am
+ *      Container, `shrink-0` an Wappen/Switcher, `truncate` am Namen. Damit
+ *      kann kein Element mehr über den Switcher wandern, auch wenn später
+ *      etwas dazukommt.
+ *
+ * Breakpoints (gemessen, nicht geschätzt): Die Desktop-Nav startet bei `lg`
+ * statt `md`, und der volle Vereinsname erscheint erst ab `xl` – darunter steht
+ * die Kurzform neben dem Wappen. Grund: Bei 768 px belegen fünf Nav-Links,
+ * Fanshop und zwei Auth-Buttons zusammen 732 von 736 nutzbaren Pixeln, bei
+ * 1024 px lässt derselbe Block nur 260 px für die Marke – der volle Name
+ * braucht allein 210 px plus Wappen und Switcher. Auf `main` lief der Header
+ * bei 768 px deshalb um 172 px über (verifiziert), der Vereinsname war dort
+ * schon vorher abgeschnitten. Tablets bedienen jetzt also das Hamburger-Menü.
  */
 export default function Header() {
   const tenant = useTenant();
@@ -55,19 +79,21 @@ export default function Header() {
     >
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
 
-        {/* Linke Gruppe: Hamburger (mobil, Konvention links) + Wappen + Name */}
-        <div className="flex items-center gap-2">
+        {/* Linke Gruppe: Hamburger (mobil, Konvention links) + Wappen + Name.
+            min-w-0 erlaubt dem Namen zu truncaten, statt die Gruppe als Ganzes
+            über ihre Nachbarn zu schieben. */}
+        <div className="flex min-w-0 items-center gap-2">
           <button
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Menü schließen" : "Menü öffnen"}
             aria-expanded={menuOpen}
-            className="-ml-1 rounded p-1 text-fcb-text transition-colors hover:text-fcb-accent md:hidden"
+            className="-ml-1 shrink-0 rounded p-1 text-fcb-text transition-colors hover:text-fcb-accent lg:hidden"
           >
             {menuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
           {/* Vereinswappen (+ Stadtwappen nur FCB) + Name */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex min-w-0 items-center gap-2">
             {/*
               Fixe 36-px-Box mit object-contain: die Marken liefern unterschiedliche
               Formate (FCB = SVG, JFG = PNG). Beide Dateien sind quadratisch, das
@@ -79,7 +105,7 @@ export default function Header() {
               alt={tenant.logoAlt}
               width={36}
               height={36}
-              className="h-9 w-9 object-contain drop-shadow-lg"
+              className="h-9 w-9 shrink-0 object-contain drop-shadow-lg"
             />
             {/*
               Stadtwappen: kleiner + gedämpft – signalisiert Hierarchie (FCB > Stadt).
@@ -92,49 +118,54 @@ export default function Header() {
                 alt="Stadtwappen Burgkunstadt"
                 width={24}
                 height={24}
-                className="opacity-70"
+                className="shrink-0 opacity-70"
               />
             )}
-            <span className="hidden font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text sm:inline">
+            <span className="hidden truncate font-oswald text-lg font-semibold uppercase tracking-wide text-fcb-text xl:inline">
               {tenant.name}
             </span>
-            <span className="font-oswald text-base font-bold uppercase tracking-wide text-fcb-text sm:hidden">
+            <span className="truncate font-oswald text-base font-bold uppercase tracking-wide text-fcb-text xl:hidden">
               {tenant.kurzname}
             </span>
           </Link>
 
-          {/* Vereins-Switcher: Vorbereitung für den späteren FCB ↔ JFG-Wechsel (nur UI) */}
+          {/* Vereins-Switcher: echter Wechsel zwischen FCB- und JFG-Domain.
+              Muss auf jeder Breite bedienbar bleiben – siehe Kommentar oben. */}
           <VereinsSwitcher />
         </div>
 
-        {/* Desktop Nav: nur öffentliche Links – rollenbasierte Bereiche liegen im Account-Menü */}
-        <div className="hidden items-center gap-6 md:flex">
+        {/* Desktop Nav: öffentliche Links + Fanshop als hervorgehobene Pill –
+            rollenbasierte Bereiche liegen im Account-Menü.
+            gap-5 statt gap-6, weil die Fanshop-Pill zusätzlich Platz braucht
+            (bei 768 px sonst Overflow – gemessen). */}
+        <div className="hidden items-center gap-5 lg:flex">
           {tenant.navLinks.map(({ label, href }) => (
             <Link
               key={label}
               href={href}
-              className="font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-accent"
+              className="whitespace-nowrap font-inter text-sm font-medium text-fcb-text/85 transition-colors hover:text-fcb-accent"
             >
               {label}
             </Link>
           ))}
-        </div>
-
-        {/* Rechte Seite: Fanshop (prominent, gefüllter Akzent-Button) + Auth */}
-        <div className="flex items-center gap-3">
+          {/* Fanshop bleibt hervorgehoben (gefüllter Akzent), sitzt aber jetzt
+              als letzter Nav-Punkt statt in der rechten Button-Gruppe. */}
           {fanshopLink && (
             <Link
               href={fanshopLink.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 rounded-full bg-fcb-accent px-3 py-1.5 font-inter text-xs font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90 sm:px-3.5 sm:text-sm"
+              className="flex shrink-0 items-center gap-1.5 rounded-full bg-fcb-accent px-3 py-1.5 font-inter text-xs font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
             >
               <ShoppingBag size={16} aria-hidden />
-              {/* Auf sehr kleinen Screens nur das Icon, Platz ist knapp neben Hamburger/Wappen.
-                  Kein "xs"-Breakpoint im Projekt konfiguriert – "sm" ist die kleinste Stufe. */}
-              <span className="hidden sm:inline">Fanshop</span>
+              Fanshop
             </Link>
           )}
+        </div>
+
+        {/* Rechte Seite: nur noch Auth. shrink-0, damit die Buttons ihre Breite
+            nicht auf Kosten der linken Gruppe (Switcher!) ausdehnen. */}
+        <div className="flex shrink-0 items-center gap-3">
           <UserDropdown />
         </div>
       </div>
@@ -148,7 +179,7 @@ export default function Header() {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="overflow-hidden border-t border-fcb-border bg-fcb-surface/95 md:hidden"
+            className="overflow-hidden border-t border-fcb-border bg-fcb-surface/95 lg:hidden"
           >
             <div className="flex flex-col gap-1 px-4 py-3">
               {tenant.navLinks.map(({ label, href }) => (
@@ -161,6 +192,25 @@ export default function Header() {
                   {label}
                 </Link>
               ))}
+
+              {/* Fanshop: eigener Block unter einer Trennlinie, damit er im Menü
+                  genauso auffällt wie vorher im Header (gefüllter Akzent, volle
+                  Breite). Öffnet extern – deshalb target/rel wie beim Desktop. */}
+              {fanshopLink && (
+                <>
+                  <div className="mt-2 h-px bg-fcb-border" aria-hidden />
+                  <Link
+                    href={fanshopLink.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => setMenuOpen(false)}
+                    className="mt-2 flex items-center justify-center gap-2 rounded-lg bg-fcb-accent px-4 py-2.5 font-oswald text-sm font-semibold uppercase tracking-wide text-white transition-opacity hover:opacity-90"
+                  >
+                    <ShoppingBag size={16} aria-hidden />
+                    Fanshop
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}

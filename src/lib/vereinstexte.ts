@@ -136,11 +136,14 @@ const VEREIN_JFG: VereinsSeitenTexte = {
       "Der Anspruch dahinter: eine Jugend aufbauen, die es mit den Leistungszentren der großen Vereine aufnehmen kann. Trotzdem bleibt bei uns Platz für jeden, der einfach kicken will – Leistungssport und Spaß am Ball schließen sich bei uns nicht aus.",
     ],
   },
+  // Übergangslösung (2026-07-30): Der ausformulierte Text ist raus, weil der
+  // zweite Absatz eine unbelegte Zahl enthielt ("rund 90 % der Spieler vom
+  // FCB"). Bis der geplante Zeitstrahl mit belegter Chronik steht, ist hier
+  // bewusst nur ein Platzhalter – lieber ehrlich leer als falsch belegt.
   geschichte: {
     heading: "Geschichte",
     absaetze: [
-      "2004 haben der 1. FC 1911 Burgkunstadt, die SG Roth-Main Mainroth und der 1. FC 1916 Redwitz a. d. Rodach ihre Jugendabteilungen in der JFG Kunstadt-Obermain zusammengelegt. Ziel war eine leistungsorientierte Jugendarbeit in der Region, die mit den Leistungszentren größerer Vereine mithalten kann.",
-      "Über die Jahre ist aus der Fördergemeinschaft eine feste Größe im Jugendfußball der Region geworden. Heute kommen rund 90 % der Spieler vom FCB, getragen wird die JFG aber weiterhin von drei Vereinen – ein gemeinsames Projekt, keine Nebensache eines einzelnen Clubs.",
+      "Hier entsteht gerade ein Zeitstrahl mit der ausführlichen JFG-Geschichte – schau bald wieder vorbei.",
     ],
   },
   faktenHeading: "Zahlen & Fakten",

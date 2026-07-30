@@ -116,6 +116,12 @@ export default function UserDropdown() {
 
   // Ausgeloggt → Split-Variante: zwei eigenständige Buttons direkt in der Navbar,
   // kein Dropdown. „Anmelden" als Outline (weniger dominant), „Registrieren" gefüllt.
+  //
+  // Unter `sm` (< 640 px) zeigt der Header nur „Anmelden": Beide Buttons zusammen
+  // belegten dort so viel Breite, dass die linke Header-Gruppe zerdrückt wurde und
+  // der Vereins-Switcher nicht mehr klickbar war (Live-Fund 2026-07-30, Details im
+  // Kommentar in Header.tsx). Die Registrierung bleibt einen Tap entfernt – die
+  // Login-Seite verlinkt sie unten selbst („Noch kein Konto?").
   if (!isLoggedIn) {
     return (
       <div className="flex items-center gap-2">
@@ -128,7 +134,7 @@ export default function UserDropdown() {
         {/* text-white bewusst: steht auf konstantem fcb-accent, in beiden Themes korrekt */}
         <Link
           href="/registrieren"
-          className="flex items-center gap-1.5 rounded-full border border-fcb-accent bg-fcb-accent px-2.5 py-1 font-inter text-xs font-medium text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface md:px-3 md:py-1.5 md:text-sm"
+          className="hidden items-center gap-1.5 rounded-full border border-fcb-accent bg-fcb-accent px-2.5 py-1 font-inter text-xs font-medium text-white transition hover:brightness-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent focus-visible:ring-offset-2 focus-visible:ring-offset-fcb-surface sm:flex md:px-3 md:py-1.5 md:text-sm"
         >
           <UserPlus className="h-3.5 w-3.5 md:h-4 md:w-4" />
           <span>Registrieren</span>

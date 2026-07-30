@@ -52,6 +52,15 @@ export interface TenantConfig {
   logoSrc: string;
   /** Alt-Text des Wappens (Screenreader). */
   logoAlt: string;
+  /**
+   * Browsertab-Icon (ICO mit 32–256 px) und iOS-Homescreen-Icon (180 px), beide
+   * in /public. Müssen pro Marke gesetzt sein: Das Root-Layout deklariert sie
+   * in `generateMetadata()`, sonst würde der Browser blind `/favicon.ico`
+   * anfragen – das ist das FCB-Wappen und stand deshalb auch im JFG-Tab
+   * (Live-Fund 2026-07-30). Neue Marke = neue Icon-Dateien, kein Fallback.
+   */
+  faviconSrc: string;
+  appleTouchIconSrc: string;
   /** Produktionsdomain ohne Protokoll. Für den Vereins-Switcher. */
   domain: string;
   /** Träger, dessen Mannschaften dieser Auftritt zeigt. */
@@ -93,6 +102,8 @@ const FCB: TenantConfig = {
   untertitel: "Hauptverein · seit 1911",
   logoSrc: "/logo.svg",
   logoAlt: "Vereinslogo 1. FC 1911 Burgkunstadt",
+  faviconSrc: "/favicon.ico",
+  appleTouchIconSrc: "/apple-touch-icon.png",
   domain: "www.fcbuku.de",
   traeger: "fcb",
   navLinks: [
@@ -126,6 +137,9 @@ const JFG: TenantConfig = {
   untertitel: "Jugendförderung · A- bis D-Junioren",
   logoSrc: "/logo-jfg.png",
   logoAlt: "Wappen JFG Kunstadt-Obermain",
+  // Aus logo-jfg.png generiert (gleiche Größenstaffel wie das FCB-Favicon).
+  faviconSrc: "/favicon-jfg.ico",
+  appleTouchIconSrc: "/apple-touch-icon-jfg.png",
   // Domain registriert und live (2026-07-29): DNS, Redirect und HTTPS geprüft.
   domain: "www.jfg-kunstadt-obermain.de",
   traeger: "jfg",

@@ -30,8 +30,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: tenant.metaTitle,
     description: tenant.metaDescription,
+    // Icons pro Marke: vorher stand hier fest "/favicon.ico" (FCB-Wappen),
+    // wodurch der JFG-Browsertab das falsche Wappen zeigte. `shortcut` ist
+    // bewusst mit gesetzt – ältere Browser lesen nur rel="shortcut icon" und
+    // hätten sonst weiter blind /favicon.ico geholt.
     icons: {
-      icon: "/favicon.ico",
+      icon: tenant.faviconSrc,
+      shortcut: tenant.faviconSrc,
+      apple: tenant.appleTouchIconSrc,
     },
   };
 }
