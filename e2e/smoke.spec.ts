@@ -669,3 +669,73 @@ test.describe("Hero – rotierendes Wort auf Mobile", () => {
 function w(wort: string): string {
   return wort.toUpperCase();
 }
+
+// ──────────────────────────────────────────────
+// 13. Hero-Headline bleibt auf schmalen Screens im Inhaltsbereich
+//
+// Die Headline hat eine feste Zeile („BURGKUNSTADT."), die nicht umbrechen kann –
+// wird die Schrift zu groß für den Viewport, läuft sie aus dem Container und die
+// Section (overflow-hidden) schneidet sie ab. Die untere clamp-Grenze skaliert
+// deshalb unter 320 px mit der Breite; dieser Test hält das fest, inklusive der
+// ultraschmalen Fälle (280 px = Galaxy Fold außen).
+//
+// Zusätzlich für beide Marken: der Hero-Inhalt ragt nirgends seitlich heraus.
+// ──────────────────────────────────────────────
+test.describe("Hero-Headline – schmale Screens", () => {
+  const BREITEN = [280, 300, 320, 360, 375, 414];
+
+  test("FCB-Headline bleibt innerhalb des Inhaltsbereichs", async ({ page }) => {
+    await seedStorage(page);
+
+    for (const breite of BREITEN) {
+      await page.setViewportSize({ width: breite, height: 820 });
+      await page.goto("/?tenant=fcb", { waitUntil: "load" });
+      // Oswald per next/font mit font-display: swap – ohne dieses Warten misst
+      // man die Fallback-Schrift und damit falsche Breiten.
+      await page.evaluate(() => document.fonts.ready);
+
+      const m = await page.evaluate(() => {
+        const h1 = document.querySelector("h1") as HTMLElement;
+        const container = h1.parentElement as HTMLElement;
+        const cs = getComputedStyle(container);
+        const cr = container.getBoundingClientRect();
+        const innenLinks = cr.left + parseFloat(cs.paddingLeft);
+        const innenRechts = cr.right - parseFloat(cs.paddingRight);
+        const zeilen = [...h1.children].map((c) => {
+          const r = c.getBoundingClientRect();
+          return { text: c.textContent ?? "", links: r.left, rechts: r.right };
+        });
+        return {
+          innenLinks: Math.round(innenLinks),
+          innenRechts: Math.round(innenRechts),
+          ueberstand: Math.max(
+            ...zeilen.map((z) => Math.max(z.rechts - innenRechts, innenLinks - z.links))
+          ),
+          breiteste: zeilen.reduce((a, b) => (b.rechts - b.links > a.rechts - a.links ? b : a)),
+        };
+      });
+
+      expect(
+        Math.round(m.ueberstand),
+        `Headline ragt bei ${breite}px um ${Math.round(m.ueberstand)}px aus dem Inhaltsbereich ("${m.breiteste.text}")`
+      ).toBeLessThanOrEqual(0);
+    }
+  });
+
+  for (const id of ["fcb", "jfg"] as const) {
+    test(`${id.toUpperCase()}: Hero erzeugt bei 320 px keinen Seitwärts-Overflow`, async ({
+      page,
+    }) => {
+      await seedStorage(page);
+      await page.setViewportSize({ width: 320, height: 820 });
+      await page.goto(`/?tenant=${id}`, { waitUntil: "load" });
+      await page.evaluate(() => document.fonts.ready);
+
+      const overflow = await page.evaluate(() => {
+        const inhalt = document.querySelector("section > div.relative") as HTMLElement;
+        return inhalt ? inhalt.scrollWidth - inhalt.clientWidth : 0;
+      });
+      expect(overflow, `Hero-Inhalt läuft bei 320px um ${overflow}px über`).toBeLessThanOrEqual(0);
+    });
+  }
+});

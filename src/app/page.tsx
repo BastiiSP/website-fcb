@@ -165,6 +165,19 @@ export default function HomePage() {
             </>
           ) : (
             <h1 className="font-oswald font-bold uppercase leading-[0.95] tracking-tight text-fcb-text">
+              {/*
+               * Schriftgröße: clamp(min(2.25rem,11.25vw), 5vw, 5rem).
+               *
+               * Das `min()` in der unteren Grenze ist eine Sicherheitsmarge für
+               * ultraschmale Geräte. Die alte feste Untergrenze von 2.25rem (36 px)
+               * galt für JEDE Breite unter 720 px – „BURGKUNSTADT." ist bei 36 px
+               * 237 px breit und hatte damit bei 320 px noch 25 px Luft pro Seite
+               * (gemessen, also kein Beschnitt), bei 280 px aber nur noch 5 px.
+               * 11.25vw ist so gewählt, dass die Grenze exakt bei 320 px umschlägt:
+               * ab 320 px bleibt die Darstellung unverändert bei 36 px, darunter
+               * skaliert die Headline proportional mit (280 px → 31.5 px, wieder
+               * ~20 px Luft pro Seite). Desktop bleibt vollständig unberührt.
+               */}
               {HEADLINE_LINES.map((line, i) => {
                 // Längste Zeile bestimmt die Container-Breite (siehe Justify-Hinweis oben).
                 const longestLength = Math.max(...HEADLINE_LINES.map((l) => l.length));
@@ -185,7 +198,7 @@ export default function HomePage() {
                     <motion.span
                       key={line}
                       {...motionProps}
-                      className="block text-[clamp(2.25rem,5vw,5rem)]"
+                      className="block text-[clamp(min(2.25rem,11.25vw),5vw,5rem)]"
                     >
                       {/* Anfangsbuchstabe im Marken-Akzent, Rest erbt die Theme-Textfarbe */}
                       <span className="text-fcb-accent">{line[0]}</span>
@@ -198,7 +211,7 @@ export default function HomePage() {
                   <motion.span
                     key={line}
                     {...motionProps}
-                    className="flex justify-between text-[clamp(2.25rem,5vw,5rem)]"
+                    className="flex justify-between text-[clamp(min(2.25rem,11.25vw),5vw,5rem)]"
                   >
                     {Array.from(line).map((char, idx) => (
                       <span key={idx} className={idx === 0 ? "text-fcb-accent" : undefined}>
