@@ -15,6 +15,7 @@ import SportheimAnfrageFormular, {
   type BelegtesZeitfenster,
 } from "@/components/sportheim/SportheimAnfrageFormular";
 import Banner from "@/components/ui/Banner";
+import type { SportheimEventArt } from "@/lib/sportheim";
 
 // Modul-Ebene → stabile Referenz (gleiches Muster wie kalender/page.tsx)
 const supabase = createClient();
@@ -74,8 +75,8 @@ export default function SportheimBereich({ heimspiele }: Props) {
   const events = useMemo<EventInput[]>(() => {
     const belegt: EventInput[] = belegteZeiten.map((zeit, index) => {
       const props: SportheimEventProps = {
-        art: zeit.typ === "sperrung" ? "gesperrt" : "belegt",
-        label: zeit.typ === "sperrung" ? "Gesperrt" : "Belegt",
+        art: "buchung",
+        label: zeit.typ === "sperrung" ? "Sperrtermin" : "Belegt",
       };
       return {
         id: `belegt-${index}`,
@@ -90,9 +91,13 @@ export default function SportheimBereich({ heimspiele }: Props) {
 
     const spiele: EventInput[] = heimspiele.map((spiel, index) => {
       const anstoss = new Date(spiel.anstoss);
+      const art: SportheimEventArt =
+        spiel.traeger === "fcb" ? "heimspiel-fcb" : "heimspiel-jfg";
       const props: SportheimEventProps = {
-        art: "heimspiel",
-        label: `Heimspiel ${spiel.mannschaft}`,
+        art,
+        // Der exakte zentrale Anzeigename bleibt ungekürzt; das kompakte
+        // FCB-/JFG-Kurzlabel ergänzt der Kalender selbst davor.
+        label: spiel.mannschaft,
         detail: `${format(anstoss, "HH:mm", { locale: de })} Uhr · gegen ${spiel.gast}`,
       };
       return {

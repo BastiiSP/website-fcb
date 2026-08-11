@@ -140,6 +140,15 @@ test.describe("Navigation je Marke", () => {
 
     expect(response?.status()).toBe(200);
     await expect(page.locator("h1")).toContainText("Sportheim");
+
+    // Farbe allein reicht für die Kategorien nicht: Die Legende muss die drei
+    // Bedeutungen auch auf schmalen Viewports namentlich unterscheiden.
+    const legende = page.getByRole("list", {
+      name: "Kategorien im Belegungskalender",
+    });
+    await expect(legende.getByText("FCB-Heimspiel", { exact: true })).toBeVisible();
+    await expect(legende.getByText("JFG-Heimspiel", { exact: true })).toBeVisible();
+    await expect(legende.getByText("Belegung Sportheim", { exact: true })).toBeVisible();
   });
 });
 
@@ -151,9 +160,29 @@ test.describe("Mannschaften je Marke", () => {
     const main = page.locator("main");
     await expect(main).toContainText("A-Junioren");
     await expect(main).toContainText("D-Junioren");
+    // Die Auswahl bleibt bei der Altersklasse – der BFV-Name steht erst auf
+    // der Card (siehe Test "C-Junioren tragen ihren BFV-Namen").
+    await expect(main).toContainText("C-Junioren");
     // FCB-eigene Teams dürfen auf dem JFG-Auftritt nicht auftauchen
     await expect(main).not.toContainText("1. Mannschaft");
     await expect(main).not.toContainText("G-Junioren");
+  });
+
+  test("C-Junioren tragen ihren BFV-Namen auf der Spielbetriebs-Card", async ({
+    page,
+  }) => {
+    await seedConsent(page);
+    await page.goto("/mannschaften?tenant=jfg");
+
+    // Genau dieser Name muss auch an einer Sportheim-Sperre stehen, damit der
+    // Slot eindeutig dieser Mannschaft zuzuordnen ist. Ohne die Kennung "C"
+    // stünde dort nur "JFG Kunstadt-Obermain".
+    await page
+      .getByRole("group", { name: "Mannschaft wählen" })
+      .getByRole("button", { name: "C-Junioren" })
+      .click();
+
+    await expect(page.locator("main")).toContainText("JFG Kunstadt-Obermain C");
   });
 
   test("FCB zeigt nur eigene Teams, keine JFG-Infos mehr (JFG hat eigene Domain)", async ({ page }) => {

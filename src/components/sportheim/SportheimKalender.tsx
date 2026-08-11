@@ -14,30 +14,26 @@ import { de } from "date-fns/locale";
 import KalenderToolbar, {
   type KalenderAnsicht,
 } from "@/components/kalender/KalenderToolbar";
-import { SPORTHEIM_FARBEN } from "@/lib/sportheim";
+import {
+  SPORTHEIM_KATEGORIEN,
+  type SportheimEventArt,
+} from "@/lib/sportheim";
 import { hexZuRgba } from "@/utils/getEventColor";
-
-/** Anzeige-Kategorien der Sportheim-Belegung. */
-export type SportheimEventArt = "belegt" | "gesperrt" | "heimspiel";
 
 /** extendedProps der Sportheim-Events – bewusst ohne personenbezogene Daten. */
 export interface SportheimEventProps {
   art: SportheimEventArt;
-  /** Erste Chip-Zeile, z. B. "Belegt" oder "Heimspiel 1. Mannschaft" */
+  /** Erste Chip-Zeile, z. B. "Belegt" oder "1. Mannschaft" */
   label: string;
   /** Optionale zweite Chip-Zeile, z. B. "15:00 · gegen SV Beispiel" */
   detail?: string;
 }
 
-// Farbe je Kategorie: Heimspiele blau (FCB-Akzent), alles andere rot (nicht verfügbar)
-function eventFarbe(art: SportheimEventArt): string {
-  return art === "heimspiel" ? SPORTHEIM_FARBEN.heimspiel : SPORTHEIM_FARBEN.belegt;
-}
-
 /** Legende über dem Kalender – gleiche Farbquelle wie die Event-Chips. */
-const LEGENDE: { art: SportheimEventArt; label: string }[] = [
-  { art: "belegt", label: "Belegt / gesperrt" },
-  { art: "heimspiel", label: "Heimspiel" },
+const LEGENDE: SportheimEventArt[] = [
+  "heimspiel-fcb",
+  "heimspiel-jfg",
+  "buchung",
 ];
 
 interface Props {
@@ -62,21 +58,28 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
 
   return (
     <div className="rounded-2xl border border-fcb-border bg-fcb-surface p-3 sm:p-5">
-      {/* Legende: erklärt die zwei Farbkategorien dauerhaft direkt am Kalender */}
-      <div className="mb-3 flex flex-wrap gap-2">
-        {LEGENDE.map(({ art, label }) => (
-          <span
-            key={art}
-            className="inline-flex items-center gap-2 rounded-full border border-fcb-border bg-fcb-bg px-3 py-1 font-inter text-sm font-medium text-fcb-text"
-          >
-            <span
-              className="inline-block h-3 w-3 rounded-full shrink-0"
-              style={{ backgroundColor: eventFarbe(art) }}
-            />
-            {label}
-          </span>
-        ))}
-      </div>
+      {/* Textlabels machen die Bedeutung auch ohne Farbwahrnehmung eindeutig. */}
+      <ul
+        className="mb-3 flex flex-wrap gap-2"
+        aria-label="Kategorien im Belegungskalender"
+      >
+        {LEGENDE.map((art) => {
+          const kategorie = SPORTHEIM_KATEGORIEN[art];
+          return (
+            <li
+              key={art}
+              className="inline-flex items-center gap-2 rounded-full border border-fcb-border bg-fcb-bg px-3 py-1 font-inter text-sm font-medium text-fcb-text"
+            >
+              <span
+                className="inline-block h-4 w-1 shrink-0 rounded-full"
+                style={{ backgroundColor: kategorie.farbe }}
+                aria-hidden
+              />
+              {kategorie.label}
+            </li>
+          );
+        })}
+      </ul>
 
       <KalenderToolbar
         titel={titel}
@@ -134,16 +137,25 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
         }}
         eventContent={(arg) => {
           const props = arg.event.extendedProps as SportheimEventProps;
-          const farbe = eventFarbe(props.art);
+          const kategorie = SPORTHEIM_KATEGORIEN[props.art];
+          const farbe = kategorie.farbe;
           const kompakt = arg.view.type === "dayGridMonth";
 
           const chip = kompakt ? (
-            // Monatsansicht: einzeilig mit Farbpunkt (wenig Platz pro Zelle)
-            <div className="flex w-full items-center gap-1.5 overflow-hidden rounded px-1 py-0.5">
+            // Auch mobil bleibt das Outlook-Muster aus Tint + Kante erhalten;
+            // das Kurzlabel ergänzt die Farbe für Menschen mit Farbfehlsicht.
+            <div
+              className="flex w-full items-center gap-1 overflow-hidden rounded px-1 py-0.5"
+              style={{
+                backgroundColor: hexZuRgba(farbe, 0.16),
+                borderLeft: `3px solid ${farbe}`,
+              }}
+            >
               <span
-                className="inline-block h-2 w-2 rounded-full shrink-0"
-                style={{ backgroundColor: farbe }}
-              />
+                className="shrink-0 rounded-sm bg-fcb-bg/80 px-1 font-inter text-[9px] font-bold uppercase leading-4 text-fcb-text"
+              >
+                {kategorie.kurzlabel}
+              </span>
               <span className="truncate font-inter text-[11px] font-medium text-fcb-text">
                 {props.label}
               </span>
@@ -158,6 +170,7 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
               }}
             >
               <span className="truncate font-inter text-[11px] font-semibold leading-tight text-fcb-text">
+                <span className="mr-1 uppercase">{kategorie.kurzlabel}</span>
                 {props.label}
               </span>
               {props.detail && (
@@ -174,7 +187,8 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
             <Tippy
               content={
                 <div className="font-inter">
-                  <div className="font-semibold">{props.label}</div>
+                  <div className="font-semibold">{kategorie.label}</div>
+                  <div className="mt-1">{props.label}</div>
                   {props.detail && <div className="mt-1">{props.detail}</div>}
                 </div>
               }
@@ -186,6 +200,7 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
               <div
                 className="h-full w-full rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
                 tabIndex={0}
+                aria-label={`${kategorie.label}: ${props.label}${props.detail ? `. ${props.detail}` : ""}`}
               >
                 {chip}
               </div>

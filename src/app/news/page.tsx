@@ -27,7 +27,7 @@ export default async function NewsPage() {
     <PageShell maxWidth="lg">
       <PageHeader
         title="News"
-        subtitle={`Was beim ${config.kurzname} los ist: unsere Instagram-Beiträge, automatisch aktuell.`}
+        subtitle={`Was ${config.kurznameDativ} los ist: unsere Instagram-Beiträge, automatisch aktuell.`}
       />
 
       {posts.length === 0 ? (

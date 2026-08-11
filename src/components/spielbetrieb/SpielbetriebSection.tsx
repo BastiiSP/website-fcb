@@ -2,7 +2,7 @@ import SpielbetriebExplorer, {
   type SpielbetriebEintrag,
 } from "@/components/spielbetrieb/SpielbetriebExplorer";
 import { getTeamsFuerTraeger } from "@/lib/teams";
-import { getSpielbetrieb } from "@/lib/bfv";
+import { getBfvAnzeigename, getSpielbetrieb } from "@/lib/bfv";
 import { getTenantConfigServer } from "@/lib/tenant.server";
 
 // Spielbetriebs-Abschnitt für /mannschaften (Server Component):
@@ -21,6 +21,8 @@ export default async function SpielbetriebSection() {
     getTeamsFuerTraeger(tenant.traeger).map(async (team) => ({
       team,
       daten: await getSpielbetrieb(team.id),
+      // Nur für Einzelteams gesetzt – Mehrfachteams bringen ihren Namen mit.
+      anzeigename: getBfvAnzeigename(team.id),
     })),
   );
 
