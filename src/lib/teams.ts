@@ -171,3 +171,8 @@ export const TEAMS: Team[] = [
 export function getTeamsFuerTraeger(traeger: Traeger): Team[] {
   return TEAMS.filter((team) => team.traeger === traeger);
 }
+
+/** Liefert die zentralen Mannschaftsdaten für BFV-nahe Zuordnungen. */
+export function getTeamNachId(teamId: string): Team | undefined {
+  return TEAMS.find((team) => team.id === teamId);
+}

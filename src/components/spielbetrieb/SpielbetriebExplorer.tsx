@@ -21,6 +21,13 @@ import type { SpielbetriebErgebnis } from "@/lib/bfv";
 export interface SpielbetriebEintrag {
   team: Team;
   daten: SpielbetriebErgebnis;
+  /**
+   * BFV-Name der Mannschaft – nur bei Altersklassen mit genau einem Team
+   * gesetzt; Mehrfachteams tragen ihn im Datenpaket. Die Card zeigt damit
+   * durchgängig den BFV-Namen (z. B. "JFG Kunstadt-Obermain C"), während die
+   * Auswahl-Buttons bei der Altersklasse bleiben.
+   */
+  anzeigename?: string;
 }
 
 interface SpielbetriebExplorerProps {
@@ -57,7 +64,7 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
   const aktiveDaten = mehrfachTeams
     ? mehrfachAuswahl?.daten ?? null
     : auswahl?.daten ?? null;
-  const kartenTitel = mehrfachAuswahl?.anzeigename;
+  const kartenTitel = mehrfachAuswahl?.anzeigename ?? auswahl?.anzeigename;
 
   // Vereinswechsel wählt automatisch die erste Mannschaft des Trägers,
   // damit nie eine Mannschaft des anderen Vereins "aktiv" hängen bleibt.

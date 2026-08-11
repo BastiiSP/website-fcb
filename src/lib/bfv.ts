@@ -1,4 +1,5 @@
 import type { Spiel, SpielbetriebDaten, TabellenEintrag } from "@/lib/bfvTypes";
+import { getTeamNachId, type Traeger } from "@/lib/teams";
 
 const REVALIDATE_SECONDS = 60 * 60; // 1 Stunde
 const BFV_WIDGET_API_BASE = "https://widget-prod.bfv.de/api/service/widget/v1";
@@ -140,9 +141,13 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
       heimspieleAmAltenPostweg: true,
     },
   ],
+  // Als einzige Altersklasse ohne Mehrfachteam liefert der BFV hier nur den
+  // blanken Vereinsnamen. Im Sportheim-Kalender stehen FCB- und JFG-Sperren
+  // nebeneinander – "JFG Kunstadt-Obermain" allein wäre dort nicht der
+  // Mannschaft zuzuordnen. Deshalb die Altersklassen-Kennung wie bei B2/D1.
   "c-junioren": {
     teamPermanentId: "011MIATUBK000000VTVG0001VTR8C1K7",
-    anzeigename: "JFG Kunstadt-Obermain",
+    anzeigename: "JFG Kunstadt-Obermain C",
     quelleUrl:
       "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain/011MIATUBK000000VTVG0001VTR8C1K7",
     heimspieleAmAltenPostweg: true,
@@ -167,6 +172,20 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
 /** Normalisiert nur intern, damit die öffentliche Konfiguration lesbar bleibt. */
 function bfvTeamConfigs(eintrag: BfvTeamConfigEintrag): BfvTeamConfig[] {
   return Array.isArray(eintrag) ? eintrag : [eintrag];
+}
+
+/**
+ * BFV-Anzeigename einer Altersklasse mit genau einer Mannschaft.
+ *
+ * Mehrfachteams tragen ihren Namen bereits im Datenpaket (siehe
+ * SpielbetriebMehrfachEintrag) und liefern hier bewusst `undefined`. Damit
+ * benennt die Spielbetriebs-Card jede Mannschaft so, wie sie beim BFV heißt –
+ * und ein Sportheim-Slot ist derselben Mannschaft zuzuordnen.
+ */
+export function getBfvAnzeigename(teamId: string): string | undefined {
+  const eintrag = BFV_TEAMS[teamId];
+  if (!eintrag || Array.isArray(eintrag)) return undefined;
+  return eintrag.anzeigename;
 }
 
 interface BfvWidgetResponse<TData> {
@@ -433,6 +452,8 @@ export interface Heimspiel {
   gast: string;
   /** Anzeigename aus BFV_TEAMS, z. B. "1. Mannschaft" */
   mannschaft: string;
+  /** Träger aus den zentralen Mannschaftsdaten, steuert die Kalender-Kategorie. */
+  traeger: Traeger;
 }
 
 /**
@@ -452,12 +473,20 @@ export interface Heimspiel {
 export async function getHeimspiele(): Promise<Heimspiel[]> {
   // Mehrfachteams werden wie eigenständige BFV-Mannschaften abgefragt, weil
   // Heimspiel-Erkennung und Anzeigename immer an ihrer permanenten ID hängen.
-  const teams = Object.values(BFV_TEAMS)
-    .flatMap(bfvTeamConfigs)
-    .filter((config) => config.heimspieleAmAltenPostweg);
+  const teams = Object.entries(BFV_TEAMS).flatMap(([teamId, eintrag]) => {
+    const traeger = getTeamNachId(teamId)?.traeger;
+    if (!traeger) return [];
+
+    // Der Träger lebt bei den Mannschaftsdaten statt in jeder BFV-Konfiguration
+    // erneut. So kann eine JFG-Sperre nicht durch einen abweichenden Namen
+    // versehentlich als FCB-Heimspiel eingefärbt werden.
+    return bfvTeamConfigs(eintrag)
+      .filter((config) => config.heimspieleAmAltenPostweg)
+      .map((config) => ({ config, traeger }));
+  });
 
   const proTeam = await Promise.all(
-    teams.map(async (config) => {
+    teams.map(async ({ config, traeger }) => {
       const matchesUrl = `${BFV_WIDGET_API_BASE}/team/${config.teamPermanentId}/matches`;
       const response = await fetchBfvJson<BfvMatchesData>(matchesUrl);
       if (!response) return [] as Heimspiel[];
@@ -472,6 +501,7 @@ export async function getHeimspiele(): Promise<Heimspiel[]> {
             heim: match.homeTeamName,
             gast: match.guestTeamName,
             mannschaft: config.anzeigename,
+            traeger,
           };
         })
         .filter((spiel): spiel is Heimspiel => spiel !== null);

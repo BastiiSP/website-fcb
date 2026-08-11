@@ -219,7 +219,8 @@ test("Sportheim-Sperren umfassen nur Heimspiele am Alten Postweg", async () => {
     });
   };
 
-  const mannschaften = (await getHeimspiele()).map((spiel) => spiel.mannschaft);
+  const heimspiele = await getHeimspiele();
+  const mannschaften = heimspiele.map((spiel) => spiel.mannschaft);
 
   // Die drei FCB-Teams plus genau die drei JFG-Teams, die laut Verein am Alten
   // Postweg antreten. Absichtlich als vollständige Liste geprüft: ein neu
@@ -228,9 +229,23 @@ test("Sportheim-Sperren umfassen nur Heimspiele am Alten Postweg", async () => {
     "1. Mannschaft",
     "2. Mannschaft",
     "F-Junioren",
-    "JFG Kunstadt-Obermain",
     "JFG Kunstadt-Obermain B2",
+    "JFG Kunstadt-Obermain C",
     "JFG Kunstadt-Obermain D1",
+  ]);
+
+  // Die Trägerkennung steuert die Kategorie im Sportheim-Kalender. Sie wird
+  // deshalb am echten Heimspiel-Mapping geprüft statt über eine zweite
+  // Namensheuristik im UI.
+  expect(
+    heimspiele.map(({ mannschaft, traeger }) => ({ mannschaft, traeger })),
+  ).toEqual([
+    { mannschaft: "1. Mannschaft", traeger: "fcb" },
+    { mannschaft: "2. Mannschaft", traeger: "fcb" },
+    { mannschaft: "F-Junioren", traeger: "fcb" },
+    { mannschaft: "JFG Kunstadt-Obermain B2", traeger: "jfg" },
+    { mannschaft: "JFG Kunstadt-Obermain C", traeger: "jfg" },
+    { mannschaft: "JFG Kunstadt-Obermain D1", traeger: "jfg" },
   ]);
 
   // Gegenprobe: die JFG-Teams in Mainroth/Redwitz dürfen nicht auftauchen.
