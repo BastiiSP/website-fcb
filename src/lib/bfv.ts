@@ -97,15 +97,17 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
   // --- JFG Kunstadt-Obermain ---
   // A-, B- und D-Junioren sind ab Saison 26/27 mit je zwei eigenständigen
   // Mannschaften gemeldet, deshalb Arrays; die C-Junioren bleiben einzeln.
-  // Anzeigenamen exakt so, wie der BFV sie führt (gegen die Widget-API
-  // verifiziert) – bewusst nicht vereinheitlicht, damit Eltern die Mannschaft
-  // auf bfv.de wiederfinden.
+  // Anzeigenamen orientieren sich an der BFV-Schreibweise (gegen die Widget-API
+  // verifiziert), damit Eltern die Mannschaft auf bfv.de wiederfinden. Einzige
+  // bewusste Abweichung: die Mannschaftsziffer steht ohne Leerzeichen am
+  // Buchstaben ("D1" statt der BFV-Schreibweise "D 1"), damit alle
+  // Altersklassen mit mehreren Teams einheitlich aussehen.
   //
   // `heimspieleAmAltenPostweg` ist pro Team gepflegt, weil die JFG auf drei
   // Anlagen spielt (Burgkunstadt, Mainroth, Redwitz) und die BFV-API keinen
   // Spielort liefert – das ist reines Vereinswissen (Stand 2026-08-11, von
   // Basti bestätigt). Am Alten Postweg spielen: B-Junioren 2 (9er flex),
-  // C-Junioren und D-Junioren D 1. A1, A2, B1 und D2 spielen in Mainroth bzw.
+  // C-Junioren und D-Junioren D1. A1, A2, B1 und D2 spielen in Mainroth bzw.
   // Redwitz und dürfen den Sportheim-Kalender deshalb NICHT sperren.
   // Bei einem Wechsel der Platzaufteilung muss das hier nachgezogen werden.
   "a-junioren": [
@@ -147,14 +149,14 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
   "d-junioren": [
     {
       teamPermanentId: "011MIEFB10000000VTVG0001VTR8C1K7",
-      anzeigename: "JFG Kunstadt-Obermain D 1",
+      anzeigename: "JFG Kunstadt-Obermain D1",
       quelleUrl:
         "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-d-1/011MIEFB10000000VTVG0001VTR8C1K7",
       heimspieleAmAltenPostweg: true,
     },
     {
       teamPermanentId: "0312I6CRGC000000VS5489BSVSCPI5U4",
-      anzeigename: "JFG Kunstadt-Obermain D 2",
+      anzeigename: "JFG Kunstadt-Obermain D2",
       quelleUrl:
         "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-d-2/0312I6CRGC000000VS5489BSVSCPI5U4",
     },

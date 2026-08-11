@@ -37,7 +37,9 @@ const MEHRFACH_FAELLE = [
   },
   {
     teamId: "d-junioren",
-    namen: ["JFG Kunstadt-Obermain D 1", "JFG Kunstadt-Obermain D 2"],
+    // Anzeigename ohne Leerzeichen (einheitlich zu A1/A2/B1), die BFV-URL
+    // behält dagegen ihren Original-Slug "d-1"/"d-2".
+    namen: ["JFG Kunstadt-Obermain D1", "JFG Kunstadt-Obermain D2"],
     urls: [
       `https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-d-1/${D1_ID}`,
       `https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-d-2/${D2_ID}`,
@@ -229,7 +231,7 @@ test("Sportheim-Sperren umfassen nur Heimspiele am Alten Postweg", async () => {
     "F-Junioren",
     "JFG Kunstadt-Obermain",
     "JFG Kunstadt-Obermain 2 (9er flex)",
-    "JFG Kunstadt-Obermain D 1",
+    "JFG Kunstadt-Obermain D1",
   ]);
 
   // Gegenprobe: die JFG-Teams in Mainroth/Redwitz dürfen nicht auftauchen.
@@ -237,7 +239,7 @@ test("Sportheim-Sperren umfassen nur Heimspiele am Alten Postweg", async () => {
     "JFG Kunstadt-Obermain A1",
     "JFG Kunstadt-Obermain A2",
     "JFG Kunstadt-Obermain B1",
-    "JFG Kunstadt-Obermain D 2",
+    "JFG Kunstadt-Obermain D2",
   ]) {
     expect(mannschaften).not.toContain(auswaerts);
   }
