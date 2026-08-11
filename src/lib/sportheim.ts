@@ -52,9 +52,10 @@ export interface SportheimKategorie {
 /**
  * Single Source of Truth für Kalender-Chips, Legende und Indikatoren – analog
  * zu PLATZ_FARBEN. Brand-Blau und -Rot entsprechen den festen fcb-Tokens.
- * Violett ist im Platzkalender (Blau/Grün) noch ungenutzt, bleibt in hell und
- * dunkel klar von beiden Trägerfarben getrennt und signalisiert eine neutrale
- * Reservierung statt Vereinszugehörigkeit oder Statusbewertung.
+ * Amber ist im Platzkalender (Blau/Grün) noch ungenutzt und signalisiert eine
+ * neutrale Belegung statt Vereinszugehörigkeit. Bewusst gelblich statt satt
+ * orange: ein kräftiges Orange läge zu nah am JFG-Rot und wäre bei
+ * Rot-Grün-Sehschwäche kaum davon zu trennen.
  *
  * Hex-Werte sind hier bewusst nötig, weil FullCalendar daraus per hexZuRgba
  * theme-unabhängige Tints mit kräftiger Akzentkante erzeugt.
@@ -73,10 +74,12 @@ export const SPORTHEIM_KATEGORIEN: Record<
     label: "JFG-Heimspiel",
     kurzlabel: "JFG",
   },
+  // Deckt Anfragen UND manuelle Sperrtermine ab – beides ist eine Belegung des
+  // Sportheims, kein Heimspiel. "Buchung" wäre für einen Sperrtermin falsch.
   buchung: {
-    farbe: "#7c3aed",
-    label: "Reguläre Buchung",
-    kurzlabel: "Buchung",
+    farbe: "#f59e0b",
+    label: "Belegung Sportheim",
+    kurzlabel: "Belegt",
   },
 };
 

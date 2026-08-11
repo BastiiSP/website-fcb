@@ -148,7 +148,7 @@ test.describe("Navigation je Marke", () => {
     });
     await expect(legende.getByText("FCB-Heimspiel", { exact: true })).toBeVisible();
     await expect(legende.getByText("JFG-Heimspiel", { exact: true })).toBeVisible();
-    await expect(legende.getByText("Reguläre Buchung", { exact: true })).toBeVisible();
+    await expect(legende.getByText("Belegung Sportheim", { exact: true })).toBeVisible();
   });
 });
 

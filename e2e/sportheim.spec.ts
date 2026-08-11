@@ -13,7 +13,7 @@ test("Sportheim-Kategorien nutzen drei eigenständige Kalenderfarben", () => {
   expect(sportheimFarben).toEqual({
     "heimspiel-fcb": "#1d5fad",
     "heimspiel-jfg": "#cc1f1f",
-    buchung: "#7c3aed",
+    buchung: "#f59e0b",
   });
 
   const farbwerte = Object.values(sportheimFarben);
