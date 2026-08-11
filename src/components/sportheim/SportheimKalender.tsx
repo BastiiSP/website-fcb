@@ -6,6 +6,8 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import type { EventInput } from "@fullcalendar/core";
+import Tippy from "@tippyjs/react";
+import "tippy.js/dist/tippy.css";
 import { format } from "date-fns";
 import { de } from "date-fns/locale";
 
@@ -47,8 +49,8 @@ interface Props {
 /**
  * Öffentlicher Belegungskalender des Sportheims – gleiches Erscheinungsbild wie
  * der Platzbuchungskalender (eigene Toolbar, Chip-Events), aber rein lesend:
- * kein Drag/Resize, keine Tooltips mit Details, da bewusst keine
- * personenbezogenen Daten angezeigt werden.
+ * kein Drag/Resize. Das informative Popover zeigt ausschließlich label/detail
+ * aus den extendedProps und weiterhin keine personenbezogenen Daten.
  */
 export default function SportheimKalender({ events, onTagKlick }: Props) {
   const kalenderRef = useRef<FullCalendar | null>(null);
@@ -60,7 +62,7 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
 
   return (
     <div className="rounded-2xl border border-fcb-border bg-fcb-surface p-3 sm:p-5">
-      {/* Legende: erklärt die zwei Farbkategorien ohne Tooltip-Interaktion */}
+      {/* Legende: erklärt die zwei Farbkategorien dauerhaft direkt am Kalender */}
       <div className="mb-3 flex flex-wrap gap-2">
         {LEGENDE.map(({ art, label }) => (
           <span
@@ -135,23 +137,19 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
           const farbe = eventFarbe(props.art);
           const kompakt = arg.view.type === "dayGridMonth";
 
-          // Monatsansicht: einzeilig mit Farbpunkt (wenig Platz pro Zelle)
-          if (kompakt) {
-            return (
-              <div className="flex w-full items-center gap-1.5 overflow-hidden rounded px-1 py-0.5">
-                <span
-                  className="inline-block h-2 w-2 rounded-full shrink-0"
-                  style={{ backgroundColor: farbe }}
-                />
-                <span className="truncate font-inter text-[11px] font-medium text-fcb-text">
-                  {props.label}
-                </span>
-              </div>
-            );
-          }
-
-          // Wochen-/Tagesansicht: Tint-Chip mit Akzentkante (Outlook-Muster)
-          return (
+          const chip = kompakt ? (
+            // Monatsansicht: einzeilig mit Farbpunkt (wenig Platz pro Zelle)
+            <div className="flex w-full items-center gap-1.5 overflow-hidden rounded px-1 py-0.5">
+              <span
+                className="inline-block h-2 w-2 rounded-full shrink-0"
+                style={{ backgroundColor: farbe }}
+              />
+              <span className="truncate font-inter text-[11px] font-medium text-fcb-text">
+                {props.label}
+              </span>
+            </div>
+          ) : (
+            // Wochen-/Tagesansicht: Tint-Chip mit Akzentkante (Outlook-Muster)
             <div
               className="flex h-full w-full flex-col overflow-hidden rounded-md px-1.5 py-1"
               style={{
@@ -168,6 +166,30 @@ export default function SportheimKalender({ events, onTagKlick }: Props) {
                 </span>
               )}
             </div>
+          );
+
+          // Der Inhalt ist rein informativ: Uncontrolled Tippy deckt Hover,
+          // Tastaturfokus und Touch ab, ohne den Kalender-Klick umzuleiten.
+          return (
+            <Tippy
+              content={
+                <div className="font-inter">
+                  <div className="font-semibold">{props.label}</div>
+                  {props.detail && <div className="mt-1">{props.detail}</div>}
+                </div>
+              }
+              theme="custom"
+              placement="top"
+              appendTo={document.body}
+              zIndex={9999}
+            >
+              <div
+                className="h-full w-full rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fcb-blue"
+                tabIndex={0}
+              >
+                {chip}
+              </div>
+            </Tippy>
           );
         }}
       />
