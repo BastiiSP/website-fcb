@@ -98,15 +98,16 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
   // A-, B- und D-Junioren sind ab Saison 26/27 mit je zwei eigenständigen
   // Mannschaften gemeldet, deshalb Arrays; die C-Junioren bleiben einzeln.
   // Anzeigenamen orientieren sich an der BFV-Schreibweise (gegen die Widget-API
-  // verifiziert), damit Eltern die Mannschaft auf bfv.de wiederfinden. Einzige
-  // bewusste Abweichung: die Mannschaftsziffer steht ohne Leerzeichen am
-  // Buchstaben ("D1" statt der BFV-Schreibweise "D 1"), damit alle
-  // Altersklassen mit mehreren Teams einheitlich aussehen.
+  // verifiziert), damit Eltern die Mannschaft auf bfv.de wiederfinden. Bewusst
+  // abweichend ist nur das Namensschema der Mannschaftskennung: Buchstabe plus
+  // Ziffer ohne Leerzeichen ("D1" statt BFV "D 1", "B2" statt BFV
+  // "2 (9er flex)"), damit alle Altersklassen mit mehreren Teams einheitlich
+  // aussehen. Die BFV-URLs behalten dagegen ihren Original-Slug.
   //
   // `heimspieleAmAltenPostweg` ist pro Team gepflegt, weil die JFG auf drei
   // Anlagen spielt (Burgkunstadt, Mainroth, Redwitz) und die BFV-API keinen
   // Spielort liefert – das ist reines Vereinswissen (Stand 2026-08-11, von
-  // Basti bestätigt). Am Alten Postweg spielen: B-Junioren 2 (9er flex),
+  // Basti bestätigt). Am Alten Postweg spielen: B-Junioren B2,
   // C-Junioren und D-Junioren D1. A1, A2, B1 und D2 spielen in Mainroth bzw.
   // Redwitz und dürfen den Sportheim-Kalender deshalb NICHT sperren.
   // Bei einem Wechsel der Platzaufteilung muss das hier nachgezogen werden.
@@ -133,7 +134,7 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
     },
     {
       teamPermanentId: "02Q1986GHK000000VS5489B1VVDHMN8Q",
-      anzeigename: "JFG Kunstadt-Obermain 2 (9er flex)",
+      anzeigename: "JFG Kunstadt-Obermain B2",
       quelleUrl:
         "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-2-9er-flex/02Q1986GHK000000VS5489B1VVDHMN8Q",
       heimspieleAmAltenPostweg: true,

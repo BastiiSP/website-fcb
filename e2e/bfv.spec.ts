@@ -26,10 +26,9 @@ const MEHRFACH_FAELLE = [
   },
   {
     teamId: "b-junioren",
-    namen: [
-      "JFG Kunstadt-Obermain B1",
-      "JFG Kunstadt-Obermain 2 (9er flex)",
-    ],
+    // Anzeigename einheitlich als "B2", die BFV-URL behält ihren
+    // Original-Slug "2-9er-flex".
+    namen: ["JFG Kunstadt-Obermain B1", "JFG Kunstadt-Obermain B2"],
     urls: [
       `https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-b1/${B1_ID}`,
       `https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-2-9er-flex/${B2_ID}`,
@@ -230,7 +229,7 @@ test("Sportheim-Sperren umfassen nur Heimspiele am Alten Postweg", async () => {
     "2. Mannschaft",
     "F-Junioren",
     "JFG Kunstadt-Obermain",
-    "JFG Kunstadt-Obermain 2 (9er flex)",
+    "JFG Kunstadt-Obermain B2",
     "JFG Kunstadt-Obermain D1",
   ]);
 
