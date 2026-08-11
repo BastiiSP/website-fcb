@@ -44,6 +44,13 @@ export interface TenantConfig {
   name: string;
   /** Kurzform für enge Layouts (Mobile-Header, Badges). */
   kurzname: string;
+  /**
+   * Kurzname mit Präposition im Dativ – "beim FCB", aber "bei der JFG".
+   * Das Genus unterscheidet sich je Marke (der Verein / die Fördergemeinschaft),
+   * deshalb pro Tenant gepflegt statt im Fließtext zusammengesetzt: ein
+   * gemeinsames "beim ${kurzname}" wäre auf einer der beiden Domains falsch.
+   */
+  kurznameDativ: string;
   /** Rechtlich vollständige Schreibweise (Footer). */
   vereinsname: string;
   /** Einzeiler unter dem Namen, z. B. im Vereins-Switcher. */
@@ -105,6 +112,7 @@ const FCB: TenantConfig = {
   id: "fcb",
   name: "1. FC 1911 Burgkunstadt",
   kurzname: "FCB",
+  kurznameDativ: "beim FCB",
   vereinsname: "1. FC 1911 Burgkunstadt e.V.",
   untertitel: "Hauptverein · seit 1911",
   logoSrc: "/logo.svg",
@@ -138,6 +146,7 @@ const JFG: TenantConfig = {
   id: "jfg",
   name: "JFG Kunstadt-Obermain",
   kurzname: "JFG",
+  kurznameDativ: "bei der JFG",
   // Rechtlich vollständiger Name laut Registerauskunft (handelsregister.de,
   // Amtsgericht Coburg, VR 20394) – im Alltag/auf der Seite immer
   // "JFG Kunstadt-Obermain" (siehe vereinstexte.ts), volle Schreibweise nur
