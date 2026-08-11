@@ -101,11 +101,13 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
   // verifiziert) – bewusst nicht vereinheitlicht, damit Eltern die Mannschaft
   // auf bfv.de wiederfinden.
   //
-  // OFFEN: `heimspieleAmAltenPostweg` ist hier bei keinem Team gesetzt, weil
-  // die JFG auf drei Anlagen spielt (FCB, Mainroth, Redwitz) und die BFV-API
-  // keinen Spielort liefert. Bei den JFG-Teams, die tatsächlich in
-  // Burgkunstadt antreten, muss das Flag ergänzt werden – sonst fehlt für
-  // deren Heimspiele die Sperre im Sportheim-Belegungskalender.
+  // `heimspieleAmAltenPostweg` ist pro Team gepflegt, weil die JFG auf drei
+  // Anlagen spielt (Burgkunstadt, Mainroth, Redwitz) und die BFV-API keinen
+  // Spielort liefert – das ist reines Vereinswissen (Stand 2026-08-11, von
+  // Basti bestätigt). Am Alten Postweg spielen: B-Junioren 2 (9er flex),
+  // C-Junioren und D-Junioren D 1. A1, A2, B1 und D2 spielen in Mainroth bzw.
+  // Redwitz und dürfen den Sportheim-Kalender deshalb NICHT sperren.
+  // Bei einem Wechsel der Platzaufteilung muss das hier nachgezogen werden.
   "a-junioren": [
     {
       teamPermanentId: "011MICDMU4000000VTVG0001VTR8C1K7",
@@ -132,6 +134,7 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
       anzeigename: "JFG Kunstadt-Obermain 2 (9er flex)",
       quelleUrl:
         "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-2-9er-flex/02Q1986GHK000000VS5489B1VVDHMN8Q",
+      heimspieleAmAltenPostweg: true,
     },
   ],
   "c-junioren": {
@@ -139,6 +142,7 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
     anzeigename: "JFG Kunstadt-Obermain",
     quelleUrl:
       "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain/011MIATUBK000000VTVG0001VTR8C1K7",
+    heimspieleAmAltenPostweg: true,
   },
   "d-junioren": [
     {
@@ -146,6 +150,7 @@ export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
       anzeigename: "JFG Kunstadt-Obermain D 1",
       quelleUrl:
         "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-d-1/011MIEFB10000000VTVG0001VTR8C1K7",
+      heimspieleAmAltenPostweg: true,
     },
     {
       teamPermanentId: "0312I6CRGC000000VS5489BSVSCPI5U4",
