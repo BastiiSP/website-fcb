@@ -88,9 +88,8 @@ export default async function MannschaftenPage() {
           jeweilige Marke ist. */}
       <TeamGrid teams={eigeneTeams} className="mt-8" />
 
-      {/* Tabelle & Spiele: Auswahl Verein → Mannschaft; Teams ohne BFV-Daten
-          (aktuell die Jugend) zeigen einen Hinweis statt einer Daten-Card.
-          Die Sektion entscheidet selbst, ob sie zum Auftritt passt. */}
+      {/* Tabelle & Spiele: Die Sektion lädt nur Teams des aktuellen Trägers;
+          Mehrfachmeldungen einer Altersklasse werden dort separat auswählbar. */}
       <SpielbetriebSection />
 
       {/* Abschluss-CTA – bewusst nur ein primary auf der Seite */}

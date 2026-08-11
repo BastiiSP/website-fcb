@@ -16,6 +16,8 @@ import type { Spiel, SpielbetriebDaten } from "@/lib/bfvTypes";
 interface SpielbetriebCardProps {
   team: Team;
   daten: SpielbetriebDaten;
+  /** Nur Mehrfachgruppen überschreiben den Altersklassennamen mit dem BFV-Namen. */
+  anzeigename?: string;
 }
 
 /**
@@ -100,9 +102,14 @@ function SpielZeile({ spiel }: { spiel: Spiel }) {
   );
 }
 
-export default function SpielbetriebCard({ team, daten }: SpielbetriebCardProps) {
+export default function SpielbetriebCard({
+  team,
+  daten,
+  anzeigename,
+}: SpielbetriebCardProps) {
   const accent = getTeamAccent(team.traeger);
   const reduceMotion = useReducedMotion();
+  const titel = anzeigename ?? team.name;
 
   const hatTabelle = daten.tabelle.length > 0;
   const hatNaechste = daten.naechsteSpiele.length > 0;
@@ -124,7 +131,7 @@ export default function SpielbetriebCard({ team, daten }: SpielbetriebCardProps)
           <IconBadge icon={Trophy} accent={accent.cardAccent} size="md" />
           <div>
             <h3 className="font-oswald text-xl font-semibold uppercase tracking-wide text-fcb-text">
-              {team.name}
+              {titel}
             </h3>
             <p className="mt-0.5 font-inter text-sm text-fcb-muted">{daten.ligaName}</p>
           </div>
@@ -143,7 +150,7 @@ export default function SpielbetriebCard({ team, daten }: SpielbetriebCardProps)
               <div className="mt-2 overflow-x-auto">
                 <table className="w-full min-w-[420px] border-collapse font-inter text-sm">
                   <caption className="sr-only">
-                    Tabelle der {daten.ligaName} mit {team.name}
+                    Tabelle der {daten.ligaName} mit {titel}
                   </caption>
                   <thead>
                     <tr className="border-b border-fcb-border text-left text-xs uppercase tracking-wide text-fcb-muted">

@@ -10,17 +10,17 @@ import {
   type Team,
   type Traeger,
 } from "@/lib/teams";
-import type { SpielbetriebDaten } from "@/lib/bfvTypes";
+import type { SpielbetriebErgebnis } from "@/lib/bfv";
 
 // Zweistufige Auswahl für den Spielbetrieb: erst Verein (FCB/JFG), dann
-// Mannschaft – erst danach erscheint die Daten-Card. So bleibt die Seite
-// übersichtlich, wenn künftig auch Jugend-Teams BFV-Daten bekommen.
+// Altersklasse – erst danach erscheint die Daten-Card. Altersklassen mit zwei
+// BFV-Mannschaften erhalten eine zusätzliche, klar beschriftete Unterauswahl.
 // Mannschaften ohne Daten zeigen einen dezenten Info-Banner statt einer Card.
 
 /** Ein Team samt seiner (evtl. fehlenden) BFV-Daten – kommt aus der Server-Sektion. */
 export interface SpielbetriebEintrag {
   team: Team;
-  daten: SpielbetriebDaten | null;
+  daten: SpielbetriebErgebnis;
 }
 
 interface SpielbetriebExplorerProps {
@@ -45,10 +45,19 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
 
   const [traeger, setTraeger] = useState<Traeger>(startTraeger);
   const [teamId, setTeamId] = useState<string>(() => erstesTeam(startTraeger));
+  const [bfvTeamIndex, setBfvTeamIndex] = useState(0);
 
   const teamsDesTraegers = eintraege.filter((e) => e.team.traeger === traeger);
   const auswahl = eintraege.find((e) => e.team.id === teamId);
   const accent = getTeamAccent(traeger);
+  const mehrfachTeams =
+    auswahl && Array.isArray(auswahl.daten) ? auswahl.daten : null;
+  const mehrfachAuswahl =
+    mehrfachTeams?.[bfvTeamIndex] ?? mehrfachTeams?.[0] ?? null;
+  const aktiveDaten = mehrfachTeams
+    ? mehrfachAuswahl?.daten ?? null
+    : auswahl?.daten ?? null;
+  const kartenTitel = mehrfachAuswahl?.anzeigename;
 
   // Vereinswechsel wählt automatisch die erste Mannschaft des Trägers,
   // damit nie eine Mannschaft des anderen Vereins "aktiv" hängen bleibt.
@@ -56,6 +65,14 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
     if (neu === traeger) return;
     setTraeger(neu);
     setTeamId(erstesTeam(neu));
+    setBfvTeamIndex(0);
+  };
+
+  // Beim Wechsel der Altersklasse beginnt eine mögliche Unterauswahl immer
+  // beim ersten BFV-Team, damit kein Index der vorherigen Gruppe hängen bleibt.
+  const wechsleTeam = (neu: string) => {
+    setTeamId(neu);
+    setBfvTeamIndex(0);
   };
 
   return (
@@ -106,7 +123,7 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
               key={team.id}
               type="button"
               aria-pressed={aktiv}
-              onClick={() => setTeamId(team.id)}
+              onClick={() => wechsleTeam(team.id)}
               // Volle Klassen-Literale (Tailwind-Scanner) – kein String-Bau.
               className={`rounded-full border px-3.5 py-1.5 font-inter text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent ${
                 aktiv
@@ -122,24 +139,60 @@ export default function SpielbetriebExplorer({ eintraege }: SpielbetriebExplorer
         })}
       </div>
 
-      {/* Stufe 3: Daten der gewählten Mannschaft – sanfter Wechsel zwischen Teams */}
+      {/* Nur Mehrfachgruppen brauchen eine dritte Auswahlstufe. Auf Mobilgeräten
+          stehen die vollständigen BFV-Namen untereinander statt in einer
+          horizontal scrollenden oder abgeschnittenen Leiste. */}
+      {mehrfachTeams && mehrfachTeams.length > 1 && (
+        <div
+          role="group"
+          aria-label="BFV-Mannschaft wählen"
+          className="grid gap-2 sm:flex sm:flex-wrap"
+        >
+          {mehrfachTeams.map(({ anzeigename }, index) => {
+            const aktiv = index === bfvTeamIndex;
+            return (
+              <button
+                key={anzeigename}
+                type="button"
+                aria-pressed={aktiv}
+                onClick={() => setBfvTeamIndex(index)}
+                className={`w-full whitespace-normal rounded-full border px-3.5 py-2 text-left font-inter text-sm transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-fcb-accent sm:w-auto sm:py-1.5 ${
+                  aktiv
+                    ? `${accent.badge} font-medium`
+                    : traeger === "fcb"
+                      ? "border-fcb-border text-fcb-muted hover:border-fcb-accent/40 hover:text-fcb-text"
+                      : "border-fcb-border text-fcb-muted hover:border-fcb-red/40 hover:text-fcb-text"
+                }`}
+              >
+                {anzeigename}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Daten der gewählten BFV-Mannschaft – sanfter Wechsel zwischen Teams */}
       <AnimatePresence mode="wait" initial={false}>
         <motion.div
-          key={teamId}
+          key={`${teamId}-${bfvTeamIndex}`}
           initial={reduceMotion ? false : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={reduceMotion ? undefined : { opacity: 0, y: -8 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
         >
           {auswahl &&
-            (auswahl.daten ? (
-              <SpielbetriebCard team={auswahl.team} daten={auswahl.daten} />
+            (aktiveDaten && !Array.isArray(aktiveDaten) ? (
+              <SpielbetriebCard
+                team={auswahl.team}
+                daten={aktiveDaten}
+                anzeigename={kartenTitel}
+              />
             ) : (
-              // Kein kaputter/leerer Bereich: Teams ohne BFV-Daten (aktuell die
-              // Jugend) bekommen einen dezenten Hinweis statt einer Daten-Card.
+              // Auch ein einzelner fehlgeschlagener Abruf innerhalb einer
+              // Mehrfachgruppe bleibt über seinen BFV-Namen nachvollziehbar.
               <Banner
                 variant="info"
-                message={`Für die ${auswahl.team.name} liegen beim BFV noch keine Spieldaten vor. Sobald der Spielplan online ist, erscheinen Tabelle und Termine hier automatisch.`}
+                message={`Für ${kartenTitel ?? `die ${auswahl.team.name}`} liegen beim BFV noch keine Spieldaten vor. Sobald der Spielplan online ist, erscheinen Tabelle und Termine hier automatisch.`}
               />
             ))}
         </motion.div>

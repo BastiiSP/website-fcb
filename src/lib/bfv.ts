@@ -19,26 +19,64 @@ export interface BfvTeamConfig {
   quelleUrl: string;
   /** Optionaler Fallback, falls der BFV kurzfristig keinen Liganamen liefert. */
   ligaNameFallback?: string;
+  /**
+   * Trägt diese Mannschaft ihre Heimspiele auf der FCB-Anlage am Alten Postweg
+   * aus? Nur dann blockiert ein Heimspiel den Sportheim-Belegungskalender
+   * (siehe `getHeimspiele`).
+   *
+   * Muss explizit gepflegt werden, weil die BFV-Matches-API KEINEN Spielort
+   * liefert (verifiziert: nur Teams, Anstoß, Ergebnis – kein Venue-Feld). Bei
+   * der JFG ist das entscheidend: sie ist eine Fördergemeinschaft aus FCB,
+   * SG Roth-Main Mainroth und 1. FC Redwitz, ihre "Heimspiele" finden also
+   * auf drei verschiedenen Anlagen statt. Ohne Flag würden Spiele in Mainroth
+   * oder Redwitz das Burgkunstadter Sportheim fälschlich sperren.
+   *
+   * Default (nicht gesetzt) = sperrt nicht. Bewusst fail-open, damit ein
+   * vergessenes Flag höchstens eine fehlende Sperre bedeutet – die der
+   * Vorstand beim Freigeben der Anfrage sieht – statt einen blockierten
+   * Termin, den nie jemand hinterfragt.
+   */
+  heimspieleAmAltenPostweg?: boolean;
 }
 
+/** Eine Altersklasse verweist auf eine oder mehrere eigenständige BFV-Mannschaften. */
+export type BfvTeamConfigEintrag = BfvTeamConfig | BfvTeamConfig[];
+
 /**
- * BFV-Konfiguration für die FCB-Herren.
+ * Mehrfachteams brauchen ihren offiziellen BFV-Namen neben dem Datenpaket,
+ * damit API und UI die Mannschaften einer Altersklasse eindeutig trennen.
+ */
+export interface SpielbetriebMehrfachEintrag {
+  anzeigename: string;
+  daten: SpielbetriebDaten | null;
+}
+
+/** Einzelteams behalten ihren bisherigen Rückgabevertrag unverändert. */
+export type SpielbetriebErgebnis =
+  | SpielbetriebDaten
+  | SpielbetriebMehrfachEintrag[]
+  | null;
+
+/**
+ * BFV-Konfiguration nach den Team-IDs aus `src/lib/teams.ts`.
  *
  * Weitere Teams ergänzen:
  * 1. Auf bfv.de die öffentliche Mannschaftsseite öffnen.
  * 2. Die `teamPermanentId` aus dem letzten URL-Segment übernehmen.
  * 3. Einen Eintrag mit Team-ID aus `src/lib/teams.ts`, Anzeigename und
- *    Quellen-URL ergänzen.
+ *    Quellen-URL ergänzen. Bei mehreren BFV-Mannschaften derselben
+ *    Altersklasse wird stattdessen ein Array hinterlegt.
  * 4. Live prüfen: `/team/{teamPermanentId}/matches` muss `data.team.compoundId`
  *    liefern; die Tabelle kommt anschließend automatisch über diese ID.
  */
-export const BFV_TEAMS: Record<string, BfvTeamConfig> = {
+export const BFV_TEAMS: Record<string, BfvTeamConfigEintrag> = {
   "herren-1": {
     teamPermanentId: "016PAE5PRO000000VV0AG811VTE5EA5R",
     anzeigename: "1. Mannschaft",
     quelleUrl:
       "https://www.bfv.de/mannschaften/1-fc-burgkunstadt/016PAE5PRO000000VV0AG811VTE5EA5R",
     ligaNameFallback: "Kreisliga 2",
+    heimspieleAmAltenPostweg: true,
   },
   "herren-2": {
     teamPermanentId: "01SBAIPT94000000VS548984VTL2SVNK",
@@ -46,6 +84,7 @@ export const BFV_TEAMS: Record<string, BfvTeamConfig> = {
     quelleUrl:
       "https://www.bfv.de/mannschaften/1fc-burgkunstadt-2/01SBAIPT94000000VS548984VTL2SVNK",
     ligaNameFallback: "Kreisklasse 2",
+    heimspieleAmAltenPostweg: true,
   },
   "f-junioren": {
     teamPermanentId: "011MIA4V50000000VTVG0001VTR8C1K7",
@@ -53,8 +92,74 @@ export const BFV_TEAMS: Record<string, BfvTeamConfig> = {
     quelleUrl:
       "https://www.bfv.de/mannschaften/fc-burgkunstadt/011MIA4V50000000VTVG0001VTR8C1K7",
     ligaNameFallback: "Kreisliga Kinderfußball",
+    heimspieleAmAltenPostweg: true,
   },
+  // --- JFG Kunstadt-Obermain ---
+  // A-, B- und D-Junioren sind ab Saison 26/27 mit je zwei eigenständigen
+  // Mannschaften gemeldet, deshalb Arrays; die C-Junioren bleiben einzeln.
+  // Anzeigenamen exakt so, wie der BFV sie führt (gegen die Widget-API
+  // verifiziert) – bewusst nicht vereinheitlicht, damit Eltern die Mannschaft
+  // auf bfv.de wiederfinden.
+  //
+  // OFFEN: `heimspieleAmAltenPostweg` ist hier bei keinem Team gesetzt, weil
+  // die JFG auf drei Anlagen spielt (FCB, Mainroth, Redwitz) und die BFV-API
+  // keinen Spielort liefert. Bei den JFG-Teams, die tatsächlich in
+  // Burgkunstadt antreten, muss das Flag ergänzt werden – sonst fehlt für
+  // deren Heimspiele die Sperre im Sportheim-Belegungskalender.
+  "a-junioren": [
+    {
+      teamPermanentId: "011MICDMU4000000VTVG0001VTR8C1K7",
+      anzeigename: "JFG Kunstadt-Obermain A1",
+      quelleUrl:
+        "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-a1/011MICDMU4000000VTVG0001VTR8C1K7",
+    },
+    {
+      teamPermanentId: "0312HJ55NC000000VS5489BSVSCPI5U4",
+      anzeigename: "JFG Kunstadt-Obermain A2",
+      quelleUrl:
+        "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-a2/0312HJ55NC000000VS5489BSVSCPI5U4",
+    },
+  ],
+  "b-junioren": [
+    {
+      teamPermanentId: "011MIAAUCO000000VTVG0001VTR8C1K7",
+      anzeigename: "JFG Kunstadt-Obermain B1",
+      quelleUrl:
+        "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-b1/011MIAAUCO000000VTVG0001VTR8C1K7",
+    },
+    {
+      teamPermanentId: "02Q1986GHK000000VS5489B1VVDHMN8Q",
+      anzeigename: "JFG Kunstadt-Obermain 2 (9er flex)",
+      quelleUrl:
+        "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-2-9er-flex/02Q1986GHK000000VS5489B1VVDHMN8Q",
+    },
+  ],
+  "c-junioren": {
+    teamPermanentId: "011MIATUBK000000VTVG0001VTR8C1K7",
+    anzeigename: "JFG Kunstadt-Obermain",
+    quelleUrl:
+      "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain/011MIATUBK000000VTVG0001VTR8C1K7",
+  },
+  "d-junioren": [
+    {
+      teamPermanentId: "011MIEFB10000000VTVG0001VTR8C1K7",
+      anzeigename: "JFG Kunstadt-Obermain D 1",
+      quelleUrl:
+        "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-d-1/011MIEFB10000000VTVG0001VTR8C1K7",
+    },
+    {
+      teamPermanentId: "0312I6CRGC000000VS5489BSVSCPI5U4",
+      anzeigename: "JFG Kunstadt-Obermain D 2",
+      quelleUrl:
+        "https://www.bfv.de/mannschaften/jfg-kunstadt-obermain-d-2/0312I6CRGC000000VS5489BSVSCPI5U4",
+    },
+  ],
 };
+
+/** Normalisiert nur intern, damit die öffentliche Konfiguration lesbar bleibt. */
+function bfvTeamConfigs(eintrag: BfvTeamConfigEintrag): BfvTeamConfig[] {
+  return Array.isArray(eintrag) ? eintrag : [eintrag];
+}
 
 interface BfvWidgetResponse<TData> {
   state: number;
@@ -292,7 +397,17 @@ async function fetchBfvJson<TData>(
       return null;
     }
 
-    return (await res.json()) as BfvWidgetResponse<TData>;
+    const json = (await res.json()) as BfvWidgetResponse<TData> | null;
+
+    // Der BFV antwortet auch dann mit HTTP 200, wenn es schlicht keinen Inhalt
+    // gibt – dann steht `data: null` im Body. Das passiert regulär, nicht nur
+    // im Fehlerfall: Kinderfußball-Staffeln (F-Junioren) haben per Definition
+    // keine Tabelle. Ohne diesen Guard liefe jeder Aufrufer in ein
+    // `Cannot read properties of null` und riss die ganze Seite mit.
+    // Für Aufrufer ist "kein Inhalt" dasselbe wie "nicht abrufbar" → null.
+    if (!json?.data) return null;
+
+    return json;
   } catch (err) {
     console.error("[bfv] Unerwarteter Fehler beim BFV-Abruf:", err);
     return null;
@@ -300,7 +415,7 @@ async function fetchBfvJson<TData>(
 }
 
 /**
- * Ein Heimspiel der Herrenmannschaften für den Sportheim-Belegungskalender.
+ * Ein Heimspiel einer konfigurierten Mannschaft für den Belegungskalender.
  * Bewusst schlank: nur was der öffentliche Kalender anzeigen muss.
  */
 export interface Heimspiel {
@@ -313,15 +428,25 @@ export interface Heimspiel {
 }
 
 /**
- * Lädt alle Heimspiele der konfigurierten BFV-Teams (für die Sportheim-Seite).
+ * Lädt die Heimspiele für den Sportheim-Belegungskalender.
  *
  * Heimspiel-Erkennung über `homeTeamPermanentId === teamPermanentId` – Namens-
  * vergleiche wären fragil (BFV schreibt "1.FC Burgkunstadt" uneinheitlich).
  * Fehler einzelner Teams brechen nicht den gesamten Abruf: fetchBfvJson liefert
  * dann null und das Team fällt still aus der Liste.
+ *
+ * Bewusst NICHT alle konfigurierten Teams: gesperrt wird nur, was das Sportheim
+ * am Alten Postweg wirklich belegt (Flag `heimspieleAmAltenPostweg`). Die
+ * JFG-Mannschaften stehen zwar in BFV_TEAMS, spielen ihre Heimspiele aber je
+ * nach Team auch in Mainroth oder Redwitz – die pauschal zu sperren hätte
+ * allein in Saison 26/27 rund 45 Termine grundlos blockiert.
  */
 export async function getHeimspiele(): Promise<Heimspiel[]> {
-  const teams = Object.values(BFV_TEAMS);
+  // Mehrfachteams werden wie eigenständige BFV-Mannschaften abgefragt, weil
+  // Heimspiel-Erkennung und Anzeigename immer an ihrer permanenten ID hängen.
+  const teams = Object.values(BFV_TEAMS)
+    .flatMap(bfvTeamConfigs)
+    .filter((config) => config.heimspieleAmAltenPostweg);
 
   const proTeam = await Promise.all(
     teams.map(async (config) => {
@@ -351,18 +476,15 @@ export async function getHeimspiele(): Promise<Heimspiel[]> {
 }
 
 /**
- * Lädt Tabelle und Spiele eines konfigurierten BFV-Teams.
+ * Lädt Tabelle und Spiele einer einzelnen BFV-Konfiguration.
  *
  * Der Tabellen-Endpunkt hängt an `compoundId`, nicht an `teamPermanentId`.
  * Deshalb ist der Matches-Abruf der erste Pflichtschritt; ohne ihn kennen wir
  * die korrekte aktuelle Staffel nicht und geben kontrolliert `null` zurück.
  */
-export async function getSpielbetrieb(
-  teamId: string,
+async function getSpielbetriebFuerConfig(
+  config: BfvTeamConfig,
 ): Promise<SpielbetriebDaten | null> {
-  const config = BFV_TEAMS[teamId];
-  if (!config) return null;
-
   const matchesUrl = `${BFV_WIDGET_API_BASE}/team/${config.teamPermanentId}/matches`;
   const matchesResponse = await fetchBfvJson<BfvMatchesData>(matchesUrl);
 
@@ -395,4 +517,31 @@ export async function getSpielbetrieb(
     abgerufenAm: new Date().toISOString(),
     quelleUrl: config.quelleUrl,
   };
+}
+
+/**
+ * Lädt den Spielbetrieb einer Altersklasse. Einzelteams liefern weiterhin
+ * exakt ein Datenobjekt; nur echte Mehrfachkonfigurationen liefern eine
+ * beschriftete Liste, damit bestehende FCB-Aufrufer unverändert bleiben.
+ */
+export async function getSpielbetrieb(
+  teamId: string,
+): Promise<SpielbetriebErgebnis> {
+  const eintrag = BFV_TEAMS[teamId];
+  if (!eintrag) return null;
+
+  if (!Array.isArray(eintrag)) {
+    return getSpielbetriebFuerConfig(eintrag);
+  }
+
+  const teams = await Promise.all(
+    eintrag.map(async (config): Promise<SpielbetriebMehrfachEintrag> => ({
+      anzeigename: config.anzeigename,
+      daten: await getSpielbetriebFuerConfig(config),
+    })),
+  );
+
+  // Wie beim Einzelteam signalisiert `null`, dass aktuell überhaupt keine
+  // BFV-Daten abrufbar sind; einzelne Ausfälle bleiben separat auswählbar.
+  return teams.some(({ daten }) => daten !== null) ? teams : null;
 }
