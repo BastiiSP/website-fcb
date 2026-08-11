@@ -47,6 +47,13 @@ export const BFV_TEAMS: Record<string, BfvTeamConfig> = {
       "https://www.bfv.de/mannschaften/1fc-burgkunstadt-2/01SBAIPT94000000VS548984VTL2SVNK",
     ligaNameFallback: "Kreisklasse 2",
   },
+  "f-junioren": {
+    teamPermanentId: "011MIA4V50000000VTVG0001VTR8C1K7",
+    anzeigename: "F-Junioren",
+    quelleUrl:
+      "https://www.bfv.de/mannschaften/fc-burgkunstadt/011MIA4V50000000VTVG0001VTR8C1K7",
+    ligaNameFallback: "Kreisliga Kinderfußball",
+  },
 };
 
 interface BfvWidgetResponse<TData> {
