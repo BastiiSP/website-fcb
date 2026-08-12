@@ -87,9 +87,23 @@ export default function BenutzerListe({ eigeneRolle }: BenutzerListeProps) {
   const ablehnen = async (userId: string, name: string) => {
     if (!confirm(`Nutzer ${name} wirklich ablehnen und Konto löschen?`)) return;
 
+    // Access-Token mitschicken, damit die Route serverseitig prüfen kann,
+    // wer den Aufruf macht (Sicherheitsfix 2026-08-12).
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      setFehler("Nicht angemeldet – bitte neu einloggen.");
+      return;
+    }
+
     const res = await fetch("/api/benutzer-ablehnen", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${session.access_token}`,
+      },
       body: JSON.stringify({ userId }),
     });
 
