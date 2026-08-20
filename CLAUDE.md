@@ -5,10 +5,10 @@
 Website des 1. FC 1911 Burgkunstadt – ein echter Fußballverein aus Burgkunstadt.
 
 - **Live-URL**: https://www.fcbuku.de
-- **GitHub**: https://github.com/BastiiSP/website-fcb
+- **GitHub**: https://github.com/BastiiSP/fcb-website
 - **Deployment**: Vercel (auto-deploy bei Push auf `main`)
 - **Supabase Project Ref**: jktvmckqfklfziszfsxf
-- **Lokaler Pfad**: `~/Workspace/website-fcb/`
+- **Lokaler Pfad**: `~/Workspace/fcb-website/`
 
 ## Tech Stack
 
@@ -238,7 +238,7 @@ Der Supabase MCP-Server ist eingerichtet. Nutze ihn für:
 ## Lokale Entwicklung
 
 ```bash
-cd ~/Workspace/website-fcb
+cd ~/Workspace/fcb-website
 npm run dev        # Entwicklungsserver auf localhost:3000
 npm run build      # Production Build – schlägt LOKAL oft fehl (s. Deployment), Vercel baut sauber
 npm run lint       # ESLint
@@ -272,7 +272,7 @@ git push
 
 Alle Designentscheidungen wurden gemeinsam mit Basti besprochen und sind verbindlich.
 Bei neuen Komponenten und Änderungen **immer** diese Spec einhalten.
-Die vollständige Designdokumentation liegt in der Obsidian-Projektdatei `02 Projekte/Website FCB.md`.
+Die vollständige Designdokumentation liegt in der Obsidian-Projektdatei `02 Projekte/FCB Website.md`.
 
 > **Status:** Die Design-Migration ist abgeschlossen (Design-System + Dual-Theme live seit
 > 2026-06-19). **Alle Routen** laufen auf den semantischen `fcb.*`-Tokens und unterstützen

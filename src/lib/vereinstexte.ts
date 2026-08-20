@@ -120,7 +120,7 @@ const VEREIN_FCB: VereinsSeitenTexte = {
 
 // JFG-Texte: Trägervereine, Gründungsjahr und Jugendleitung sind echte
 // Angaben (von Basti bestätigt bzw. recherchiert, siehe Verlauf in
-// 02 Projekte/Website FCB.md). Exakte Amtsbezeichnungen der Jugendleitung
+// 02 Projekte/FCB Website.md). Exakte Amtsbezeichnungen der Jugendleitung
 // waren nicht bekannt – bewusst allgemein gehalten ("Organisation"/"Sport")
 // statt eine falsche offizielle Bezeichnung zu erfinden.
 const VEREIN_JFG: VereinsSeitenTexte = {
